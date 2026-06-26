@@ -2302,17 +2302,17 @@
     function openMakeModal() { document.getElementById('make-modal').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     
-    function gainExp(amt) {
-        if(gameState.level >= 12) return;
-        gameState.exp += amt;
-        while(gameState.exp >= gameState.maxExp && gameState.level < 12) {
-            gameState.level++; gameState.exp -= gameState.maxExp; gameState.maxExp = Math.floor(gameState.maxExp * 1.8);
-            logMessage(`🎉 レベルアップ！ Lv.${gameState.level}`, true);
-        }
-        if(gameState.level >= 12) { gameState.level = 12; gameState.exp = gameState.maxExp; }
-        updateUI(); saveActiveGame();
-    }
+    // ボタン類のバインド
+    document.getElementById('btn-shop').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中は使えません！'); } playSE('click'); openShopModal(); };
+    document.getElementById('btn-bag').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中は使えません！'); } playSE('click'); openBagModal(); };
+    document.getElementById('close-shop').onclick = () => { playSE('click'); closeModal('shop-modal'); };
+    document.getElementById('close-bag').onclick = () => { playSE('click'); closeModal('bag-modal'); };
+    document.getElementById('close-bg-modal').onclick = () => { playSE('click'); closeModal('bg-modal'); };
+    document.getElementById('close-make').onclick = () => { playSE('click'); closeModal('make-modal'); updateUI(); saveActiveGame(); };
+    document.getElementById('close-minigame').onclick = () => { playSE('click'); closeModal('minigame-modal'); };
 
+    // スタート
+    document.getElementById('btn-start-game').onclick = () => {
     document.getElementById('drawer-notice-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; renderNotices(); document.getElementById('notice-modal').style.display = 'flex'; document.getElementById('notice-badge').style.display = 'none'; };
     document.getElementById('drawer-transfer-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('trans-my-id').innerText = gameState.friendId; document.getElementById('trans-my-pass').innerText = gameState.password || "1234"; document.getElementById('transfer-modal').style.display = 'flex'; };
     document.getElementById('close-transfer-modal').onclick = () => { playSE('click'); closeModal('transfer-modal'); };
