@@ -507,7 +507,45 @@
     function saveActiveGame(showFlash = false) {
         let slots = getGlobalSaves(); slots[currentSlotIndex] = gameState;
         saveAllSlots(slots); registerToAccountPool(gameState);
+        cloudSavePlayer(gameState); // 🌐 オンライン同期（下で設定していない場合は何もしない／既存のローカル保存は無条件で実行される）
         if (showFlash) logMessage("💾 セーブデータを保存しました！", true);
+    }
+    // ==========================================
+
+    // ==========================================
+    // --- 🌐 オンライン同期設定（フレンド・引き継ぎ機能専用／上のセーブ機構とは無関係・触れていません） ---
+    // ==========================================
+    // 下のFIREBASE_DB_URLに、自分のFirebase Realtime DatabaseのURLを貼ってください。
+    // 例: const FIREBASE_DB_URL = "https://my-project-12345-default-rtdb.asia-southeast1.firebasedatabase.app";
+    // 空文字のままなら、今までと同じ「この端末の中だけで完結する」動作になります（壊れません）。
+    const FIREBASE_DB_URL = "https://daikichi-67e67-default-rtdb.firebaseio.com";
+
+    async function cloudGetPlayer(friendId) {
+        if (!FIREBASE_DB_URL) return null;
+        try {
+            const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}.json`);
+            if (!res.ok) return null;
+            return (await res.json()) || null;
+        } catch (e) { return null; } // オフライン・未設定時はnullを返し、呼び出し側がローカルにフォールバックする
+    }
+
+    async function cloudSavePlayer(state) {
+        if (!FIREBASE_DB_URL) return;
+        try {
+            await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(state.friendId)}.json`, {
+                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state)
+            });
+        } catch (e) { /* オフライン時は無視（ローカル保存は既に完了している） */ }
+    }
+
+    async function cloudUpdatePlayerField(friendId, partialObj) {
+        if (!FIREBASE_DB_URL) return false;
+        try {
+            const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}.json`, {
+                method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(partialObj)
+            });
+            return res.ok;
+        } catch (e) { return false; }
     }
     // ==========================================
 
@@ -620,11 +658,17 @@
     document.getElementById('title-load-menu-btn').onclick = () => { document.getElementById('title-start-new-btn').style.display = 'none'; document.getElementById('title-load-menu-btn').style.display = 'none'; document.getElementById('title-load-pane').style.display = 'block'; renderSaveSlots(); };
     document.getElementById('btn-back-to-title').onclick = initTitleScreen;
 
-    document.getElementById('btn-title-execute-transfer').onclick = () => {
+    document.getElementById('btn-title-execute-transfer').onclick = async () => {
         const idInput = document.getElementById('title-transfer-id').value.trim(); const passInput = document.getElementById('title-transfer-pass').value.trim();
         if(!idInput || !passInput) return alert("すべて入力してください");
-        const pool = getAccountPool(); const targetAcc = pool.find(acc => acc.friendId === idInput);
-        if(!targetAcc) { playSE('error'); return alert("❌ 指定されたIDは見つかりません。"); }
+
+        const transferBtn = document.getElementById('btn-title-execute-transfer');
+        transferBtn.disabled = true; transferBtn.innerText = "確認中…";
+        let targetAcc = await cloudGetPlayer(idInput); // 🌐 まずオンラインを確認（他の端末のデータもここで見つかる）
+        if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === idInput); } // 見つからなければ同一端末内を確認
+        transferBtn.disabled = false; transferBtn.innerText = "この端末に同期する";
+
+        if(!targetAcc) { playSE('error'); return alert("❌ 指定されたIDは見つかりません。\n（オンライン同期を設定していない場合、別の端末のデータは引き継げません）"); }
         if(targetAcc.password !== passInput) { playSE('error'); return alert("❌ パスワードが一致しません。"); }
         tempTransferData = migrateData(JSON.parse(JSON.stringify(targetAcc)));
         document.getElementById('transfer-slot-modal').style.display = 'flex';
@@ -823,12 +867,17 @@
     document.getElementById('drawer-friend-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('my-friend-id').innerText = gameState.friendId; renderFriendList(); document.getElementById('friend-modal').style.display = 'flex'; };
     document.getElementById('close-friend').onclick = () => { playSE('click'); closeModal('friend-modal'); };
     
-    document.getElementById('btn-add-friend').onclick = () => {
+    document.getElementById('btn-add-friend').onclick = async () => {
         playSE('click'); const fid = document.getElementById('friend-id-input').value.trim();
         if(!fid || fid === gameState.friendId || gameState.friends.some(f => f.id === fid)) { playSE('error'); return alert("エラー：不正なID、または追加済みです。"); }
-        
-        const pool = getAccountPool(); const targetAcc = pool.find(acc => acc.friendId === fid);
-        if(!targetAcc) { playSE('error'); return alert("見つかりません"); }
+
+        const addFriendBtn = document.getElementById('btn-add-friend');
+        addFriendBtn.disabled = true; addFriendBtn.innerText = "検索中…";
+        let targetAcc = await cloudGetPlayer(fid); // 🌐 まずオンラインを確認（他の端末の友達もここで見つかる）
+        if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === fid); } // 見つからなければ同一端末内を確認
+        addFriendBtn.disabled = false; addFriendBtn.innerText = "検索追加";
+
+        if(!targetAcc) { playSE('error'); return alert("見つかりません。IDが正しいか、相手が一度セーブ済みか確認してください。"); }
 
         if(confirm(`「${targetAcc.ownerName} の ${targetAcc.name}」さんにフレンド申請しますか？`)) {
             gameState.friends.push({ id: targetAcc.friendId, name: targetAcc.name, ownerName: targetAcc.ownerName, level: targetAcc.level, bg: targetAcc.appearance?.bgClass, app: targetAcc.appearance });
@@ -865,12 +914,13 @@
     
     let targetVisitFriendData = null;
     let targetVisitFriendSave = null;
-    window.openFriendVisit = function(fid) {
+    window.openFriendVisit = async function(fid) {
         playSE('click');
         targetVisitFriendData = gameState.friends.find(f => f.id === fid);
         if(!targetVisitFriendData) return;
         
-        const pool = getAccountPool(); targetVisitFriendSave = pool.find(acc => acc.friendId === fid);
+        targetVisitFriendSave = await cloudGetPlayer(fid); // 🌐 まずオンラインの最新データを確認
+        if(!targetVisitFriendSave) { const pool = getAccountPool(); targetVisitFriendSave = pool.find(acc => acc.friendId === fid); } // なければ同一端末内
         document.getElementById('visit-f-name').innerText = `${targetVisitFriendData.ownerName} さんのお家`;
         
         const amIFavorited = targetVisitFriendSave && targetVisitFriendSave.favorites && targetVisitFriendSave.favorites.includes(gameState.friendId);
@@ -885,7 +935,7 @@
     };
     document.getElementById('close-visit-modal').onclick = () => { playSE('click'); closeModal('friend-visit-modal'); };
 
-    document.getElementById('btn-send-money').onclick = () => {
+    document.getElementById('btn-send-money').onclick = async () => {
         playSE('click');
         if(gameState.coins < 100) { playSE('error'); return alert("お金が足りません (100コイン必要です)"); }
         gameState.coins -= 100;
@@ -895,6 +945,9 @@
             pool[targetIndex].coins += 100;
             localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); 
         }
+        const cloudFriend = await cloudGetPlayer(targetVisitFriendData.id); // 🌐 相手が別の端末にいてもここで反映される
+        if(cloudFriend) { await cloudUpdatePlayerField(targetVisitFriendData.id, { coins: (cloudFriend.coins || 0) + 100 }); }
+
         playSE('coin'); updateUI(); saveActiveGame(); alert("ベストフレンドにお小遣いを100コイン送りました！");
     };
 
