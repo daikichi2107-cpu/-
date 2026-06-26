@@ -6,16 +6,41 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ウパ育成">
-    <link rel="apple-touch-icon" href="icon.png">
-    <title>悩み解決！育成ゲーム Ultimate</title>
+    <title>悩み解決！育成ゲーム</title>
     <style>
-        /* 基本スタイル設定 (少し大きく、縦比率を圧縮) */
-        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: rgba(0,0,0,0) !important; -webkit-user-select: none !important; user-select: none !important; }
-        body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #2b2b2b; color: #2b2b2b; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-size: 16px; }
+        /* タッチ・クリック感度の最適化と基本スタイル */
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: rgba(0,0,0,0) !important; }
         
-        /* 縦比率を少し縮め、画面を少し大きく */
-        .game-container { width: 100%; max-width: 540px; height: 100vh; max-height: 85vh; background-color: #ffffff; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); border-radius: 12px; overflow: hidden; }
-        @media (min-width: 768px) { .game-container { border-radius: 24px; } }
+        body { 
+            margin: 0; padding: 0; 
+            font-family: 'Helvetica Neue', Arial, sans-serif; 
+            background-color: #1a1a1a; color: #2b2b2b; 
+            display: flex; justify-content: center; align-items: center; 
+            min-height: 100vh; overflow: hidden; font-size: 16px; 
+        }
+        
+        /* 誤選択を防止しつつ、入力フォームの選択は許可する */
+        body, .game-container, .aquarium, .char-wrapper, .upa-character, button, .menu-btn, .option-btn, .drawer-btn { 
+            -webkit-user-select: none !important; 
+            user-select: none !important; 
+        }
+        input, textarea { 
+            -webkit-user-select: text !important; 
+            user-select: text !important; 
+        }
+        
+        .game-container { 
+            width: 100%; max-width: 540px; 
+            height: 100vh; max-height: 90vh; 
+            background-color: #ffffff; 
+            box-shadow: 0 0 40px rgba(0,0,0,0.6); 
+            display: flex; flex-direction: column; 
+            position: relative; 
+            padding-top: env(safe-area-inset-top); 
+            padding-bottom: env(safe-area-inset-bottom); 
+            border-radius: 16px; overflow: hidden; 
+        }
+        @media (min-width: 768px) { .game-container { border-radius: 28px; } }
 
         /* タイトル画面 */
         .title-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e3fafc, #c5f6fa, #99e9f2); z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; overflow-y: auto; }
@@ -42,7 +67,7 @@
         .fullness-bar { background-color: #fab005; width: 100%; height: 100%; transition: width 0.4s ease; }
 
         /* 背景 */
-        .aquarium { flex-grow: 1; position: relative; overflow: hidden; touch-action: none; transition: background 0.5s ease; background-size: cover !important; background-position: center !important; }
+        .aquarium { flex-grow: 1; position: relative; overflow: hidden; touch-action: none; transition: all 0.5s ease; background-size: cover !important; background-position: center !important; }
         .bg-aquarium { background: linear-gradient(to bottom, #e3fafc, #99e9f2); }
         .bg-garden { background: linear-gradient(to bottom, #ebfbee, #b2f2bb, #d8f5a2); }
         .bg-deepsea { background: linear-gradient(to bottom, #0b1b3d, #020813); }
@@ -50,9 +75,8 @@
         .bg-sunset { background: linear-gradient(to bottom, #ff8787, #ffd8a8); }
         .bg-candy { background: linear-gradient(to bottom, #fff0f6, #ffdeeb); }
         .bg-room { background: linear-gradient(to bottom, #fff9db, #ffe066); }
-        .bg-snow { background: linear-gradient(to bottom, #f1f3f5, #ced4da); }
 
-        /* キャラクター配置・電球の同期 */
+        /* キャラクター配置 */
         .char-wrapper { position: absolute; width: 120px; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: left 0.8s linear, top 0.8s linear; cursor: pointer; z-index: 6; }
         .upa-character { width: 110px; height: 110px; position: relative; animation: swim 4s ease-in-out infinite; transition: transform 0.2s; }
         .upa-character.jump { animation: jump 0.3s ease-out; }
@@ -66,7 +90,7 @@
         @keyframes jump { 0% { transform: scale(1) translateY(0); } 50% { transform: scale(1.1) translateY(-15px); } 100% { transform: scale(1) translateY(0); } }
 
         /* 家具 */
-        .placed-furniture { position: absolute; font-size: 2.8rem; cursor: move; z-index: 4; touch-action: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .placed-furniture { position: absolute; font-size: 2.8rem; cursor: move; z-index: 4; touch-action: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); pointer-events: auto !important; }
         .placed-furniture.editing { border: 2px dashed #15aabf; background-color: rgba(21, 170, 191, 0.1); border-radius: 8px; }
         .preview-area { width: 120px; height: 130px; margin: 5px auto; position: relative; display: flex; flex-direction: column; align-items: center; }
 
@@ -74,10 +98,10 @@
         .modal, .side-drawer, .welcome-screen, .fullscreen-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
         .modal { background-color: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; }
         .fullscreen-modal { background: linear-gradient(135deg, #f8f9fa, #e9ecef); flex-direction: column; overflow-y: auto; z-index: 200; padding: 16px; color: #2b2b2b; }
-        .fullscreen-modal.dark { background: linear-gradient(135deg, #1a0b2e, #4b1d52); color: white; }
+        .fullscreen-modal.dark { background: linear-gradient(135deg, #111a2e, #070d19); color: white; }
         
         .side-drawer { background-color: rgba(0,0,0,0.5); z-index: 150; justify-content: flex-start; }
-        .drawer-content { width: 280px; height: 100%; background-color: white; box-shadow: 10px 0 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; padding: 16px 12px; animation: slideRight 0.3s ease; overflow-y: auto; }
+        .drawer-content { width: 290px; height: 100%; background-color: white; box-shadow: 10px 0 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; padding: 16px 12px; animation: slideRight 0.3s ease; overflow-y: auto; }
         @keyframes slideRight { from { transform: translateX(-100%); } to { transform: translateX(0); } }
         
         .drawer-header, .modal-header, .welcome-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 14px; text-align: center; }
@@ -118,7 +142,7 @@
         .menu-btn { background-color: #15aabf; color: white; border: none; border-radius: 14px; padding: 12px 4px; font-size: 0.9rem; font-weight: 800; text-align: center; box-shadow: 0 4px 8px rgba(21, 170, 191, 0.2); cursor: pointer; transition: opacity 0.2s; }
         .menu-btn.orange { background-color: #ff922b; }
         .menu-btn.green { background-color: #40c057; }
-        .game-log { background-color: #f1f3f5; border-radius: 10px; padding: 10px; margin-top: 8px; font-size: 0.85rem; color: #495057; min-height: 42px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; }
+        .game-log { background-color: #1a1a1a; border-radius: 10px; padding: 10px; margin-top: 8px; font-size: 0.85rem; color: #a9e34b; font-family: monospace; min-height: 42px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; overflow-y: auto; max-height: 60px; }
         .game-log.alert-flash { background-color: #fff0f6; color: #d6336c; }
 
         .char-part { display: none; }
@@ -135,7 +159,7 @@
         .game-panel { background: #fff; border-radius: 16px; padding: 20px; text-align: center; color: #2b2b2b; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
         .mg-title { font-size: 1.6rem; color: #fcc419; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); text-align: center; font-weight: 900; }
 
-        .mission-item { background: #f8f9fa; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border-left: 5px solid #ced4da; font-weight: bold; }
+        .mission-item { background: #f8f9fa; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border-left: 5px solid #ced4da; font-weight: bold; color: #2b2b2b; }
         .mission-item.completed { border-left-color: #40c057; background: #ebfbee; }
         .trophy-item { background: #fff3bf; border: 1px solid #fcc419; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: bold; color: #d9480f; }
 
@@ -143,21 +167,31 @@
         .book-spread { display: flex; width: 100%; max-height: 60vh; background: #fdf6e3; border-radius: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.2); border: 2px solid #e6ca8a; position: relative; }
         .book-spread::after { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0.05), rgba(0,0,0,0.1)); transform: translateX(-50%); }
         .book-page { flex: 1; padding: 10px; overflow-y: auto; }
-        .dict-item { background: rgba(255,255,255,0.6); border: 1px solid #e6ca8a; padding: 8px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .dict-item { background: rgba(255,255,255,0.6); border: 1px solid #e6ca8a; padding: 8px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
         .dict-item.unlocked { background: #e3fafc; border-color: #15aabf; }
 
         /* ログインボーナススタンプ */
         .login-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
-        .login-cell { background: #f1f3f5; border: 2px solid #ced4da; border-radius: 8px; padding: 10px 5px; text-align: center; font-size: 0.75rem; font-weight: bold; position: relative; }
+        .login-cell { background: #f1f3f5; border: 2px solid #ced4da; border-radius: 8px; padding: 10px 5px; text-align: center; font-size: 0.75rem; font-weight: bold; position: relative; color: #2b2b2b; }
         .login-cell.stamped::after { content: '💮'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); font-size: 1.8rem; color: #fa5252; opacity: 0.8; }
 
-        /* フレンドリスト (専用画面) */
-        .f-list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 2px solid #dee2e6; }
+        /* フレンドリスト */
+        .f-list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 2px solid #dee2e6; color: #2b2b2b; }
         .f-fav-btn { font-size: 1.5rem; background: none; border: none; cursor: pointer; outline: none; padding: 0 10px; color: #ccc; transition: all 0.2s; }
         .f-fav-btn.active { color: #fcc419; text-shadow: 0 0 5px orange; }
         
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 0.9rem; }
         .setting-slider { width: 60%; }
+
+        /* 拡張機能スタイル */
+        .baby-mode .upa-character { transform: scale(0.5) !important; transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .mat-badge { background: #e9ecef; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; display: inline-flex; align-items: center; gap: 4px; margin-right: 4px; border: 1px solid #ced4da; color: #2b2b2b; }
+        .album-item { background: white; border: 2px solid #e9ecef; padding: 12px; border-radius: 8px; margin-bottom: 10px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 8px; color: #2b2b2b; }
+
+        /* 交配の二択カード */
+        .breeding-choice-container { display: flex; gap: 12px; width: 100%; margin-top: 15px; }
+        .breeding-choice-card { flex: 1; border: 3px dashed #ced4da; border-radius: 16px; padding: 12px; display: flex; flex-direction: column; align-items: center; text-align: center; cursor: pointer; background: white; transition: border-color 0.2s, transform 0.2s; }
+        .breeding-choice-card.selected { border: 3px solid #ff85a2; background: #fff0f3; transform: translateY(-4px); }
     </style>
 </head>
 <body>
@@ -171,8 +205,9 @@
 <audio id="se-error" src="https://dova-s.jp/_contents/se/play/dummy_error.mp3"></audio>
 
 <div class="game-container">
+    <!-- タイトル画面 -->
     <div class="title-screen" id="title-screen">
-        <div class="title-logo">🌟 悩み解決！ 🌟<br>育成ゲーム Ultimate</div>
+        <div class="title-logo">🌟 悩み解決！ 🌟<br>育成ゲーム</div>
         <button class="title-btn orange" id="title-start-new-btn">✨ 初めからあそぶ</button>
         <button class="title-btn" id="title-load-menu-btn">💾 続きからあそぶ</button>
 
@@ -191,6 +226,7 @@
         <div class="version-text">ver.1.1.0</div>
     </div>
 
+    <!-- 引き継ぎ保存スロット選択 -->
     <div class="modal" id="transfer-slot-modal" style="z-index: 400;">
         <div class="modal-content">
             <div class="modal-header">保存先スロットの選択</div>
@@ -201,6 +237,7 @@
         </div>
     </div>
 
+    <!-- お友達づくり（新規登録） -->
     <div class="welcome-screen" id="welcome-screen">
         <div class="welcome-header">🌟 新しいお友達づくり 🌟</div>
         
@@ -230,13 +267,14 @@
         <button class="start-btn" id="btn-start-game">この子と暮らす！</button>
     </div>
 
+    <!-- ゲーム画面ヘッダー -->
     <header>
         <div class="menu-trigger" id="menu-trigger">☰</div>
         <h1 id="game-title">悩み解決！育成ゲーム</h1>
         <span class="name-edit-hint">（タップして名前を変更できます）</span>
         <div class="status-bar">
             <div class="status-row">
-                <span id="level-display">Lv.1</span>
+                <span id="level-display">Lv.1 <span id="gen-display" style="font-size:0.75rem; background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:6px; margin-left:4px;">1代目</span></span>
                 <div class="exp-container"><div class="exp-bar" id="exp-bar"></div></div>
                 <span class="next-exp-txt" id="next-exp-display">あと 30 EXP</span>
             </div>
@@ -254,6 +292,7 @@
         </div>
     </header>
 
+    <!-- メインステージ -->
     <div class="aquarium bg-aquarium" id="aquarium">
         <div class="char-wrapper" id="char-wrapper">
             <div class="worry-lamp" id="worry-lamp">💡</div>
@@ -264,6 +303,7 @@
         <div id="furniture-placement-layer" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none;"></div>
     </div>
 
+    <!-- 下部アクションメニュー -->
     <footer>
         <div class="action-menu">
             <button class="menu-btn orange" id="btn-shop">🛒 ショップ</button>
@@ -273,10 +313,17 @@
         <div class="game-log" id="game-log">のんびり過ごしているよ。</div>
     </footer>
 
+    <!-- サイドドロワーメニュー -->
     <div class="side-drawer" id="side-drawer">
         <div class="drawer-content">
             <div class="drawer-header">メニュー</div>
             <button class="drawer-btn" id="drawer-notice-btn" style="color: #d6336c; font-weight: bold;">🔔 お知らせ <span id="notice-badge" style="display:none; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:0.7rem; margin-left:5px;">!</span></button>
+            
+            <button class="drawer-btn" id="drawer-town-btn" style="background:#ebfbee; color:#2b8a3e; border:1px solid #b2f2bb;">🏘️ 街・庭の管理</button>
+            <button class="drawer-btn" id="drawer-diy-btn" style="background:#f3f0ff; color:#6741d9; border:1px solid #d0bfff;">🛠️ DIY・スキル</button>
+            <button class="drawer-btn" id="drawer-exped-btn" style="background:#e3fafc; color:#0b7285; border:1px solid #99e9f2;">🎒 探索遠征・アルバム</button>
+            <hr style="border:0; border-top:1px solid #e9ecef; margin:8px 0; width:100%;">
+
             <button class="drawer-btn" id="drawer-profile-btn">👤 プロフィール</button>
             <button class="drawer-btn" id="drawer-title-dict-btn">📖 称号辞典</button>
             <button class="drawer-btn" id="drawer-mg-record-btn">🏆 ミニゲーム記録</button>
@@ -285,7 +332,7 @@
             <button class="drawer-btn" id="drawer-dress-btn">👗 きがえ・クローゼット</button>
             <button class="drawer-btn" id="drawer-furniture-btn">🛋️ 家具を設置する</button>
             <button class="drawer-btn" id="drawer-bg-btn">🖼️ 背景模様替え</button>
-            <button class="drawer-btn" id="drawer-friend-btn">🤝 フレンド</button>
+            <button class="drawer-btn" id="drawer-friend-btn">🤝 フレンド・交配</button>
             <button class="drawer-btn" id="drawer-trophy-btn" style="background:#fff3bf; color:#d9480f;">🏆 トロフィー</button>
             <button class="drawer-btn" id="drawer-transfer-btn" style="background:#e3fafc; color:#0b7285;">🔑 ID確認・パスワード</button>
             <button class="drawer-btn" id="drawer-settings-btn">⚙️ 設定</button>
@@ -295,82 +342,14 @@
         </div>
     </div>
 
-    <!-- お知らせモーダル -->
-    <div class="modal" id="notice-modal" style="z-index: 260;">
-        <div class="modal-content">
-            <div class="modal-header">🔔 お知らせ</div>
-            <div id="notice-list-container" style="max-height: 300px; overflow-y: auto;"></div>
-            <button class="close-btn" id="close-notice">閉じる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="login-bonus-modal" style="z-index: 250;">
-        <div class="modal-content">
-            <div class="modal-header">📅 ログインボーナス (30日)</div>
-            <p style="text-align:center; font-weight:bold; font-size:0.9rem; color:#0b7285;">毎日ログインしてご褒美をもらおう！<br>本日のボーナス: 💰30</p>
-            <div class="login-grid" id="login-stamp-grid"></div>
-            <button class="start-btn" id="close-login-bonus" style="margin-top:20px;">受け取る！</button>
-        </div>
-    </div>
-
-    <div class="modal" id="profile-modal">
-        <div class="modal-content" style="text-align: center;">
-            <div class="modal-header">プロフィール</div>
-            <div style="font-size:1.1rem; font-weight:bold; margin-bottom:8px; color:#1c7ed6;" id="prof-owner-pet"></div>
-            <div style="font-size:0.9rem; margin-bottom:6px;" id="prof-level"></div>
-            <div style="font-size:0.9rem; margin-bottom:6px; font-weight:bold; color:#d9480f;" id="prof-title"></div>
-            <div style="font-size:0.9rem; margin-bottom:6px;" id="prof-coins"></div>
-            <div style="font-size:0.85rem; margin-bottom:6px; color:#15aabf;" id="prof-stats"></div>
-            <div style="font-size:0.85rem; margin-bottom:10px; color:#e64980;" id="prof-login-days"></div>
-            <button class="close-btn" id="close-profile">閉じる</button>
-        </div>
-    </div>
-
-    <div class="fullscreen-modal" id="title-dict-modal">
-        <div class="modal-header" style="font-size:1.5rem; margin-bottom:5px;">📖 称号辞典</div>
-        <p style="font-size:0.85rem; text-align:center; margin-bottom:15px; font-weight:bold;">解放した称号をタップでセットできます</p>
-        <div class="book-spread">
-            <div class="book-page" id="dict-page-left"></div>
-            <div class="book-page" id="dict-page-right"></div>
-        </div>
-        <button class="close-btn" id="close-title-dict" style="margin-top:20px; font-size:1.1rem; padding:12px;">辞典を閉じる</button>
-    </div>
-
-    <div class="modal" id="mg-record-modal">
-        <div class="modal-content">
-            <div class="modal-header">🏆 ミニゲーム記録</div>
-            <div id="mg-record-container" style="max-height: 300px; overflow-y: auto;"></div>
-            <button class="close-btn" id="close-mg-record">閉じる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="settings-modal">
-        <div class="modal-content">
-            <div class="modal-header">⚙️ 設定</div>
-            
-            <div class="setting-row">
-                <span>🎵 BGM音量</span>
-                <input type="range" min="0" max="1" step="0.1" value="0.5" class="setting-slider" id="bgm-vol-slider">
-            </div>
-            <div class="setting-row">
-                <span>🔊 SE音量</span>
-                <input type="range" min="0" max="1" step="0.1" value="0.5" class="setting-slider" id="se-vol-slider">
-            </div>
-
-            <hr style="border:0; border-top:1px solid #ced4da; margin:15px 0;">
-            
-            <button class="option-btn" id="btn-admin-login" style="background:#fa5252; color:white; font-weight:bold; text-align:center;">🛠️ 管理者メニューを開く</button>
-            <div id="admin-panel" style="display:none; background:#f8f9fa; border:2px dashed #fa5252; padding:12px; border-radius:10px; margin-top:10px;">
-                <h4 style="margin:0 0 10px 0; color:#fa5252;">チート / デバッグ</h4>
-                <button class="type-btn" id="cheat-coin">+10000 コイン</button>
-                <button class="type-btn" id="cheat-exp">+9999 EXP</button>
-                <button class="type-btn" id="cheat-full">満腹度MAX</button>
-                <button class="type-btn" id="cheat-furni">全家具+1</button>
-                <button class="type-btn" id="cheat-ceo" style="background:#fcc419; color:#2b2b2b;">👑 隠し称号「代表取締役」解放</button>
-            </div>
-            <button class="close-btn" id="close-settings">閉じる</button>
-        </div>
-    </div>
+    <!-- 各種ポップアップモーダル群 -->
+    <div class="modal" id="notice-modal" style="z-index: 260;"><div class="modal-content"><div class="modal-header">🔔 お知らせ</div><div id="notice-list-container" style="max-height: 300px; overflow-y: auto;"></div><button class="close-btn" id="close-notice">閉じる</button></div></div>
+    <div class="modal" id="login-bonus-modal" style="z-index: 250;"><div class="modal-content"><div class="modal-header">📅 ログインボーナス (30日)</div><p style="text-align:center; font-weight:bold; font-size:0.9rem; color:#0b7285;">毎日ログインしてご褒美をもらおう！<br>本日のボーナス: 💰30</p><div class="login-grid" id="login-stamp-grid"></div><button class="start-btn" id="close-login-bonus" style="margin-top:20px;">受け取る！</button></div></div>
+    <div class="modal" id="profile-modal"><div class="modal-content" style="text-align: center;"><div class="modal-header">プロフィール</div><div style="font-size:1.1rem; font-weight:bold; margin-bottom:8px; color:#1c7ed6;" id="prof-owner-pet"></div><div style="font-size:0.9rem; margin-bottom:6px;" id="prof-level"></div><div style="font-size:0.9rem; margin-bottom:6px; font-weight:bold; color:#d9480f;" id="prof-title"></div><div style="font-size:0.9rem; margin-bottom:6px;" id="prof-coins"></div><div style="font-size:0.85rem; margin-bottom:6px; color:#15aabf;" id="prof-stats"></div><div style="font-size:0.85rem; margin-bottom:10px; color:#e64980;" id="prof-login-days"></div><button class="close-btn" id="close-profile">閉じる</button></div></div>
+    <div class="fullscreen-modal" id="title-dict-modal"><div class="modal-header" style="font-size:1.5rem; margin-bottom:5px;">📖 称号辞典</div><p style="font-size:0.85rem; text-align:center; margin-bottom:15px; font-weight:bold;">解放した称号をタップでセットできます</p><div class="book-spread"><div class="book-page" id="dict-page-left"></div><div class="book-page" id="dict-page-right"></div></div><button class="close-btn" id="close-title-dict" style="margin-top:20px; font-size:1.1rem; padding:12px;">辞典を閉じる</button></div>
+    <div class="modal" id="mg-record-modal"><div class="modal-content"><div class="modal-header">🏆 ミニゲーム記録</div><div id="mg-record-container" style="max-height: 300px; overflow-y: auto;"></div><button class="close-btn" id="close-mg-record">閉じる</button></div></div>
+    
+    <div class="modal" id="settings-modal"><div class="modal-content"><div class="modal-header">⚙️ 設定</div><div class="setting-row"><span>🎵 BGM音量</span><input type="range" min="0" max="1" step="0.1" value="0.5" class="setting-slider" id="bgm-vol-slider"></div><div class="setting-row"><span>🔊 SE音量</span><input type="range" min="0" max="1" step="0.1" value="0.5" class="setting-slider" id="se-vol-slider"></div><hr style="border:0; border-top:1px solid #ced4da; margin:15px 0;"><button class="option-btn" id="btn-admin-login" style="background:#fa5252; color:white; font-weight:bold; text-align:center;">🛠️ 管理者メニューを開く</button><div id="admin-panel" style="display:none; background:#f8f9fa; border:2px dashed #fa5252; padding:12px; border-radius:10px; margin-top:10px;"><h4 style="margin:0 0 10px 0; color:#fa5252;">チート / デバッグ</h4><button class="type-btn" id="cheat-coin">+10000 コイン</button><button class="type-btn" id="cheat-exp">+9999 EXP</button><button class="type-btn" id="cheat-full">満腹度MAX</button><button class="type-btn" id="cheat-furni">全家具+1</button></div><button class="close-btn" id="close-settings">閉じる</button></div></div>
 
     <div class="fullscreen-modal" id="friend-modal">
         <div class="modal-header" style="font-size:1.5rem;">🤝 フレンド広場</div>
@@ -381,27 +360,67 @@
             <input type="text" class="name-input-box" id="friend-id-input" placeholder="友達のIDを検索" style="margin:0; padding:10px; font-size:1rem;">
             <button class="start-btn" id="btn-add-friend" style="margin:0; width:100px; padding:10px;">検索追加</button>
         </div>
-        
-        <p style="font-size:0.85rem; font-weight:bold; color:#495057; margin-bottom:5px;">お互いに⭐(お気に入り)にすると<br>💖ベストフレンドになってお小遣いが送れます。</p>
+        <p style="font-size:0.85rem; font-weight:bold; color:#495057; margin-bottom:5px;">お互いに⭐にすると💖ベストフレンドになってお小遣いが送れます。<br>さらに親愛度を上げると『世代交代（交配・二択選択）』が可能に！</p>
         <div id="friend-list-container" style="flex-grow:1; overflow-y:auto; background:#f8f9fa; padding:10px; border-radius:12px; border:2px solid #dee2e6; max-height: 350px;"></div>
-        
         <button class="close-btn" id="close-friend" style="margin-top:20px; font-size:1.1rem; padding:14px;">広場を出る</button>
     </div>
 
+    <!-- 拡張訪問メニュー -->
     <div class="modal" id="friend-visit-modal" style="z-index: 250;">
         <div class="modal-content" style="text-align: center;">
-            <div class="modal-header">訪問メニュー</div>
+            <div class="modal-header">訪問・交流メニュー</div>
             <p id="visit-f-name" style="font-weight:bold; font-size:1.1rem; margin-bottom:10px;"></p>
+            <div id="visit-f-love-display" style="font-weight:bold; color:#e64980; margin-bottom:10px; font-size:1.2rem; background:#fff0f6; border:1px solid #ffdeeb; padding:8px; border-radius:8px;">親愛度: 0 / 100</div>
+            
+            <button class="start-btn" id="btn-interact" style="background:#ff922b; margin-bottom:10px;">💞 遊びに行って交流する (親愛度UP: 1日1回)</button>
+            <button class="start-btn" id="btn-breed" style="background:#d6336c; color:white; margin-bottom:10px; display:none; box-shadow:0 0 10px #e64980;">💖 次世代の子供を授かる（交配）</button>
+            <button class="start-btn" id="btn-do-visit" style="background:#40c057; margin-bottom:10px;">🏠 お家を見に行く</button>
+            
             <div id="visit-f-profile" style="background:#f1f3f5; padding:10px; border-radius:8px; font-size:0.85rem; margin-bottom:15px; text-align:left; line-height:1.4;"></div>
-            <button class="start-btn" id="btn-do-visit" style="background:#40c057; margin-bottom:10px;">🏠 お家に行く</button>
             <button class="start-btn" id="btn-send-money" style="background:#fcc419; color:#d9480f; display:none; margin-bottom:10px;">💰 お小遣いを100送る</button>
             <button class="close-btn" id="close-visit-modal">もどる</button>
         </div>
     </div>
 
+    <!-- 交配二択選択モーダル -->
+    <div class="modal" id="breeding-choice-modal" style="z-index: 280;">
+        <div class="modal-content" style="text-align: center; max-height: 95vh;">
+            <div class="modal-header" style="color: #e64980;">💖 赤ちゃんを選択しよう 💖</div>
+            <p style="font-size:0.85rem; font-weight:bold; margin-bottom:10px;">親の遺伝子から2つの卵が生まれました！<br>どちらの子を次の世代として育てますか？</p>
+            
+            <div class="breeding-choice-container">
+                <div class="breeding-choice-card" id="breed-card-a" onclick="selectBreedingChoice('A')">
+                    <b style="color: #15aabf;">候補 A</b>
+                    <div id="breed-preview-svg-a" style="width:70px; height:70px; margin: 8px 0;"></div>
+                    <small id="breed-trait-a" style="background:#e3fafc; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:0.75rem; color:#0b7285;"></small>
+                </div>
+                <div class="breeding-choice-card" id="breed-card-b" onclick="selectBreedingChoice('B')">
+                    <b style="color: #ff922b;">候補 B</b>
+                    <div id="breed-preview-svg-b" style="width:70px; height:70px; margin: 8px 0;"></div>
+                    <small id="breed-trait-b" style="background:#fff0f3; padding:2px 6px; border-radius:6px; font-weight:bold; font-size:0.75rem; color:#c53030;"></small>
+                </div>
+            </div>
+
+            <button class="start-btn" id="btn-confirm-breed-choice" style="background:#e64980; display:none;">この子を育てる！</button>
+            <button class="close-btn" id="close-breed-choice" style="margin-top:10px;">キャンセル</button>
+        </div>
+    </div>
+
     <div class="modal" id="transfer-modal"><div class="modal-content"><div class="modal-header">🔑 アカウント情報</div><div style="background:#f1f3f5; padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:10px; text-align:center;"><b>あなたのID:</b> <br><span id="trans-my-id" style="color:#15aabf; font-size:1.1rem; font-weight:bold;">---</span><br><br><b>現在のパスワード:</b> <br><span id="trans-my-pass" style="color:#d6336c; font-size:1.1rem; font-weight:bold;">---</span></div><button id="btn-change-pass" style="width:100%; font-size:0.9rem; font-weight:bold; background:#e3fafc; color:#0b7285; border:1px solid #15aabf; padding:10px; border-radius:6px; margin-bottom:10px;">パスワードを変更する</button><button class="close-btn" id="close-transfer-modal">閉じる</button></div></div>
     <div class="modal" id="trophy-modal"><div class="modal-content"><div class="modal-header">🏆 獲得トロフィー</div><div id="trophy-list-container" style="max-height: 300px; overflow-y: auto;"></div><button class="close-btn" id="close-trophy-modal">閉じる</button></div></div>
-    <div class="fullscreen-modal dark" id="minigame-modal"><div class="mg-title" id="minigame-header-title">🎮 ミニゲーム広場</div><div id="minigame-menu-view" class="minigame-grid"></div><div id="minigame-play-view" style="display:none; padding:10px 0; width:100%; max-width:400px; margin:0 auto;"><div id="minigame-arena" class="game-panel"></div><button class="close-btn" id="btn-abort-game" style="background-color:#fa5252; color:white; margin-top:15px; font-size:1.1rem; padding:12px;">やめる</button></div><button class="close-btn" id="close-minigame" style="background:rgba(255,255,255,0.2); color:white; margin-top:20px; font-size:1.1rem; padding:12px;">広場を出る</button></div>
+    
+    <!-- 31種類のミニゲームモーダル -->
+    <div class="fullscreen-modal dark" id="minigame-modal">
+        <div class="mg-title" id="minigame-header-title">🎮 ミニゲーム広場 (全31種)</div>
+        <p style="text-align:center; font-size:0.8rem; margin:-10px 0 15px 0; font-weight:bold; color:#a9e34b;">ミニゲームを遊ぶと、たまに遠征用クラフト素材を入手できます！</p>
+        <div id="minigame-menu-view" class="minigame-grid" style="max-height: 65vh; overflow-y: auto; padding: 5px;"></div>
+        <div id="minigame-play-view" style="display:none; padding:10px 0; width:100%; max-width:400px; margin:0 auto;">
+            <div id="minigame-arena" class="game-panel"></div>
+            <button class="close-btn" id="btn-abort-game" style="background-color:#fa5252; color:white; margin-top:15px; font-size:1.1rem; padding:12px;">やめる</button>
+        </div>
+        <button class="close-btn" id="close-minigame" style="background:rgba(255,255,255,0.2); color:white; margin-top:20px; font-size:1.1rem; padding:12px;">広場を出る</button>
+    </div>
+
     <div class="modal" id="mission-modal"><div class="modal-content"><div class="modal-header">📅 デイリー要素</div><div style="font-weight:bold; font-size:0.9rem; margin-bottom:6px;">今日のミッション:</div><div id="mission-list-container"></div><button class="close-btn" id="close-mission">閉じる</button></div></div>
     <div class="modal" id="gacha-modal"><div class="modal-content" style="background: linear-gradient(135deg, #1a0b2e, #4b1d52, #99326d); color:white; height:100vh; border-radius:0; max-height:none; display:flex; flex-direction:column; justify-content:center; align-items:center;"><div class="modal-header" style="color:white; z-index:2; font-size:1.6rem;">🪙 よろずガチャ</div><div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:16px; margin-bottom:10px;" id="gacha-ui-box"><p style="font-size:1rem; margin-bottom:15px; font-weight:bold;">1回 <b>💰 50</b></p><div id="gacha-machine" style="font-size:6rem; margin-bottom:20px;">🎰</div><button class="start-btn" id="btn-play-gacha" style="background:#fcc419; color:#d9480f; font-size:1.2rem; padding:16px;">ガチャを引く</button></div><div id="gacha-result-area" style="display:none; flex-direction:column; align-items:center;"><div id="gacha-result-icon" style="font-size:6rem;"></div><div id="gacha-result-text" style="font-weight:bold; font-size:1.4rem; margin-top:15px;"></div><button class="start-btn" id="btn-gacha-next" style="margin-top:25px; background:#40c057; font-size:1.1rem;">もう一度引く</button></div><button class="close-btn" id="close-gacha" style="background:rgba(255,255,255,0.2); color:white; margin-top:30px; font-size:1.1rem;">やめる</button></div></div>
     <div class="modal" id="dress-modal"><div class="modal-content"><div class="modal-header">👗 クローゼット</div><div id="dress-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:250px; overflow-y:auto;"></div><button class="close-btn" id="close-dress">閉じる</button></div></div>
@@ -410,11 +429,101 @@
     <div class="modal" id="shop-modal"><div class="modal-content"><div class="modal-header">よろずショップ</div><div class="shop-tabs"><button class="shop-tab-btn active" id="tab-food-btn">🍖 エサ</button><button class="shop-tab-btn" id="tab-bg-btn">🖼️ 背景</button><button class="shop-tab-btn" id="tab-furni-btn">🛋️ 家具</button></div><div id="shop-food-pane" class="shop-pane" style="max-height:280px; overflow-y:auto;"></div><div id="shop-bg-pane" class="shop-pane" style="display:none;"><input type="file" id="custom-bg-uploader" accept="image/*" style="margin-bottom:8px; font-size:0.8rem; width:100%;"><div id="shop-bg-list"></div></div><div id="shop-furni-pane" class="shop-pane" style="display:none; max-height:280px; overflow-y:auto;"></div><button class="close-btn" id="close-shop">とじる</button></div></div>
     <div class="modal" id="bag-modal"><div class="modal-content"><div class="modal-header">持っているごはん</div><div id="bag-container" style="max-height:250px; overflow-y:auto;"></div><button class="close-btn" id="close-bag">とじる</button></div></div>
     <div class="modal" id="bg-modal"><div class="modal-content"><div class="modal-header">背景の模様替え</div><div id="bg-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:200px; overflow-y:auto;"></div><button class="close-btn" id="close-bg-modal">とじる</button></div></div>
+
+    <!-- 街管理モーダル -->
+    <div class="modal" id="town-modal">
+        <div class="modal-content">
+            <div class="modal-header" style="color:#2b8a3e;">🏘️ 街・庭の管理</div>
+            <p style="font-size:0.8rem; color:#666; margin-bottom:15px;">施設を発展させると、新しいお悩みや報酬アップが解放されます！</p>
+            <div class="option-btn" style="text-align:center;">
+                <b style="font-size:1.1rem; color:#2b8a3e;">☕ 広場カフェ (Lv.<span id="txt-lvl-cafe">0</span>)</b><br>
+                <small>効果: 街特有の「人間関係の悩み」が発生</small><br>
+                <button class="start-btn" style="background:#40c057; margin-top:8px;" onclick="upgradeFacility('cafe')">💰 200コインで改修</button>
+            </div>
+            <div class="option-btn" style="text-align:center;">
+                <b style="font-size:1.1rem; color:#2b8a3e;">🌳 @@@公園 (Lv.<span id="txt-lvl-park">0</span>)</b><br>
+                <small>効果: 天気連動お悩みの報酬が1.5倍に</small><br>
+                <button class="start-btn" style="background:#40c057; margin-top:8px;" onclick="upgradeFacility('park')">💰 300コインで改修</button>
+            </div>
+            <button class="start-btn" style="background:#15aabf;" onclick="toggleTownView()">🔄 部屋とお庭ビューを切り替える</button>
+            <button class="close-btn" onclick="closeModal('town-modal')">とじる</button>
+        </div>
+    </div>
+
+    <!-- DIY・スキルツリーモーダル -->
+    <div class="modal" id="diy-modal">
+        <div class="modal-content">
+            <div class="modal-header" style="color:#6741d9;">🛠️ DIY・スキルツリー</div>
+            <div style="margin-bottom:15px; text-align:center; display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;">
+                <span class="mat-badge">🪵 木材:<span id="cnt-wood">0</span></span>
+                <span class="mat-badge">⚙️ 鉄くず:<span id="cnt-iron">0</span></span>
+                <span class="mat-badge">🎨 染料:<span id="cnt-dye">0</span></span>
+                <span class="mat-badge" style="background:#ffdeeb;">🐚 貝殻:<span id="cnt-shell">0</span></span>
+                <span class="mat-badge" style="background:#e8f7ff;">💎 鉱石:<span id="cnt-ore">0</span></span>
+                <span class="mat-badge" style="background:#fff9db;">⭐ 星砂:<span id="cnt-star">0</span></span>
+            </div>
+            
+            <div class="card-ext" style="background: #fdf6e3; border: 1px solid #e6ca8a; padding: 10px; border-radius: 12px; margin-bottom: 12px;">
+                <b style="color: #b58900; font-size: 0.9rem;">✨ 遠征素材限定 DIYクラフト家具</b>
+                <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;" id="diy-craft-recipes-container"></div>
+            </div>
+
+            <div class="option-btn">
+                <b style="color:#6741d9;">🎨 家具のリカラー（オーラ付与）</b><br>
+                <small>染料を1つ消費して、最後に置いた家具に特殊な輝きを付与します。</small>
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <button class="start-btn" style="background:#ff8787; margin:0; padding:8px;" onclick="applyDyeColor('#ff8787')">🔴 暖色</button>
+                    <button class="start-btn" style="background:#74c0fc; margin:0; padding:8px;" onclick="applyDyeColor('#74c0fc')">🔵 寒色</button>
+                    <button class="start-btn" style="background:#51cf66; margin:0; padding:8px;" onclick="applyDyeColor('#51cf66')">🟢 自然色</button>
+                </div>
+            </div>
+            <div class="option-btn">
+                <b style="color:#6741d9;">🧬 育成スキルツリー (残Pt: <span id="txt-skill-pts">0</span>)</b><br>
+                <small>お悩みを5回解決するごとに1Pt貯まります。</small>
+                <div style="display:flex; gap:10px; margin-top:8px;">
+                    <button class="start-btn" style="background:#7950f2; margin:0; padding:8px;" onclick="upgradeSkill('coin')">💰 コイン効率UP</button>
+                    <button class="start-btn" style="background:#7950f2; margin:0; padding:8px;" onclick="upgradeSkill('exp')">✨ 獲得EXP UP</button>
+                </div>
+            </div>
+            <button class="close-btn" onclick="closeModal('diy-modal')">とじる</button>
+        </div>
+    </div>
+
+    <!-- おでかけ遠征・アルバムモーダル -->
+    <div class="modal" id="exped-modal">
+        <div class="modal-content" style="max-height: 90vh;">
+            <div class="modal-header" style="color:#0b7285;">🎒 おでかけ探索遠征・思い出アルバム</div>
+            <div class="option-btn" style="text-align:center;">
+                <b style="font-size:1.1rem; color:#0b7285;">🚀 時間を選んで探索に送り出す</b><br>
+                <p style="font-size:0.75rem; color:#666; margin: 4px 0 10px 0;">長い探索ほど、たくさんの資材や激レア限定クラフト素材を持ち帰る確率が高まります！</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;" id="exped-time-selectors">
+                    <button class="type-btn" onclick="setExpedDuration(10, '10秒 (テスト)')" style="background: #ebfbee;">⏱️ 10秒</button>
+                    <button class="type-btn" onclick="setExpedDuration(300, '5分')">⏱️ 5分</button>
+                    <button class="type-btn" onclick="setExpedDuration(1800, '30分')">⏱️ 30分</button>
+                    <button class="type-btn" onclick="setExpedDuration(3600, '1時間')">⏱️ 1時間</button>
+                    <button class="type-btn" onclick="setExpedDuration(10800, '3時間')">⏱️ 3時間</button>
+                    <button class="type-btn" onclick="setExpedDuration(25200, '7時間')">⏱️ 7時間</button>
+                </div>
+
+                <div style="font-size:0.85rem; margin:10px 0; color:#d6336c; font-weight:bold;" id="txt-exped-status">状態: お部屋でのんびりしています</div>
+                <button class="start-btn" id="btn-do-exped" style="background:#15aabf;" onclick="startExpedition()">🌅 選択中の時間で出発！</button>
+            </div>
+            
+            <div style="font-weight:bold; margin-top:15px; color:#495057;">📖 旅の思い出アルバムスナップ (デバイス保存可能)</div>
+            <div style="max-height:220px; overflow-y:auto; background:#f8f9fa; padding:10px; border-radius:8px; border:1px solid #dee2e6;" id="album-list-container">
+                <div style="text-align:center; color:#adb5bd; font-size:0.8rem;">まだ写真がありません。<br>遠征から帰るとここに思い出が記録されます。</div>
+            </div>
+            <button class="close-btn" onclick="closeModal('exped-modal')">とじる</button>
+        </div>
+    </div>
+
+    <!-- キャラクターメイク -->
     <div class="modal" id="make-modal"><div class="modal-content"><div class="modal-header">キャラクターメイク</div><div class="color-picker-title">🐾 種類</div><div class="color-options" id="char-types"><button class="type-btn" data-type="upa">ウパ</button><button class="type-btn" data-type="cat">ねこ</button><button class="type-btn" data-type="chick">ひよこ</button><button class="type-btn" data-type="fish">さかな</button><button class="type-btn" data-type="dog">いぬ</button><button class="type-btn" data-type="bear">くま</button><button class="type-btn" data-type="rabbit">うさぎ</button></div><div class="color-picker-title">🎨 からだ</div><div class="color-options"><input type="color" class="custom-color-picker" id="body-color-picker"></div><div class="color-picker-title">🌸 かざり</div><div class="color-options"><input type="color" class="custom-color-picker" id="gill-color-picker"></div><button class="close-btn" id="close-make">決定</button></div></div>
 </div>
 
 <script>
-    // --- SVG定義 (手足追加版) ---
+    // --- SVG定義 ---
     const SVG_TEMPLATE = `
         <svg viewBox="0 0 100 120" width="100%" height="100%">
             <path class="char-part part-upa gill-part" d="M 25,40 C 10,35 5,50 25,50" />
@@ -463,29 +572,31 @@
         </svg>
     `;
 
-    // ==========================================
-    // --- セーブデータの永続化 (変更なし・完全保持) ---
-    // ==========================================
-    const SAVE_KEY = 'upa_slots_ultimate_v1';
-    const ACCOUNT_POOL_KEY = 'upa_account_pool_ultimate_v1';
+    // データベース管理
+    const SAVE_KEY = 'upa_slots_ultimate_v3_giga';
+    const ACCOUNT_POOL_KEY = 'upa_account_pool_ultimate_v3';
 
     function createInitialState() {
         return {
             name: "ウパのココロ", ownerName: "あなた", level: 1, exp: 0, maxExp: 30, coins: 150, fullness: 80,
             friendId: "FC-" + Math.floor(100000 + Math.random() * 900000), password: "1234",
-            friends: [], favorites: [], notices: [], minigameStats: {}, unlockedHiddenTitles: [], loginBonusDay: 1,
+            friends: [], favorites: [], notices: [], minigameStats: {}, loginBonusDay: 1,
             inventory: {}, unlockedBgs: ["bg-aquarium"], customBgData: "",
             furnitureInventory: {}, placedFurniture: [],
             appearance: { type: "upa", bodyColor: "#fff0f3", gillColor: "#ff85a2", bgClass: "bg-aquarium" },
             lastLoginDate: "", currentLoginStreak: 0, maxLoginStreak: 0,
             loveLevel: 0, loveExp: 0, maxLoveExp: 10,
             unlockedCostumes: ["なし"], currentCostume: "なし", currentTitle: "見習い",
-            dailyMissions: [
-                { id: "feed", desc: "ごはんを1回あげる", target: 1, current: 0, completed: false },
-                { id: "game", desc: "ミニゲームを1回遊ぶ", target: 1, current: 0, completed: false },
-                { id: "worry", desc: "お悩みを1回解決する", target: 1, current: 0, completed: false }
-            ],
-            lastMissionDate: "", totalFeeds: 0, totalMinigames: 0, trophies: []
+            dailyMissions: [ { id: "feed", desc: "ごはんを1回あげる", target: 1, current: 0, completed: false }, { id: "game", desc: "ミニゲームを1回遊ぶ", target: 1, current: 0, completed: false }, { id: "worry", desc: "お悩みを1回解決する", target: 1, current: 0, completed: false } ],
+            lastMissionDate: "", totalFeeds: 0, totalMinigames: 0, trophies: [],
+            generation: 1, solvedCount: 0, friendLove: {},
+            lastInteractDates: {}, // 各フレンドとの最終交流日管理用のオブジェクト
+            materials: { wood: 3, iron: 2, dye: 1, shell: 0, ore: 0, star: 0 },
+            skills: { coin: 0, exp: 0, points: 0 },
+            town: { cafe: 0, park: 0, viewMode: "room" },
+            albums: [],
+            totalDIYS: 0,
+            totalExpeditions: 0
         };
     }
 
@@ -497,24 +608,36 @@
             appearance: { ...defaultState.appearance, ...(savedData.appearance || {}) },
             inventory: { ...defaultState.inventory, ...(savedData.inventory || {}) },
             furnitureInventory: { ...defaultState.furnitureInventory, ...(savedData.furnitureInventory || {}) },
+            materials: { ...defaultState.materials, ...(savedData.materials || {}) },
+            skills: { ...defaultState.skills, ...(savedData.skills || {}) },
+            town: { ...defaultState.town, ...(savedData.town || {}) },
             minigameStats: { ...defaultState.minigameStats, ...(savedData.minigameStats || {}) },
-            unlockedHiddenTitles: savedData.unlockedHiddenTitles || [],
             favorites: savedData.favorites || [],
             notices: savedData.notices || [],
-            loginBonusDay: savedData.loginBonusDay || 1
+            albums: savedData.albums || [],
+            trophies: savedData.trophies || [],
+            generation: savedData.generation || 1,
+            solvedCount: savedData.solvedCount || 0,
+            totalDIYS: savedData.totalDIYS || 0,
+            totalExpeditions: savedData.totalExpeditions || 0,
+            lastInteractDates: savedData.lastInteractDates || {}
         };
     }
 
     let gameState = createInitialState();
     let currentSlotIndex = 0;
-    
-    // 訪問フラグ
     let isVisiting = false;
     let visitTargetSave = null;
 
-    function getGlobalSaves() { const saves = localStorage.getItem(SAVE_KEY); return saves ? JSON.parse(saves) : [null, null]; }
+    function getGlobalSaves() { 
+        let saves = localStorage.getItem(SAVE_KEY); 
+        return saves ? JSON.parse(saves) : [null, null]; 
+    }
     function saveAllSlots(arr) { localStorage.setItem(SAVE_KEY, JSON.stringify(arr)); }
-    function getAccountPool() { const pool = localStorage.getItem(ACCOUNT_POOL_KEY); return pool ? JSON.parse(pool) : []; }
+    function getAccountPool() { 
+        let pool = localStorage.getItem(ACCOUNT_POOL_KEY); 
+        return pool ? JSON.parse(pool) : []; 
+    }
     function registerToAccountPool(state) {
         let pool = getAccountPool(); pool = pool.filter(acc => acc.friendId !== state.friendId);
         pool.push(JSON.parse(JSON.stringify(state))); localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool));
@@ -523,14 +646,11 @@
     function saveActiveGame(showFlash = false) {
         let slots = getGlobalSaves(); slots[currentSlotIndex] = gameState;
         saveAllSlots(slots); registerToAccountPool(gameState);
-        cloudSavePlayer(gameState); // 🌐 オンライン同期
+        cloudSavePlayer(gameState); 
         if (showFlash) logMessage("💾 セーブデータを保存しました！", true);
     }
-    // ==========================================
 
-    // ==========================================
-    // --- 🌐 オンライン同期設定 ---
-    // ==========================================
+    // Firebase同期設定
     const FIREBASE_DB_URL = "https://daikichi-67e67-default-rtdb.firebaseio.com";
 
     async function cloudGetPlayer(friendId) {
@@ -546,51 +666,74 @@
 
     async function cloudSavePlayer(state) {
         if (!FIREBASE_DB_URL) return;
-        try {
-            await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(state.friendId)}.json`, {
-                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ player: state })
-            });
-        } catch (e) { }
+        try { await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(state.friendId)}.json`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ player: state }) }); } catch (e) { }
     }
 
     async function cloudUpdatePlayerField(friendId, partialObj) {
         if (!FIREBASE_DB_URL) return false;
-        try {
-            const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}/player.json`, {
-                method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(partialObj)
-            });
-            return res.ok;
-        } catch (e) { return false; }
+        try { const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}/player.json`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(partialObj) }); return res.ok; } catch (e) { return false; }
     }
-    // ==========================================
 
     let logTimer = null; let isMoving = false; let bgmMode = 'title';
     let currentWorry = null; let hasWorry = false;
     let tempTransferData = null; 
-    let sessionTouchCount = 0;
 
-    function playSE(id) { 
-        try { 
-            const se = document.getElementById(`se-${id}`); 
-            if(se) { se.currentTime = 0; se.play().catch(()=>{}); }
-        } catch(e){} 
-    }
-    function playBGM(mode) {
-        bgmMode = mode; const main = document.getElementById('bgm-main'); const title = document.getElementById('bgm-title'); const gacha = document.getElementById('bgm-gacha');
-        try { main.pause(); title.pause(); gacha.pause(); } catch(e){}
-        try { if(mode==='title') title.play().catch(()=>{}); else if(mode==='main') main.play().catch(()=>{}); else if(mode==='gacha') gacha.play().catch(()=>{}); } catch(e){}
-    }
-    document.getElementById('bgm-vol-slider').oninput = (e) => { const v = e.target.value; ['bgm-main','bgm-title','bgm-gacha'].forEach(id => document.getElementById(id).volume = v); };
-    document.getElementById('se-vol-slider').oninput = (e) => { const v = e.target.value; ['se-click','se-coin','se-jump','se-error'].forEach(id => document.getElementById(id).volume = v); };
+    function playSE(id) { try { const se = document.getElementById(`se-${id}`); if(se) { se.currentTime = 0; se.play().catch(()=>{}); } } catch(e){} }
+    function playBGM(mode) { bgmMode = mode; const main = document.getElementById('bgm-main'); const title = document.getElementById('bgm-title'); const gacha = document.getElementById('bgm-gacha'); try { main.pause(); title.pause(); gacha.pause(); } catch(e){} try { if(mode==='title') title.play().catch(()=>{}); else if(mode==='main') main.play().catch(()=>{}); else if(mode==='gacha') gacha.play().catch(()=>{}); } catch(e){} }
 
+    // --- 35種類のごはんデータベース ---
     const foodData = {
-        pellet: { name: "ひかりウパ（粒餌）", cost: 10, exp: 5, full: 10 }, worm: { name: "冷凍赤虫", cost: 25, exp: 15, full: 20 }, shrimp: { name: "乾燥淡水エビ", cost: 50, exp: 32, full: 25 }, cookie: { name: "どうぶつクッキー", cost: 80, exp: 55, full: 30 }, cake: { name: "ミニパンケーキ", cost: 150, exp: 110, full: 50 }, premium: { name: "高級極エサ", cost: 300, exp: 240, full: 70 }, apple: { name: "林檎", cost: 15, exp: 8, full: 12 }, meat: { name: "ほねつき肉", cost: 60, exp: 42, full: 35 }, sushi: { name: "特上寿司", cost: 180, exp: 135, full: 55 }, steak: { name: "和牛ステーキ", cost: 250, exp: 195, full: 65 }, golden_apple: { name: "黄金のりんご", cost: 1000, exp: 900, full: 100 }
+        pellet: { name: "ひかりウパ（粒餌）", cost: 10, exp: 5, full: 10 },
+        worm: { name: "冷凍赤虫", cost: 25, exp: 15, full: 20 },
+        shrimp: { name: "乾燥淡水エビ", cost: 50, exp: 32, full: 25 },
+        cookie: { name: "どうぶつクッキー", cost: 80, exp: 55, full: 30 },
+        cake: { name: "ミニパンケーキ", cost: 150, exp: 110, full: 50 },
+        premium: { name: "高級極エサ", cost: 300, exp: 240, full: 70 },
+        apple: { name: "林檎", cost: 15, exp: 8, full: 12 },
+        meat: { name: "ほねつき肉", cost: 60, exp: 42, full: 35 },
+        sushi: { name: "特上寿司", cost: 180, exp: 135, full: 55 },
+        steak: { name: "和牛ステーキ", cost: 250, exp: 195, full: 65 },
+        golden_apple: { name: "黄金のりんご", cost: 1000, exp: 900, full: 100 },
+        strawberry: { name: "完熟いちご", cost: 20, exp: 10, full: 15 },
+        melon: { name: "クラウンメロン", cost: 400, exp: 350, full: 80 },
+        ramen: { name: "特製醤油ラーメン", cost: 90, exp: 70, full: 45 },
+        curry: { name: "スパイシーカレー", cost: 110, exp: 85, full: 50 },
+        macaron: { name: "桜マカロン", cost: 45, exp: 35, full: 18 },
+        parfait: { name: "豪華イチゴパフェ", cost: 220, exp: 180, full: 60 },
+        rice_egg: { name: "ふわとろオムライス", cost: 130, exp: 100, full: 52 },
+        takoyaki: { name: "アツアツたこ焼き", cost: 70, exp: 50, full: 30 },
+        taiyaki: { name: "あんこたい焼き", cost: 35, exp: 25, full: 20 },
+        pizza: { name: "たっぷりピザ", cost: 170, exp: 140, full: 58 },
+        burger: { name: "メガダブルバーガー", cost: 140, exp: 115, full: 50 },
+        donut: { name: "チョコドーナツ", cost: 40, exp: 28, full: 22 },
+        fries: { name: "カリカリポテト", cost: 55, exp: 38, full: 28 },
+        bubble_tea: { name: "極上タピオカミルク", cost: 75, exp: 60, full: 32 },
+        pudding: { name: "なめらかプリン", cost: 50, exp: 40, full: 24 },
+        onigiri: { name: "シャケおにぎり", cost: 25, exp: 18, full: 16 },
+        dango: { name: "みたらし団子", cost: 30, exp: 22, full: 18 },
+        croissant: { name: "黄金クロワッサン", cost: 45, exp: 32, full: 20 },
+        pineapple: { name: "完熟パイン", cost: 65, exp: 48, full: 30 },
+        grape: { name: "シャインマスカット", cost: 500, exp: 420, full: 75 },
+        peach: { name: "白桃", cost: 160, exp: 125, full: 40 },
+        crab: { name: "タラバガニ", cost: 380, exp: 310, full: 68 },
+        caviar: { name: "高級キャビア", cost: 800, exp: 720, full: 85 },
+        truffle: { name: "黒トリュフ", cost: 950, exp: 850, full: 95 }
     };
+
     const bgList = [ { id: "bg-aquarium", name: "🫧 アクアリウム", cost: 0 }, { id: "bg-garden", name: "🏡 ひろいお庭", cost: 100 }, { id: "bg-deepsea", name: "⚓ 深海", cost: 150 }, { id: "bg-space", name: "🌌 宇宙", cost: 200 }, { id: "bg-sunset", name: "🌇 夕焼け空", cost: 120 }, { id: "bg-candy", name: "🍬 お菓子の国", cost: 180 }, { id: "bg-room", name: "🛋️ マイルーム", cost: 80 } ];
     const furnitureData = { f_table: { name: "木製テーブル", emoji: "🟫", cost: 30 }, f_bed: { name: "お布団", emoji: "🛏️", cost: 100 }, f_tv: { name: "テレビ", emoji: "📺", cost: 120 }, f_bear: { name: "クマ", emoji: "🧸", cost: 50 }, f_game: { name: "ゲーム", emoji: "🕹️", cost: 90 }, f_sofa: { name: "ソファ", emoji: "🛋️", cost: 150 }, f_tent: { name: "テント", emoji: "⛺", cost: 220 }, f_crystal: { name: "水晶", emoji: "🔮", cost: 250 }, f_gold_chest: { name: "宝箱", emoji: "🪙", cost: 400 } };
     const costumeData = { "なし": { emoji: "" }, "🎀 リボン": { emoji: "🎀" }, "👑 王冠": { emoji: "👑" }, "🎩 ハット": { emoji: "🎩" }, "👓 メガネ": { emoji: "👓" }, "🐱 猫耳": { emoji: "🐱" }, "👼 天使": { emoji: "👼" }, "🌸 お花": { emoji: "🌸" } };
-    const worryData = [ { text: "角に頭をぶつけちゃう…", options: [ { text: "クッションを貼る", correct: true, rewardCoin: 30, rewardExp: 10, reply: "いたくなくなった！" }, { text: "ヘルメットを渡す", correct: false, rewardCoin: 10, rewardExp: 2, reply: "重いよぉ…" } ] }, { text: "なんだかツヤがない…", options: [ { text: "お水を綺麗にする", correct: true, rewardCoin: 50, rewardExp: 20, reply: "ピカピカ元気！" }, { text: "ペンで塗る", correct: false, rewardCoin: 0, rewardExp: 0, reply: "汚れちゃう！" } ] } ];
 
+    // --- 遠征限定・クラフト限定家具レシピ ---
+    const diyFurnitureData = {
+        diy_shell_lamp: { name: "輝く貝殻ランプ", emoji: "🐚", req: { shell: 3, dye: 1 } },
+        diy_ore_statue: { name: "古代鉱石の彫像", emoji: "🗿", req: { ore: 5, iron: 3 } },
+        diy_star_carpet: { name: "満天 of 星空絨毯", emoji: "🌌", req: { star: 4, dye: 2 } },
+        diy_sea_bed: { name: "深海貝のベッド", emoji: "🛏️", req: { shell: 5, wood: 5 } },
+        diy_crown_chair: { name: "王冠の玉座", emoji: "👑", req: { ore: 8, iron: 5, dye: 3 } }
+    };
+
+    // --- 35種類以上のやり込み称号図鑑 ---
     const TITLE_DICT = [
         { id: 't1', name: '見習い', cond: () => true, hint: '最初から' },
         { id: 't2', name: '駆け出し', cond: () => gameState.level >= 2, hint: 'レベル2到達' },
@@ -617,64 +760,146 @@
         { id: 't23', name: '成金', cond: () => gameState.coins >= 10000, hint: 'コイン10,000所持' },
         { id: 't24', name: '大富豪', cond: () => gameState.coins >= 50000, hint: 'コイン50,000所持' },
         { id: 't25', name: '億万長者', cond: () => gameState.coins >= 100000, hint: 'コイン100,000所持' },
-        { id: 't26', name: 'ぼっち回避', cond: () => gameState.friends.length >= 1, hint: 'フレンド1人' },
-        { id: 't27', name: '人気者', cond: () => gameState.friends.length >= 5, hint: 'フレンド5人' },
-        { id: 't28', name: 'カリスマ', cond: () => gameState.friends.length >= 10, hint: 'フレンド10人' },
-        { id: 't29', name: 'みんなのアイドル', cond: () => gameState.friends.length >= 20, hint: 'フレンド20人' },
-        { id: 't30', name: 'ズッ友', cond: () => gameState.favorites.length >= 1, hint: 'お気に入りを1人作る' },
+        { id: 't26', name: 'ぼっち回避', cond: () => gameState.friends && gameState.friends.length >= 1, hint: 'フレンド1人' },
+        { id: 't27', name: '人気者', cond: () => gameState.friends && gameState.friends.length >= 5, hint: 'フレンド5人' },
+        { id: 't28', name: 'カリスマ', cond: () => gameState.friends && gameState.friends.length >= 10, hint: 'フレンド10人' },
+        { id: 't29', name: 'みんなのアイドル', cond: () => gameState.friends && gameState.friends.length >= 20, hint: 'フレンド20人' },
+        { id: 't30', name: 'ズッ友', cond: () => gameState.favorites && gameState.favorites.length >= 1, hint: 'お気に入りを1人作る' },
         { id: 't31', name: '三日坊主', cond: () => gameState.maxLoginStreak >= 3, hint: '連続ログイン3日' },
         { id: 't32', name: '継続は力', cond: () => gameState.maxLoginStreak >= 10, hint: '連続ログイン10日' },
         { id: 't33', name: 'ログインの鬼', cond: () => gameState.maxLoginStreak >= 30, hint: '連続ログイン30日' },
-        { id: 'h1', name: '代表取締役', cond: () => gameState.unlockedHiddenTitles.includes('代表取締役'), hint: '' },
-        { id: 'h2', name: '愛情たっぷり', cond: () => gameState.unlockedHiddenTitles.includes('愛情たっぷり'), hint: '' }
+        { id: 't34', name: 'クラフター', cond: () => (gameState.totalDIYS || 0) >= 1, hint: '遠征限定家具を1回DIYする' },
+        { id: 't35', name: '匠（タクミ）', cond: () => (gameState.totalDIYS || 0) >= 5, hint: '遠征限定家具を5回DIYする' },
+        { id: 't36', name: '旅ガラス', cond: () => (gameState.totalExpeditions || 0) >= 3, hint: 'おでかけ探索に3回出す' },
+        { id: 't37', name: 'ワールドトラベラー', cond: () => (gameState.totalExpeditions || 0) >= 15, hint: 'おでかけ探索に15回出す' },
+        { id: 't38', name: '名家の一族', cond: () => (gameState.generation || 1) >= 3, hint: '世代交代を2回以上行う(3代目)' }
     ];
 
-    const minigames = [
-        { id: "mole", name: "ウパたたき🔨", desc: "ランダムに現れるウパをタップ！" },
-        { id: "memory", name: "神経衰弱🃏", desc: "同じ絵柄を当てよう" },
-        { id: "stop", name: "ジャストストップ⏱️", desc: "ゲージが中央に来た瞬間に止めろ！" },
-        { id: "slot", name: "ウパスロット🎰", desc: "絵柄を揃えろ！" },
-        { id: "math", name: "限界計算サバイバル🧮", desc: "間違えるまで続く" },
-        { id: "clicker", name: "10秒連打ラッシュ👆", desc: "ひたすら叩きまくれ！" },
-        { id: "catch", name: "リンゴキャッチ🍎", desc: "落ちてくるリンゴを拾おう！" }
+    // --- 30種類以上のミニゲームデータベース (全31種) ---
+    const minigameList = [
+        { id: "mole", name: "ウパたたき🔨", desc: "ランダムに現れるウパをタップ！", engine: "mole", icon: "🐙" },
+        { id: "memory", name: "神経衰弱🃏", desc: "同じカードをペアで揃えよう！", engine: "memory", icon: "🃏" },
+        { id: "stop", name: "ジャストストップ⏱️", desc: "ゲージが中央にきた瞬間にストップ！", engine: "stop", icon: "⏱️" },
+        { id: "slot", name: "ウパスロット🎰", desc: "目押しで絵柄を揃えて大当たり！", engine: "slot", icon: "🎰" },
+        { id: "math", name: "限界計算サバイバル🧮", desc: "2択の計算問題を瞬時に解き続けろ！", engine: "math", icon: "🧮" },
+        { id: "clicker", name: "10秒連打ラッシュ👆", desc: "限界を超えてボタンをタップ！", engine: "clicker", icon: "👆" },
+        { id: "catch", name: "リンゴキャッチ🍎", desc: "落ちてくる果物をカゴで受け取ろう！", engine: "catch", icon: "🍎" },
+        { id: "g_wood", name: "木材伐採ラリー🪵", desc: "大木を連打して木材を切り出そう！", engine: "clicker", icon: "🪵" },
+        { id: "g_iron", name: "鉄くず発掘⚒️", desc: "岩石を何度も叩いて鉄くずを発掘！", engine: "clicker", icon: "⚒️" },
+        { id: "g_heart", name: "ハッピーダンス踊り狂い💃", desc: "踊りまくって感情を爆発！", engine: "clicker", icon: "💃" },
+        { id: "g_balloon", name: "風船膨らまし対決🎈", desc: "連打で風船をギリギリまで膨らませろ！", engine: "clicker", icon: "🎈" },
+        { id: "g_crab", name: "カニカニパニック🦀", desc: "暴れるカニを素早くタップ！", engine: "mole", icon: "🦀" },
+        { id: "g_alien", name: "エイリアン襲来👽", desc: "侵略してくるUFOを撃退せよ！", engine: "mole", icon: "👽" },
+        { id: "g_bubble", name: "シャボン玉ポッピング🫧", desc: "浮かんで消えるシャボンを割れ！", engine: "mole", icon: "🫧" },
+        { id: "g_meteor", name: "メテオデストロイ☄️", desc: "隕石をタップして地球を守れ！", engine: "mole", icon: "☄️" },
+        { id: "g_fruit", name: "フルーツペアハント🍌", desc: "果物の位置を覚えて揃えよう！", engine: "memory", icon: "🍌" },
+        { id: "g_emoji", name: "絵文字パズル🧩", desc: "同じ絵の組み合わせを探し出せ！", engine: "memory", icon: "🧩" },
+        { id: "g_ocean", name: "マリンメイト🐬", desc: "海の仲間たちを引き合わせよう！", engine: "memory", icon: "🐬" },
+        { id: "g_fish", name: "グレートフィッシング🎣", desc: "魚が引いた瞬間にリールを引き抜け！", engine: "stop", icon: "🎣" },
+        { id: "g_landing", name: "ロケット月面着陸🚀", desc: "地表ぴったりでエンジンを噴射！", engine: "stop", icon: "🚀" },
+        { id: "g_bomb", name: "時限爆弾解除コード💣", desc: "赤ラインと針が重なる瞬間を狙え！", engine: "stop", icon: "💣" },
+        { id: "g_jump", name: "縄跳びダブルダッチ🪢", desc: "ロープが足元にくるタイミングでジャンプ！", engine: "stop", icon: "🪢" },
+        { id: "g_brain", name: "脳トレ2択パズル🧠", desc: "正しい図形の色を素早く回答！", engine: "math", icon: "🧠" },
+        { id: "g_sub", name: "超スピード引き算パズル🔢", desc: "10から引き算した答えを選べ！", engine: "math", icon: "🔢" },
+        { id: "g_mult", name: "爆速かけ算特訓✖️", desc: "九九を限界までサバイバル回答！", engine: "math", icon: "✖️" },
+        { id: "g_star", name: "星屑集め☆", desc: "夜空から降る流星をすべてカゴへ！", engine: "catch", icon: "⭐" },
+        { id: "g_rain", name: "雨粒よけ🌂", desc: "降ってくる危険な酸性雨を避けよ！", engine: "catch", icon: "🌂" },
+        { id: "g_gold", name: "金貨ゴールドラッシュ💰", desc: "大量のコインを集めまくれ！", engine: "catch", icon: "💰" },
+        { id: "g_janken", name: "ウパじゃんけん✊", desc: "ウパに勝てる手を素早く選ぼう！", engine: "janken", icon: "✊" },
+        { id: "g_box", name: "トレジャーミミック🎁", desc: "3つの宝箱から本物を選び抜け！", engine: "box", icon: "🎁" },
+        { id: "g_omikuji", name: "デイリーおみくじ⛩️", desc: "今日のウパ運を神に委ねる！", engine: "omikuji", icon: "⛩" }
     ];
 
-    // --- タイトル・ロード・引き継ぎ ---
+    // --- お悩みデータベース ---
+    const worryData = [ 
+        { text: "角に頭をぶつけちゃう…", options: [ { text: "クッションを貼る", correct: true, rewardCoin: 30, rewardExp: 10, reply: "いたくなくなった！" }, { text: "ヘルメットを渡す", correct: false, rewardCoin: 10, rewardExp: 2, reply: "重いよぉ…" } ] }, 
+        { text: "なんだかツヤがない…", options: [ { text: "お水を綺麗にする", correct: true, rewardCoin: 50, rewardExp: 20, reply: "ピカピカ元気！" }, { text: "ペンで塗る", correct: false, rewardCoin: 0, rewardExp: 0, reply: "汚れちゃう！" } ] },
+        { text: "雨の日だから、お部屋に【寒色系】の家具を置いて落ち着きたいな…", options: [{ text: "青色オーラ(DIY)を付与する", correct: true, rewardCoin: 60, rewardExp: 30, reply: "すごく落ち着く〜！"}, {text:"気にしない", correct: false, rewardCoin: 10, rewardExp: 5, reply: "むぅ…"}] },
+        { text: "今の流行りの【レトロモダン】な服や部屋に変えてみたい気分！", options: [{ text: "メガネをかける", correct: true, rewardCoin: 80, rewardExp: 40, reply: "知的なウパ誕生！"}, {text:"そのままがいいよ", correct: false, rewardCoin: 20, rewardExp: 10, reply: "そうかな？"}] },
+        { text: "もっと広い世界を見たいな。遠征に行って新しい刺激が欲しい！", options: [{ text: "遠征に行かせる", correct: true, rewardCoin: 100, rewardExp: 50, reply: "お土産、楽しみにしててね！"}, {text:"お家が一番だよ", correct: false, rewardCoin: 20, rewardExp: 10, reply: "退屈だなぁ…"}] }
+    ];
+
+    // --- 起動・初期化 ---
     function initTitleScreen() {
-        document.getElementById('title-screen').style.display = 'flex'; document.getElementById('title-load-pane').style.display = 'none';
-        document.getElementById('title-start-new-btn').style.display = 'block'; document.getElementById('title-load-menu-btn').style.display = 'block';
+        document.getElementById('title-screen').style.display = 'flex'; 
+        document.getElementById('title-load-pane').style.display = 'none';
+        document.getElementById('title-start-new-btn').style.display = 'block'; 
+        document.getElementById('title-load-menu-btn').style.display = 'block';
         playBGM('title');
     }
+
     function renderSaveSlots() {
-        const container = document.getElementById('save-slots-container'); container.innerHTML = '';
+        const container = document.getElementById('save-slots-container'); 
+        container.innerHTML = '';
         const slots = getGlobalSaves();
         slots.forEach((slot, idx) => {
             const card = document.createElement('div'); card.className = 'save-slot-card';
             if (slot) {
-                card.innerHTML = `<div class="slot-click-area" id="slot-click-${idx}"><b style="color:#15aabf;">${slot.name}</b><br><small>Lv.${slot.level} | 💰${slot.coins}</small></div><button class="delete-slot-btn" id="slot-del-btn-${idx}">🗑️</button>`;
+                const gen = slot.generation || 1;
+                card.innerHTML = `<div class="slot-click-area" id="slot-click-${idx}"><b style="color:#15aabf;">${slot.name}</b><small style="background:#e3fafc; padding:2px 4px; border-radius:4px; margin-left:5px;">${gen}代目</small><br><small>Lv.${slot.level} | 💰${slot.coins}</small></div><button class="delete-slot-btn" id="slot-del-btn-${idx}">🗑️</button>`;
                 container.appendChild(card);
+                
                 document.getElementById(`slot-click-${idx}`).onclick = () => { 
-                    currentSlotIndex = idx; gameState = migrateData(slot); 
+                    currentSlotIndex = idx; 
+                    gameState = migrateData(slot); 
                     document.getElementById('title-screen').style.display = 'none'; 
                     document.getElementById('game-slot-indicator').innerText = `Slot ${idx+1}`; 
-                    checkLoginStreakAndMissions(); updateUI(); checkNotices(); playBGM('main'); 
+                    checkLoginStreakAndMissions(); 
+                    updateUI(); 
+                    checkNotices(); 
+                    playBGM('main'); 
                 };
-                document.getElementById(`slot-del-btn-${idx}`).onclick = () => { if(confirm(`スロット ${idx+1} を完全に消去しますか？`)) { let fresh = getGlobalSaves(); fresh[idx] = null; saveAllSlots(fresh); renderSaveSlots(); } };
+                
+                document.getElementById(`slot-del-btn-${idx}`).onclick = () => { 
+                    if(confirm(`スロット ${idx+1} を完全に消去しますか？`)) { 
+                        let fresh = getGlobalSaves(); 
+                        fresh[idx] = null; 
+                        saveAllSlots(fresh); 
+                        renderSaveSlots(); 
+                    } 
+                };
             } else {
-                card.innerHTML = `<div style="color:#adb5bd; font-style:italic; flex-grow:1; padding:4px;">空のデータ (スロット ${idx+1})</div>`;
-                card.onclick = () => { currentSlotIndex = idx; startNewGameFlow(); };
+                card.innerHTML = `<div style="color:#adb5bd; font-style:italic; flex-grow:1; padding:4px; cursor:pointer;" id="slot-empty-${idx}">空のデータ (スロット ${idx+1})</div>`;
                 container.appendChild(card);
+                document.getElementById(`slot-empty-${idx}`).onclick = () => { 
+                    currentSlotIndex = idx; 
+                    startNewGameFlow(); 
+                };
             }
         });
     }
 
-    function startNewGameFlow() { playBGM('main'); document.getElementById('title-screen').style.display = 'none'; document.getElementById('welcome-screen').style.display = 'flex'; gameState = createInitialState(); applyAppearanceForState(gameState); }
-    document.getElementById('title-start-new-btn').onclick = () => { const slots = getGlobalSaves(); if(slots[0] && slots[1]){ if(!confirm("スロット1を上書きして始めますか？")) return; currentSlotIndex = 0; } else { currentSlotIndex = slots[0] ? 1 : 0; } startNewGameFlow(); };
-    document.getElementById('title-load-menu-btn').onclick = () => { document.getElementById('title-start-new-btn').style.display = 'none'; document.getElementById('title-load-menu-btn').style.display = 'none'; document.getElementById('title-load-pane').style.display = 'block'; renderSaveSlots(); };
+    function startNewGameFlow() { 
+        playBGM('main'); 
+        document.getElementById('title-screen').style.display = 'none'; 
+        document.getElementById('welcome-screen').style.display = 'flex'; 
+        gameState = createInitialState(); 
+        applyAppearanceForState(gameState); 
+    }
+
+    document.getElementById('title-start-new-btn').onclick = () => { 
+        const slots = getGlobalSaves(); 
+        if(slots[0] && slots[1]){ 
+            if(!confirm("スロット1を上書きして始めますか？")) return; 
+            currentSlotIndex = 0; 
+        } else { 
+            currentSlotIndex = slots[0] ? 1 : 0; 
+        } 
+        startNewGameFlow(); 
+    };
+    
+    document.getElementById('title-load-menu-btn').onclick = () => { 
+        document.getElementById('title-start-new-btn').style.display = 'none'; 
+        document.getElementById('title-load-menu-btn').style.display = 'none'; 
+        document.getElementById('title-load-pane').style.display = 'block'; 
+        renderSaveSlots(); 
+    };
+    
     document.getElementById('btn-back-to-title').onclick = initTitleScreen;
 
     document.getElementById('btn-title-execute-transfer').onclick = async () => {
-        const idInput = document.getElementById('title-transfer-id').value.trim(); const passInput = document.getElementById('title-transfer-pass').value.trim();
+        const idInput = document.getElementById('title-transfer-id').value.trim(); 
+        const passInput = document.getElementById('title-transfer-pass').value.trim();
         if(!idInput || !passInput) return alert("すべて入力してください");
 
         const transferBtn = document.getElementById('btn-title-execute-transfer');
@@ -683,11 +908,12 @@
         if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === idInput); }
         transferBtn.disabled = false; transferBtn.innerText = "この端末に同期する";
 
-        if(!targetAcc) { playSE('error'); return alert("❌ 指定されたIDは見つかりません。\n（オンライン同期を設定していない場合、別の端末のデータは引き継げません）"); }
+        if(!targetAcc) { playSE('error'); return alert("❌ 指定されたIDは見つかりません。"); }
         if(targetAcc.password !== passInput) { playSE('error'); return alert("❌ パスワードが一致しません。"); }
         tempTransferData = migrateData(JSON.parse(JSON.stringify(targetAcc)));
         document.getElementById('transfer-slot-modal').style.display = 'flex';
     };
+    
     document.getElementById('tslot-0-btn').onclick = () => executeTransferToSlot(0);
     document.getElementById('tslot-1-btn').onclick = () => executeTransferToSlot(1);
     document.getElementById('close-tslot-modal').onclick = () => closeModal('transfer-slot-modal');
@@ -696,7 +922,7 @@
         currentSlotIndex = slotIdx; gameState = tempTransferData;
         let slots = getGlobalSaves(); slots[currentSlotIndex] = gameState; saveAllSlots(slots);
         closeModal('transfer-slot-modal'); renderSaveSlots();
-        alert(`✅ スロット ${slotIdx+1} に引き継ぎが完了しました！リストから選択して遊んでください。`);
+        alert(`✅ スロット ${slotIdx+1} に同期が完了しました！リストから選択して遊んでください。`);
         document.getElementById('title-transfer-id').value = ""; document.getElementById('title-transfer-pass').value = "";
     }
 
@@ -753,48 +979,72 @@
         }
     }
 
-    // 定期的に通知を確認
-    setInterval(async () => {
-        if(document.getElementById('title-screen').style.display === 'flex' || !gameState.friendId) return;
-        if(FIREBASE_DB_URL) {
-            const me = await cloudGetPlayer(gameState.friendId);
-            if(me && me.notices) {
-                let updated = false;
-                me.notices.forEach(n => {
-                    if(!gameState.notices) gameState.notices = [];
-                    if(!gameState.notices.some(localN => localN.id === n.id)) {
-                        gameState.notices.push(n);
-                        updated = true;
-                    }
-                });
-                if(updated) {
-                    checkNotices();
-                    saveActiveGame();
-                }
-            }
-        }
-    }, 15000);
-
+    // --- ドラッグ（PointerEvents） ＆ 描画システム ---
     function renderPlacedFurnitureForState(s) {
         const layer = document.getElementById('furniture-placement-layer'); 
         layer.innerHTML = ''; 
         const furnitures = s.placedFurniture || [];
         furnitures.forEach(f => { 
-            const div = document.createElement('div'); div.className = 'placed-furniture'; div.innerText = f.emoji; 
-            div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; 
+            const div = document.createElement('div'); 
+            div.className = 'placed-furniture'; 
+            div.innerText = f.emoji; 
+            div.style.left = `${f.x}px`; 
+            div.style.top = `${f.y}px`; 
+            
+            if(f.colorFilter) {
+                div.style.filter = `drop-shadow(0 0 10px ${f.colorFilter}) drop-shadow(0 4px 6px rgba(0,0,0,0.15))`;
+            }
             
             if(isVisiting) {
                 div.style.pointerEvents = 'none';
             } else {
                 div.style.pointerEvents = 'auto'; 
-                let drag = false; let sx, sy; 
-                const start = (cx, cy) => { drag = true; div.classList.add('editing'); sx = cx - div.offsetLeft; sy = cy - div.offsetTop; }; 
-                const move = (cx, cy) => { if(!drag) return; f.x = cx - sx; f.y = cy - sy; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; }; 
-                const end = () => { if(drag) { drag = false; div.classList.remove('editing'); saveActiveGame(); } }; 
-                div.onmousedown = (e) => { start(e.clientX, e.clientY); e.stopPropagation(); }; window.onmousemove = (e) => move(e.clientX, e.clientY); window.onmouseup = end; 
-                div.ontouchstart = (e) => { start(e.touches[0].clientX, e.touches[0].clientY); e.stopPropagation(); }; window.ontouchmove = (e) => { if(drag) move(e.touches[0].clientX, e.touches[0].clientY); }; window.ontouchend = end; 
+                let drag = false; 
+                let sx, sy; 
+                
+                const start = (cx, cy) => { 
+                    drag = true; 
+                    div.classList.add('editing'); 
+                    sx = cx - div.offsetLeft; 
+                    sy = cy - div.offsetTop; 
+                }; 
+                const move = (cx, cy) => { 
+                    if(!drag) return; 
+                    f.x = cx - sx; 
+                    f.y = cy - sy; 
+                    div.style.left = `${f.x}px`; 
+                    div.style.top = `${f.y}px`; 
+                }; 
+                
+                div.onpointerdown = (e) => {
+                    div.setPointerCapture(e.pointerId);
+                    start(e.clientX, e.clientY);
+                    e.stopPropagation();
+                };
+                div.onpointermove = (e) => {
+                    if(drag) move(e.clientX, e.clientY);
+                };
+                div.onpointerup = (e) => {
+                    if(drag) {
+                        drag = false;
+                        div.classList.remove('editing');
+                        saveActiveGame();
+                    }
+                };
+                
                 let lt = 0; 
-                div.onclick = (e) => { let now = Date.now(); if(now - lt < 300) { playSE('click'); gameState.furnitureInventory[f.key] = (gameState.furnitureInventory[f.key] || 0) + 1; gameState.placedFurniture = gameState.placedFurniture.filter(x => x.id !== f.id); updateUI(); saveActiveGame(); } lt = now; e.stopPropagation(); }; 
+                div.onclick = (e) => { 
+                    let now = Date.now(); 
+                    if(now - lt < 300) { 
+                        playSE('click'); 
+                        gameState.furnitureInventory[f.key] = (gameState.furnitureInventory[f.key] || 0) + 1; 
+                        gameState.placedFurniture = gameState.placedFurniture.filter(x => x.id !== f.id); 
+                        updateUI(); 
+                        saveActiveGame(); 
+                    } 
+                    lt = now; 
+                    e.stopPropagation(); 
+                }; 
             }
             layer.appendChild(div); 
         });
@@ -813,7 +1063,9 @@
         if(!isVisiting) {
             document.getElementById('body-color-picker').value = s.appearance.bodyColor; 
             document.getElementById('gill-color-picker').value = s.appearance.gillColor;
-            document.querySelectorAll('#char-types .type-btn').forEach(el => { if(el.getAttribute('data-type') === s.appearance.type) el.classList.add('active'); else el.classList.remove('active'); });
+            document.querySelectorAll('#char-types .type-btn').forEach(el => { 
+                if(el.getAttribute('data-type') === s.appearance.type) el.classList.add('active'); else el.classList.remove('active'); 
+            });
         }
     }
 
@@ -821,7 +1073,7 @@
         const s = isVisiting ? visitTargetSave : gameState;
         if(!s) return;
 
-        document.getElementById('level-display').innerText = `Lv.${s.level}`; 
+        document.getElementById('level-display').innerHTML = `Lv.${s.level} <span id="gen-display" style="font-size:0.75rem; background:rgba(0,0,0,0.2); padding:2px 6px; border-radius:6px; margin-left:4px;">${s.generation || 1}代目</span>`; 
         document.getElementById('coin-display').innerText = `💰 ${s.coins}`;
         document.getElementById('exp-bar').style.width = `${Math.min((s.exp / s.maxExp) * 100, 100)}%`; 
         document.getElementById('next-exp-display').innerText = isVisiting ? '---' : `あと ${s.maxExp - s.exp} EXP`;
@@ -830,7 +1082,6 @@
         document.getElementById('personality-display').innerText = `称号: ${s.currentTitle}`; 
         document.getElementById('love-display').innerText = `💖 なつき度: Lv.${s.loveLevel || 0}`;
         document.getElementById('main-name-label').innerText = s.name;
-        document.getElementById('preview-name-label') && (document.getElementById('preview-name-label').innerText = s.name);
         
         const cos = costumeData[s.currentCostume || "なし"]; 
         document.getElementById('costume-layer').innerText = cos ? cos.emoji : "";
@@ -854,6 +1105,21 @@
         const actionBtns = document.querySelectorAll('.action-menu .menu-btn');
         if(isVisiting) { actionBtns.forEach(btn => btn.style.opacity = '0.5'); } 
         else { actionBtns.forEach(btn => btn.style.opacity = '1'); }
+
+        if(!isVisiting) {
+            document.getElementById('cnt-wood').innerText = s.materials.wood;
+            document.getElementById('cnt-iron').innerText = s.materials.iron;
+            document.getElementById('cnt-dye').innerText = s.materials.dye;
+            document.getElementById('cnt-shell').innerText = s.materials.shell || 0;
+            document.getElementById('cnt-ore').innerText = s.materials.ore || 0;
+            document.getElementById('cnt-star').innerText = s.materials.star || 0;
+            document.getElementById('txt-skill-pts').innerText = s.skills.points;
+            document.getElementById('txt-lvl-cafe').innerText = s.town.cafe;
+            document.getElementById('txt-lvl-park').innerText = s.town.park;
+            document.getElementById('gen-display').innerText = `${s.generation || 1}代目`;
+            
+            renderDiyRecipes();
+        }
     }
 
     function moveCharacter(targetX, targetY, duration = 800) {
@@ -877,15 +1143,6 @@
         const charImg = document.getElementById('upa-char');
         charImg.classList.add('jump');
         setTimeout(() => charImg.classList.remove('jump'), 300);
-        
-        if(!isVisiting) {
-            sessionTouchCount++;
-            if(sessionTouchCount === 100 && !gameState.unlockedHiddenTitles.includes('愛情たっぷり')) {
-                gameState.unlockedHiddenTitles.push('愛情たっぷり');
-                alert('🏆 隠し称号「愛情たっぷり」を解放しました！');
-                saveActiveGame();
-            }
-        }
     };
     
     document.getElementById('aquarium').onclick = (e) => {
@@ -899,7 +1156,7 @@
     document.getElementById('menu-trigger').onclick = () => { playSE('click'); sideDrawer.style.display = 'flex'; checkNotices(); };
     document.getElementById('close-drawer').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; };
 
-    // --- お知らせ関連 ---
+    // --- お知らせ ---
     document.getElementById('drawer-notice-btn').onclick = () => {
         playSE('click'); sideDrawer.style.display = 'none';
         renderNotices();
@@ -938,11 +1195,7 @@
         });
     }
 
-    window.deleteNotice = function(nid) {
-        playSE('click');
-        gameState.notices = gameState.notices.filter(n => n.id !== nid);
-        saveActiveGame(); renderNotices(); checkNotices();
-    };
+    window.deleteNotice = function(nid) { playSE('click'); gameState.notices = gameState.notices.filter(n => n.id !== nid); saveActiveGame(); renderNotices(); checkNotices(); };
 
     window.acceptFriend = async function(nid, fromId, fromName, fromOwner, fromLevel, fromBg, fromAppStr) {
         playSE('click');
@@ -959,20 +1212,13 @@
         
         if(targetAcc) {
             targetAcc.notices = targetAcc.notices || [];
-            targetAcc.notices.push({
-                id: Date.now().toString(), type: 'request_accepted', fromId: gameState.friendId, fromOwner: gameState.ownerName, timestamp: Date.now()
-            });
+            targetAcc.notices.push({ id: Date.now().toString(), type: 'request_accepted', fromId: gameState.friendId, fromOwner: gameState.ownerName, timestamp: Date.now() });
             if(!targetAcc.friends) targetAcc.friends = [];
-            if(!targetAcc.friends.some(f => f.id === gameState.friendId)) {
-                targetAcc.friends.push({
-                    id: gameState.friendId, name: gameState.name, ownerName: gameState.ownerName, level: gameState.level, bg: gameState.appearance.bgClass, app: gameState.appearance
-                });
-            }
-            if(FIREBASE_DB_URL) {
+            if(!targetAcc.friends.some(f => f.id === gameState.friendId)) { targetAcc.friends.push({ id: gameState.friendId, name: gameState.name, ownerName: gameState.ownerName, level: gameState.level, bg: gameState.appearance.bgClass, app: gameState.appearance }); }
+            if(FIREBASE_DB_URL) { 
                 await cloudUpdatePlayerField(fromId, { notices: targetAcc.notices, friends: targetAcc.friends });
-            } else {
-                let pool = getAccountPool(); let idx = pool.findIndex(a => a.friendId === fromId);
-                if(idx !== -1) { pool[idx].notices = targetAcc.notices; pool[idx].friends = targetAcc.friends; localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); }
+            } else { 
+                let pool = getAccountPool(); let idx = pool.findIndex(a => a.friendId === fromId); if(idx !== -1) { pool[idx].notices = targetAcc.notices; pool[idx].friends = targetAcc.friends; localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); } 
             }
         }
         saveActiveGame(); renderNotices(); alert(`${fromOwner} さんとフレンドになりました！`);
@@ -982,9 +1228,9 @@
     document.getElementById('drawer-profile-btn').onclick = () => {
         playSE('click'); sideDrawer.style.display = 'none';
         document.getElementById('prof-owner-pet').innerText = `${gameState.ownerName} の ${gameState.name}`;
-        document.getElementById('prof-level').innerText = `レベル: Lv.${gameState.level}`;
+        document.getElementById('prof-level').innerText = `レベル: Lv.${gameState.level} (${gameState.generation}代目)`;
         document.getElementById('prof-title').innerText = `称号: ${gameState.currentTitle}`; document.getElementById('prof-coins').innerText = `お財布: 💰 ${gameState.coins}`;
-        document.getElementById('prof-stats').innerText = `総エサ: ${gameState.totalFeeds||0}回 / 総ゲーム: ${gameState.totalMinigames||0}回`;
+        document.getElementById('prof-stats').innerText = `総エサ: ${gameState.totalFeeds||0}回 / 総ゲーム: ${gameState.totalMinigames||0}回 / お悩み解決: ${gameState.solvedCount||0}回`;
         document.getElementById('prof-login-days').innerText = `🔥連続: ${gameState.currentLoginStreak || 1}日 / 🏆最高: ${gameState.maxLoginStreak || 1}日`;
         document.getElementById('profile-modal').style.display = 'flex';
     };
@@ -1002,15 +1248,9 @@
             if(unlocked) {
                 const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = 'ｾｯﾄ'; btn.style.padding = '4px'; btn.style.fontSize = '0.7rem';
                 if(gameState.currentTitle === t.name) { btn.innerText = 'ｾｯﾄ中'; btn.style.background = '#40c057'; btn.style.color = 'white'; }
-                else { 
-                    btn.onclick = () => { 
-                        playSE('click'); gameState.currentTitle = t.name; updateUI(); saveActiveGame(); 
-                        closeModal('title-dict-modal'); alert(`称号を「${t.name}」にセットしました！`); 
-                    }; 
-                }
+                else { btn.onclick = () => { playSE('click'); gameState.currentTitle = t.name; updateUI(); saveActiveGame(); closeModal('title-dict-modal'); alert(`称号を「${t.name}」にセットしました！`); }; }
                 div.appendChild(btn);
             } else { div.innerHTML += `<span style="font-size:1.2rem; opacity:0.3;">🔒</span>`; }
-            
             if(i < TITLE_DICT.length / 2) pLeft.appendChild(div); else pRight.appendChild(div);
         });
         document.getElementById('title-dict-modal').style.display = 'flex';
@@ -1020,7 +1260,7 @@
     document.getElementById('drawer-mg-record-btn').onclick = () => {
         playSE('click'); sideDrawer.style.display = 'none';
         const container = document.getElementById('mg-record-container'); container.innerHTML = '';
-        minigames.forEach(g => {
+        minigameList.slice(0, 10).forEach(g => {
             const stats = gameState.minigameStats[g.id] || { plays: 0, highscore: 0 };
             const div = document.createElement('div'); div.className = 'mission-item';
             div.innerHTML = `<span>🎮 ${g.name}</span><div style="text-align:right;"><small>回数: ${stats.plays}回</small><br><b style="color:#d9480f;">最高: ${stats.highscore}</b></div>`;
@@ -1034,13 +1274,12 @@
     document.getElementById('close-settings').onclick = () => { playSE('click'); closeModal('settings-modal'); };
     document.getElementById('btn-admin-login').onclick = () => {
         playSE('click'); const pw = prompt("管理者パスワードを入力:");
-        if(pw === "aka.kataoka1025") { document.getElementById('admin-panel').style.display = 'block'; alert("管理者モードを有効化しました。"); } else { playSE('error'); alert("パスワードが違います。"); }
+        if(pw === "aka.kataoka1025") { document.getElementById('admin-panel').style.display = 'block'; alert("管理者メニューを有効化しました。"); } else { playSE('error'); alert("パスワードが違います。"); }
     };
     document.getElementById('cheat-coin').onclick = () => { playSE('coin'); gameState.coins += 10000; updateUI(); saveActiveGame(true); alert("10000コイン追加"); };
     document.getElementById('cheat-exp').onclick = () => { playSE('coin'); gainExp(9999); alert("9999EXP追加"); };
     document.getElementById('cheat-full').onclick = () => { playSE('click'); gameState.fullness = 100; updateUI(); saveActiveGame(true); alert("満腹度MAX"); };
     document.getElementById('cheat-furni').onclick = () => { playSE('click'); for (const k in furnitureData) { gameState.furnitureInventory[k] = (gameState.furnitureInventory[k]||0)+1; } saveActiveGame(true); alert("全家具+1"); };
-    document.getElementById('cheat-ceo').onclick = () => { playSE('click'); if(!gameState.unlockedHiddenTitles.includes('代表取締役')) { gameState.unlockedHiddenTitles.push('代表取締役'); alert("称号「代表取締役」を解放しました！"); saveActiveGame(true); } };
 
     // --- フレンド機能 ---
     document.getElementById('drawer-friend-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('my-friend-id').innerText = gameState.friendId; renderFriendList(); document.getElementById('friend-modal').style.display = 'flex'; };
@@ -1056,7 +1295,7 @@
         if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === fid); }
         addFriendBtn.disabled = false; addFriendBtn.innerText = "検索追加";
 
-        if(!targetAcc) { playSE('error'); return alert("見つかりません。IDが正しいか、相手が一度セーブ済みか確認してください。"); }
+        if(!targetAcc) { playSE('error'); return alert("見つかりません。"); }
 
         if(confirm(`「${targetAcc.ownerName} の ${targetAcc.name}」さんにフレンド申請を送りますか？`)) {
             const req = {
@@ -1071,7 +1310,7 @@
                 let pool = getAccountPool(); let idx = pool.findIndex(a => a.friendId === fid);
                 if(idx !== -1) { pool[idx].notices = targetAcc.notices; localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); }
             }
-            alert("フレンド申請を送信しました！相手が許可するまでお待ちください。");
+            alert("フレンド申請を送信しました！");
             document.getElementById('friend-id-input').value = "";
         }
     };
@@ -1079,7 +1318,7 @@
     function renderFriendList() {
         const container = document.getElementById('friend-list-container');
         if(!gameState.favorites) gameState.favorites = [];
-        if(!gameState.friends || gameState.friends.length === 0) { container.innerHTML = "<div style='text-align:center; padding:20px;'>まだフレンドがいません</div>"; return; }
+        if(!gameState.friends || gameState.friends.length === 0) { container.innerHTML = "<div style='text-align:center; padding:20px; font-weight:bold;'>まだフレンドがいません</div>"; return; }
         
         container.innerHTML = gameState.friends.map((f, i) => {
             const isFav = gameState.favorites.includes(f.id);
@@ -1087,9 +1326,12 @@
             const borderCol = isFav ? '#fcc419' : '#dee2e6';
             return `<div class="f-list-item" style="background:${bgCol}; border-color:${borderCol};">
                 <div style="flex-grow:1; cursor:pointer;" onclick="openFriendVisit('${f.id}')">
-                    <b style="color:#0b7285; font-size:1rem;">${f.ownerName}の ${f.name}</b><br><small>Lv.${f.level} | 🏠 訪問・プロフ</small>
+                    <b style="color:#0b7285; font-size:1rem;">${f.ownerName}の ${f.name}</b><br><small>Lv.${f.level} | 🏠 訪問・交流・交配</small>
                 </div>
-                <button class="f-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${f.id}')" style="font-size:1.8rem;">${isFav ? '⭐' : '☆'}</button>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <button class="f-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${f.id}')" style="font-size:1.5rem; padding:4px;">${isFav ? '⭐' : '☆'}</button>
+                    <button class="delete-slot-btn" onclick="deleteFriend('${f.id}')" style="padding:4px 8px; font-size:0.75rem;">🗑️</button>
+                </div>
             </div>`;
         }).join("");
     }
@@ -1099,6 +1341,23 @@
         if(gameState.favorites.includes(fid)) { gameState.favorites = gameState.favorites.filter(id => id !== fid); }
         else { gameState.favorites.push(fid); }
         renderFriendList(); saveActiveGame();
+    };
+
+    window.deleteFriend = function(fid) {
+        playSE('click');
+        const friend = gameState.friends.find(f => f.id === fid);
+        if(!friend) return;
+
+        if(confirm(`本当に 「${friend.ownerName}の ${friend.name}」さんをフレンドから削除しますか？`)) {
+            gameState.friends = gameState.friends.filter(f => f.id !== fid);
+            if(gameState.favorites) gameState.favorites = gameState.favorites.filter(id => id !== fid);
+            if(gameState.friendLove) delete gameState.friendLove[fid];
+            if(gameState.lastInteractDates) delete gameState.lastInteractDates[fid];
+            
+            alert(`フレンド 「${friend.name}」 さんを削除しました。`);
+            renderFriendList();
+            saveActiveGame();
+        }
     };
     
     let targetVisitFriendData = null;
@@ -1114,7 +1373,7 @@
         targetVisitFriendSave = await cloudGetPlayer(fid);
         if(!targetVisitFriendSave) { const pool = getAccountPool(); targetVisitFriendSave = pool.find(acc => acc.friendId === fid); }
         
-        btnDoVisit.innerText = "🏠 お家に行く"; btnDoVisit.disabled = false;
+        btnDoVisit.innerText = "🏠 お家を見に行く"; btnDoVisit.disabled = false;
         
         if(!targetVisitFriendSave) { return alert("相手のデータが見つかりませんでした。"); }
 
@@ -1132,27 +1391,65 @@
         }
 
         document.getElementById('visit-f-profile').innerHTML = `
-            <b>ペット:</b> ${targetVisitFriendSave.name}<br>
+            <b>ペット:</b> ${targetVisitFriendSave.name} (${targetVisitFriendSave.generation||1}代目)<br>
             <b>レベル:</b> Lv.${targetVisitFriendSave.level}<br>
             <b>称号:</b> ${targetVisitFriendSave.currentTitle || '見習い'}<br>
-            <b>ステータス:</b> 総エサ ${targetVisitFriendSave.totalFeeds||0}回 / 総ゲーム ${targetVisitFriendSave.totalMinigames||0}回<br>
-            <b>ログイン:</b> 連続${targetVisitFriendSave.currentLoginStreak||1}日 (最高${targetVisitFriendSave.maxLoginStreak||1}日)
+            <b>ステータス:</b> 総エサ ${targetVisitFriendSave.totalFeeds||0}回 / 解決 ${targetVisitFriendSave.solvedCount||0}回<br>
         `;
+
+        if(!gameState.friendLove[fid]) gameState.friendLove[fid] = 0;
+        document.getElementById('visit-f-love-display').innerText = `親愛度: ${gameState.friendLove[fid]} / 100`;
+        
+        const btnBreed = document.getElementById('btn-breed');
+        if(gameState.friendLove[fid] >= 80) {
+            btnBreed.style.display = 'block';
+            btnBreed.onclick = () => triggerBreedingChoice(fid);
+        } else {
+            btnBreed.style.display = 'none';
+        }
         
         document.getElementById('friend-visit-modal').style.display = 'flex';
     };
     document.getElementById('close-visit-modal').onclick = () => { playSE('click'); closeModal('friend-visit-modal'); };
 
+    // 交流 (1日1回制限)
+    document.getElementById('btn-interact').onclick = () => {
+        playSE('click');
+        const fid = targetVisitFriendData.id;
+        
+        // 1日1回チェック
+        const now = new Date();
+        const todayStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+        
+        if (!gameState.lastInteractDates) gameState.lastInteractDates = {};
+        
+        if (gameState.lastInteractDates[fid] === todayStr) {
+            playSE('error');
+            alert(`⚠️ 今日の交流は既に完了しています！\nまた明日遊びに行きましょう。`);
+            return;
+        }
+        
+        gameState.friendLove[fid] = Math.min(100, (gameState.friendLove[fid] || 0) + 10);
+        gameState.lastInteractDates[fid] = todayStr; // 今日の日付を記録
+        
+        document.getElementById('visit-f-love-display').innerText = `親愛度: ${gameState.friendLove[fid]} / 100`;
+        alert(`${targetVisitFriendData.name} と一緒に遊びました！ (親愛度 +10)`);
+        
+        if(gameState.friendLove[fid] >= 80) {
+            const btnBreed = document.getElementById('btn-breed');
+            btnBreed.style.display = 'block';
+            btnBreed.onclick = () => triggerBreedingChoice(fid);
+        }
+        saveActiveGame();
+    };
+
     document.getElementById('btn-send-money').onclick = async () => {
         playSE('click');
-        if(gameState.coins < 100) { playSE('error'); return alert("お金が足りません (100コイン必要です)"); }
+        if(gameState.coins < 100) { playSE('error'); return alert("お金が足りません"); }
         gameState.coins -= 100;
         
         let pool = getAccountPool(); let targetIndex = pool.findIndex(a => a.friendId === targetVisitFriendData.id);
-        if(targetIndex !== -1) {
-            pool[targetIndex].coins += 100;
-            localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); 
-        }
+        if(targetIndex !== -1) { pool[targetIndex].coins += 100; localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); }
         const cloudFriend = await cloudGetPlayer(targetVisitFriendData.id);
         if(cloudFriend) { await cloudUpdatePlayerField(targetVisitFriendData.id, { coins: (cloudFriend.coins || 0) + 100 }); }
 
@@ -1183,121 +1480,508 @@
         document.getElementById('aquarium').appendChild(backBtn);
     };
 
-    document.getElementById('drawer-transfer-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('trans-my-id').innerText = gameState.friendId; document.getElementById('trans-my-pass').innerText = gameState.password || "1234"; document.getElementById('transfer-modal').style.display = 'flex'; };
-    document.getElementById('close-transfer-modal').onclick = () => { playSE('click'); closeModal('transfer-modal'); };
-    document.getElementById('btn-change-pass').onclick = () => { playSE('click'); const p = prompt("新しいパスワードを設定", gameState.password); if(p && p.trim()!=="") { gameState.password = p.trim(); document.getElementById('trans-my-pass').innerText = gameState.password; saveActiveGame(); alert("変更しました！"); } };
-    document.getElementById('drawer-trophy-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('trophy-list-container'); container.innerHTML = ''; if(!gameState.trophies || gameState.trophies.length === 0) { container.innerHTML = '<div style="text-align:center; color:#868e96; margin-top:20px;">まだトロフィーを持っていません。</div>'; } else { gameState.trophies.forEach(t => { const div = document.createElement('div'); div.className = 'trophy-item'; div.innerHTML = `<span>🏆</span> <span>${t}</span>`; container.appendChild(div); }); } document.getElementById('trophy-modal').style.display = 'flex'; };
-    document.getElementById('close-trophy-modal').onclick = () => { playSE('click'); closeModal('trophy-modal'); };
-    document.getElementById('drawer-mission-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('mission-list-container'); container.innerHTML = ''; if(!gameState.dailyMissions) gameState.dailyMissions = []; gameState.dailyMissions.forEach(m => { const div = document.createElement('div'); div.className = `mission-item ${m.completed ? 'completed' : ''}`; div.innerHTML = `<span>${m.desc} (${m.current}/${m.target})</span><b>${m.completed ? '✅' : '未達成'}</b>`; container.appendChild(div); }); document.getElementById('mission-modal').style.display = 'flex'; };
-    document.getElementById('close-mission').onclick = () => { playSE('click'); closeModal('mission-modal'); };
-    document.getElementById('drawer-dress-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('dress-container'); container.innerHTML = ''; gameState.unlockedCostumes.forEach(c => { const btn = document.createElement('button'); btn.className = `type-btn ${gameState.currentCostume === c ? 'active' : ''}`; btn.innerText = c; btn.onclick = () => { playSE('click'); gameState.currentCostume = c; closeModal('dress-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); }); document.getElementById('dress-modal').style.display = 'flex'; };
-    document.getElementById('close-dress').onclick = () => { playSE('click'); closeModal('dress-modal'); };
-    document.getElementById('drawer-furniture-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; openFurnitureInventoryModal(); };
-    document.getElementById('drawer-bg-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; openBgModal(); };
-    document.getElementById('drawer-save-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; saveActiveGame(true); };
-    document.getElementById('drawer-title-btn').onclick = () => { playSE('click'); if(confirm("タイトルへ戻りますか？")) { saveActiveGame(); initTitleScreen(); } };
+    // --- 拡張メニュー ---
+    document.getElementById('drawer-town-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('town-modal').style.display = 'flex'; };
+    document.getElementById('drawer-diy-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('diy-modal').style.display = 'flex'; };
+    document.getElementById('drawer-exped-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; renderAlbums(); document.getElementById('exped-modal').style.display = 'flex'; };
 
-    function triggerNewWorry() { if (hasWorry) return; currentWorry = worryData[Math.floor(Math.random() * worryData.length)]; hasWorry = true; updateUI(); }
-    document.getElementById('worry-lamp').onclick = (e) => {
-        e.stopPropagation(); playSE('click');
-        if (!hasWorry || !currentWorry || isVisiting) return;
-        document.getElementById('modal-worry-title').innerText = `${gameState.name}の相談`; document.getElementById('worry-modal-text').innerText = currentWorry.text;
-        const container = document.getElementById('worry-options-container'); container.innerHTML = '';
-        currentWorry.options.forEach((opt) => {
-            const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt.text;
-            btn.onclick = () => {
-                playSE('click');
-                gameState.coins += opt.rewardCoin; gameState.fullness = Math.max(gameState.fullness - 5, 0);
-                logMessage(`💡【解決】${opt.reply}`); gainExp(opt.rewardExp); updateMissionProgress('worry');
-                closeModal('worry-modal'); hasWorry = false; currentWorry = null; updateUI();
-            };
-            container.appendChild(btn);
-        });
-        document.getElementById('worry-modal').style.display = 'flex';
+    window.upgradeFacility = function(type) {
+        playSE('click');
+        if (type === 'cafe' && gameState.coins >= 200) { gameState.coins -= 200; gameState.town.cafe++; alert("☕ 広場カフェを改修しました！街特有のお悩みが解放されます！"); } 
+        else if (type === 'park' && gameState.coins >= 300) { gameState.coins -= 300; gameState.town.park++; alert("🌳 公園を整備しました！天気連動のお悩み報酬がアップ！"); } 
+        else { playSE('error'); alert("💰 コインが足りません！"); }
+        updateUI(); saveActiveGame();
+    };
+    
+    window.toggleTownView = function() {
+        playSE('click');
+        if(gameState.town.viewMode === "room") { gameState.town.viewMode = "town"; alert("🌳 お庭・街の広場ビューに切り替えました！"); }
+        else { gameState.town.viewMode = "room"; alert("🏠 お部屋ビューに戻りました。"); }
+        updateUI(); saveActiveGame(); closeModal('town-modal');
+    };
+    
+    window.applyDyeColor = function(colorHex) {
+        playSE('click');
+        if(gameState.materials.dye >= 1) {
+            if(gameState.placedFurniture.length > 0) {
+                gameState.materials.dye--;
+                gameState.placedFurniture[gameState.placedFurniture.length - 1].colorFilter = colorHex;
+                alert("🎨 最後に置いた家具に特殊な輝きを付与しました！");
+                updateUI(); saveActiveGame();
+            } else { playSE('error'); alert("部屋に家具がありません！先に設置してください。"); }
+        } else { playSE('error'); alert("染料が足りません！ミニゲームを遊んで集めましょう。"); }
+    };
+    
+    window.upgradeSkill = function(type) {
+        playSE('click');
+        if(gameState.skills.points >= 1) {
+            gameState.skills.points--; gameState.skills[type]++;
+            alert(`🧬 スキル解放！【${type === 'coin' ? 'コイン獲得効率' : '経験値獲得効率'}】がアップしました！`);
+            updateUI(); saveActiveGame();
+        } else { playSE('error'); alert("✨ スキルポイントが足りません！"); }
     };
 
-    function openShopModal() { renderFoodShop(); renderBgShop(); renderFurnitureShop(); document.getElementById('shop-modal').style.display = 'flex'; }
-    document.getElementById('tab-food-btn').onclick = () => { playSE('click'); switchShopTab('tab-food-btn', 'shop-food-pane'); };
-    document.getElementById('tab-bg-btn').onclick = () => { playSE('click'); switchShopTab('tab-bg-btn', 'shop-bg-pane'); };
-    document.getElementById('tab-furni-btn').onclick = () => { playSE('click'); switchShopTab('tab-furni-btn', 'shop-furni-pane'); };
-    function switchShopTab(btnId, paneId) { document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.shop-pane').forEach(p => p.style.display = 'none'); document.getElementById(btnId).classList.add('active'); document.getElementById(paneId).style.display = 'block'; }
-    function renderFoodShop() { const container = document.getElementById('shop-food-pane'); container.innerHTML = ''; for (const [key, item] of Object.entries(foodData)) { const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${item.name}</span><span class="item-cost">${item.cost}💰</span></div>`; btn.onclick = () => askPurchaseCount(key, 'food'); container.appendChild(btn); } }
-    function renderBgShop() { const container = document.getElementById('shop-bg-list'); container.innerHTML = ''; bgList.forEach(bg => { const owned = gameState.unlockedBgs.includes(bg.id); const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.disabled = owned; btn.innerHTML = `<div class="shop-item-info"><span>${bg.name}</span>${owned ? '<span class="item-owned">解放済</span>' : `<span class="item-cost">${bg.cost}💰</span>`}</div>`; if(!owned) btn.onclick = () => { playSE('click'); if(gameState.coins >= bg.cost) { gameState.coins -= bg.cost; gameState.unlockedBgs.push(bg.id); updateUI(); saveActiveGame(); renderBgShop(); playSE('coin'); } else { playSE('error'); alert("コインが足りません"); } }; container.appendChild(btn); }); }
-    document.getElementById('custom-bg-uploader').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (evt) => { gameState.customBgData = evt.target.result; gameState.appearance.bgClass = "custom-bg"; updateUI(); saveActiveGame(); }; reader.readAsDataURL(file); };
-    function renderFurnitureShop() { const container = document.getElementById('shop-furni-pane'); container.innerHTML = ''; for (const [key, f] of Object.entries(furnitureData)) { const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${f.emoji} ${f.name}</span><span class="item-cost">${f.cost}💰</span></div>`; btn.onclick = () => askPurchaseCount(key, 'furniture'); container.appendChild(btn); } }
-    function askPurchaseCount(key, type) { playSE('click'); const item = type === 'food' ? foodData[key] : furnitureData[key]; const count = parseInt(prompt(`「${item.name}」をいくつ購入しますか？`, "1")); if(isNaN(count) || count <= 0) return; const total = item.cost * count; if(gameState.coins >= total) { playSE('coin'); gameState.coins -= total; if(type === 'food') gameState.inventory[key] = (gameState.inventory[key] || 0) + count; else gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + count; updateUI(); saveActiveGame(); openShopModal(); } else { playSE('error'); alert("コインが足りません"); } }
+    // --- 探索（おでかけ遠征）パラメータ・時間管理 ---
+    let selectedExpedSeconds = 10;
+    let selectedExpedTitle = "10秒 (テスト)";
 
-    function openFurnitureInventoryModal() { const container = document.getElementById('furniture-inv-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.furnitureInventory)) { if(qty > 0) { const f = furnitureData[key]; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerHTML = `${f.emoji}<br>${f.name}(${qty})`; btn.onclick = () => { playSE('click'); gameState.furnitureInventory[key]--; gameState.placedFurniture.push({ id: "f-"+Date.now(), key: key, emoji: f.emoji, x: 100, y: 150 }); closeModal('furniture-inventory-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); } } document.getElementById('furniture-inventory-modal').style.display = 'flex'; }
-    
-    function openBagModal() { const container = document.getElementById('bag-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.inventory)) { if(qty > 0) { const item = foodData[key]; const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${item.name} (${qty}個)</span><span class="item-owned">あげる</span></div>`; btn.onclick = () => { playSE('click'); if(gameState.fullness >= 100) { playSE('error'); return alert("お腹いっぱいです"); } gameState.inventory[key]--; gameState.fullness = Math.min(gameState.fullness + item.full, 100); if(!gameState.totalFeeds) gameState.totalFeeds = 0; gameState.totalFeeds++; logMessage(`🍖 ${item.name} をあげました！`); gainExp(item.exp); updateMissionProgress('feed'); closeModal('bag-modal'); updateUI(); }; container.appendChild(btn); } } document.getElementById('bag-modal').style.display = 'flex'; }
-    function openBgModal() { const container = document.getElementById('bg-container'); container.innerHTML = ''; bgList.forEach(bg => { if(!gameState.unlockedBgs.includes(bg.id)) return; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = bg.name; btn.onclick = () => { playSE('click'); gameState.appearance.bgClass = bg.id; closeModal('bg-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); }); document.getElementById('bg-modal').style.display = 'flex'; }
-
-    function openMakeModal() { document.getElementById('make-modal').style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-    
-    function gainExp(amt) {
-        if(gameState.level >= 12) return;
-        gameState.exp += amt;
-        while(gameState.exp >= gameState.maxExp && gameState.level < 12) {
-            gameState.level++; gameState.exp -= gameState.maxExp; gameState.maxExp = Math.floor(gameState.maxExp * 1.8);
-            logMessage(`🎉 レベルアップ！ Lv.${gameState.level}`, true);
-            if (gameState.level === 12) {
-                if(!gameState.trophies) gameState.trophies = []; const tName = `最大レベル到達記念`;
-                if(!gameState.trophies.includes(tName)) { gameState.trophies.push(tName); setTimeout(() => alert(`🏆 新しいトロフィーを獲得しました！\n「${tName}」`), 500); }
+    function setExpedDuration(sec, title) {
+        playSE('click');
+        selectedExpedSeconds = sec;
+        selectedExpedTitle = title;
+        
+        const buttons = document.querySelectorAll('#exped-time-selectors button');
+        buttons.forEach(btn => {
+            if(btn.innerText.includes(title)) {
+                btn.style.background = "#ebfbee";
+                btn.style.borderColor = "#12b886";
+            } else {
+                btn.style.background = "";
+                btn.style.borderColor = "";
             }
-        }
-        if(gameState.level >= 12) { gameState.level = 12; gameState.exp = gameState.maxExp; }
-        updateUI(); saveActiveGame();
+        });
+        document.getElementById('txt-exped-status').innerText = `選択中: ${title}の探索`;
     }
 
-    // --- ミニゲーム ---
-    document.getElementById('btn-minigame').onclick = () => {
-        if(isVisiting) { playSE('error'); return alert("訪問中はミニゲームで遊べません！"); }
+    let expedTimer = null;
+    let isExpedActive = false;
+    window.startExpedition = function() {
+        if(isExpedActive) return;
         playSE('click');
-        document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場"; document.getElementById('minigame-menu-view').style.display = 'grid'; document.getElementById('minigame-play-view').style.display = 'none';
-        const menu = document.getElementById('minigame-menu-view'); menu.innerHTML = '';
-        minigames.forEach(g => {
-            const btn = document.createElement('button'); btn.className = 'option-btn';
-            btn.innerHTML = `<b style="color:#0b7285;">${g.name}</b><br><small>${g.desc}</small>`;
-            btn.onclick = () => startMinigame(g.id, g.name); menu.appendChild(btn);
+        isExpedActive = true;
+        document.getElementById('btn-do-exped').disabled = true;
+        
+        let elapsed = 0;
+        document.getElementById('txt-exped-status').innerText = `状態: 🌲 探索中… (残り ${selectedExpedSeconds}秒)`;
+        
+        expedTimer = setInterval(() => {
+            elapsed += 1;
+            const remaining = selectedExpedSeconds - elapsed;
+            document.getElementById('txt-exped-status').innerText = `状態: 🌲 探索中… (残り ${remaining}秒)`;
+            
+            if(elapsed >= selectedExpedSeconds) {
+                clearInterval(expedTimer);
+                completeExpedition();
+            }
+        }, 1000);
+    };
+
+    function completeExpedition() {
+        isExpedActive = false;
+        document.getElementById('btn-do-exped').disabled = false;
+        document.getElementById('txt-exped-status').innerText = "状態: お部屋でのんびりしています";
+        
+        let woodReward = 1;
+        let ironReward = 1;
+        let dyeReward = 1;
+        
+        // レア素材の獲得確率を大幅に低下調整
+        let shellProb = 0.01;
+        let oreProb = 0.005;
+        let starProb = 0.002;
+        let baseCoins = 30;
+
+        if (selectedExpedSeconds === 10) { 
+            woodReward = 2; ironReward = 1; dyeReward = 1; 
+            shellProb = 0.01; oreProb = 0.005; starProb = 0.002; baseCoins = 30;
+        } else if (selectedExpedSeconds === 300) { 
+            woodReward = 4; ironReward = 2; dyeReward = 1; 
+            shellProb = 0.03; oreProb = 0.01; starProb = 0.005; baseCoins = 80;
+        } else if (selectedExpedSeconds === 1800) { 
+            woodReward = 8; ironReward = 5; dyeReward = 3; 
+            shellProb = 0.08; oreProb = 0.03; starProb = 0.01; baseCoins = 220;
+        } else if (selectedExpedSeconds === 3600) { 
+            woodReward = 15; ironReward = 10; dyeReward = 6; 
+            shellProb = 0.15; oreProb = 0.06; starProb = 0.03; baseCoins = 500;
+        } else if (selectedExpedSeconds === 10800) { 
+            woodReward = 35; ironReward = 22; dyeReward = 15; 
+            shellProb = 0.3; oreProb = 0.15; starProb = 0.08; baseCoins = 1200;
+        } else if (selectedExpedSeconds === 25200) { 
+            woodReward = 80; ironReward = 50; dyeReward = 35; 
+            shellProb = 0.7; oreProb = 0.4; starProb = 0.2; baseCoins = 3200;
+        }
+
+        let sGot = 0; let oGot = 0; let stGot = 0;
+        while(shellProb > 0) { if(Math.random() < Math.min(shellProb, 1)) sGot++; shellProb--; }
+        while(oreProb > 0) { if(Math.random() < Math.min(oreProb, 1)) oGot++; oreProb--; }
+        while(starProb > 0) { if(Math.random() < Math.min(starProb, 1)) stGot++; starProb--; }
+
+        gameState.materials.wood += woodReward;
+        gameState.materials.iron += ironReward;
+        gameState.materials.dye += dyeReward;
+        gameState.materials.shell = (gameState.materials.shell || 0) + sGot;
+        gameState.materials.ore = (gameState.materials.ore || 0) + oGot;
+        gameState.materials.star = (gameState.materials.star || 0) + stGot;
+        gameState.coins += baseCoins;
+        
+        if(!gameState.totalExpeditions) gameState.totalExpeditions = 0;
+        gameState.totalExpeditions++;
+
+        const timeStr = new Date().toLocaleTimeString();
+        const locations = ["🏖️ 虹色シーサイドビーチ", "🌋 古代のマグマクリスタル火山", "✨ 天の川ミルキーウェイ", "🌲 まどろみの巨樹原生林"];
+        const loc = locations[Math.floor(Math.random()*locations.length)];
+        const memoryText = `${loc}で、大自然に囲まれて最高の一時を過ごした！`;
+        
+        const photoId = "photo-" + Date.now();
+        gameState.albums.push({ id: photoId, text: `[${timeStr}] ${memoryText}`, time: timeStr, loc: loc });
+
+        playSE('coin');
+        alert(`🚀 【遠征完了！】\n探索時間：${selectedExpedTitle}\n獲得物：\n・💰 コイン +${baseCoins}\n・🪵 木材 +${woodReward}\n・⚙️ 鉄くず +${ironReward}\n・🎨 染料 +${dyeReward}\n・🐚 輝く貝殻 +${sGot}\n・💎 幻の鉱石 +${oGot}\n・⭐ 星の砂 +${stGot}`);
+        
+        renderAlbums();
+        updateUI();
+        saveActiveGame();
+    }
+
+    // --- 限定DIYクラフト家具の製作システム ---
+    function renderDiyRecipes() {
+        const container = document.getElementById('diy-craft-recipes-container');
+        container.innerHTML = '';
+        
+        for (const [key, item] of Object.entries(diyFurnitureData)) {
+            const div = document.createElement('div');
+            div.style = "background:white; border: 1px solid #dee2e6; border-radius:10px; padding:8px; display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; margin-bottom: 4px;";
+            
+            let reqStr = "";
+            for (const [mat, qty] of Object.entries(item.req)) {
+                let matName = mat === 'shell' ? '🐚貝殻' : mat === 'ore' ? '💎鉱石' : mat === 'star' ? '⭐星砂' : mat === 'wood' ? '🪵木材' : mat === 'iron' ? '⚙️鉄くず' : '🎨染料';
+                reqStr += `${matName}x${qty} `;
+            }
+
+            div.innerHTML = `
+                <div>
+                    <b>${item.emoji} ${item.name}</b><br>
+                    <small style="color:#666;">必要: ${reqStr}</small>
+                </div>
+                <button class="type-btn" style="padding:4px 8px; font-size:0.75rem; background:#40c057; color:white; border:none;" onclick="craftDiyFurniture('${key}')">つくる</button>
+            `;
+            container.appendChild(div);
+        }
+    }
+
+    function craftDiyFurniture(key) {
+        playSE('click');
+        const item = diyFurnitureData[key];
+        if(!item) return;
+
+        for (const [mat, qty] of Object.entries(item.req)) {
+            if((gameState.materials[mat] || 0) < qty) {
+                playSE('error');
+                alert("❌ 製作に必要な素材が不足しています。");
+                return;
+            }
+        }
+
+        for (const [mat, qty] of Object.entries(item.req)) {
+            gameState.materials[mat] -= qty;
+        }
+
+        gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + 1;
+        if(!gameState.totalDIYS) gameState.totalDIYS = 0;
+        gameState.totalDIYS++;
+
+        playSE('coin');
+        alert(`🎉 DIY成功！\n「${item.name}」をクラフトし、倉庫にしまいました！`);
+        
+        renderDiyRecipes();
+        updateUI();
+        saveActiveGame();
+    }
+
+    // --- 交配（ブリード）二択選択システム ---
+    let breedingChoices = { A: null, B: null };
+    let targetBreedFriendId = null;
+
+    function selectBreedingChoice(choice) {
+        document.getElementById('breed-card-a').classList.remove('selected');
+        document.getElementById('breed-card-b').classList.remove('selected');
+        document.getElementById(`breed-card-${choice.toLowerCase()}`).classList.add('selected');
+        
+        document.getElementById('btn-confirm-breed-choice').style.display = 'block';
+        document.getElementById('btn-confirm-breed-choice').dataset.selectedChoice = choice;
+    }
+
+    window.triggerBreedingChoice = function(friendId) {
+        playSE('click');
+        targetBreedFriendId = friendId;
+        const friend = gameState.friends.find(f => f.id === friendId);
+        if(!friend) return;
+
+        const colors = ["#ffccd5", "#fff3bf", "#d3f9d8", "#e3fafc", "#f3f0ff", "#ffe0e6", "#e8f7ff"];
+        const gills = ["#ff6b6b", "#ff922b", "#fab005", "#40c057", "#22b8cf", "#7950f2", "#e64980"];
+        const types = ["upa", "cat", "chick", "fish", "dog", "bear", "rabbit"];
+        const traits = ["🏅 コイン効率20%UP", "✨ 獲得経験値25%UP", "🍖 満腹減少速度15%DOWN", "💖 親愛度上昇2倍", "🍀 レア探索確率UP"];
+
+        breedingChoices.A = {
+            type: types[Math.floor(Math.random()*types.length)],
+            bodyColor: colors[Math.floor(Math.random()*colors.length)],
+            gillColor: gills[Math.floor(Math.random()*gills.length)],
+            trait: traits[Math.floor(Math.random()*traits.length)]
+        };
+
+        breedingChoices.B = {
+            type: types[Math.floor(Math.random()*types.length)],
+            bodyColor: colors[Math.floor(Math.random()*colors.length)],
+            gillColor: gills[Math.floor(Math.random()*gills.length)],
+            trait: traits[Math.floor(Math.random()*traits.length)]
+        };
+
+        const containerA = document.getElementById('breed-preview-svg-a');
+        const containerB = document.getElementById('breed-preview-svg-b');
+        containerA.innerHTML = SVG_TEMPLATE;
+        containerB.innerHTML = SVG_TEMPLATE;
+
+        const renderChoicePreview = (container, data) => {
+            container.querySelectorAll('.char-part').forEach(p => p.style.display = 'none');
+            container.querySelectorAll(`.part-${data.type}`).forEach(p => p.style.display = 'inline');
+            container.querySelectorAll('.body-part').forEach(p => p.setAttribute('fill', data.bodyColor));
+            container.querySelectorAll('.gill-part').forEach(p => p.setAttribute('fill', data.gillColor));
+        };
+
+        renderChoicePreview(containerA, breedingChoices.A);
+        renderChoicePreview(containerB, breedingChoices.B);
+
+        document.getElementById('breed-trait-a').innerText = breedingChoices.A.trait;
+        document.getElementById('breed-trait-b').innerText = breedingChoices.B.trait;
+
+        document.getElementById('breed-card-a').classList.remove('selected');
+        document.getElementById('breed-card-b').classList.remove('selected');
+        document.getElementById('btn-confirm-breed-choice').style.display = 'none';
+
+        closeModal('friend-visit-modal');
+        closeModal('friend-modal');
+        document.getElementById('breeding-choice-modal').style.display = 'flex';
+    };
+
+    document.getElementById('btn-confirm-breed-choice').onclick = () => {
+        playSE('click');
+        const choice = document.getElementById('btn-confirm-breed-choice').dataset.selectedChoice;
+        const chosen = breedingChoices[choice];
+        if(!chosen) return;
+
+        gameState.generation++;
+        gameState.friendLove[targetBreedFriendId] = 10; 
+        
+        gameState.appearance.type = chosen.type;
+        gameState.appearance.bodyColor = chosen.bodyColor;
+        gameState.appearance.gillColor = chosen.gillColor;
+
+        gameState.level = 1;
+        gameState.exp = 0;
+        gameState.title = `${gameState.generation}代目の赤ちゃん`;
+        
+        closeModal('breeding-choice-modal');
+        
+        const charWrapper = document.getElementById('char-wrapper');
+        charWrapper.classList.add('baby-mode');
+        
+        alert(`🎉 世代交代大成功！\n${gameState.generation}代目の赤ちゃん「${gameState.name}」が誕生しました！\n【特性】${chosen.trait}`);
+        updateUI();
+        
+        setTimeout(() => {
+            charWrapper.classList.remove('baby-mode');
+            gameState.title = `頼れる ${gameState.generation}代目`;
+            alert("🍼 赤ちゃんがすくすく成長して、大きくなりました！");
+            updateUI();
+            saveActiveGame(true);
+        }, 6000);
+    };
+
+    document.getElementById('close-breed-choice').onclick = () => { playSE('click'); closeModal('breeding-choice-modal'); };
+
+    // --- 遠征アルバム思い出スナップのデバイス保存機能 (Canvas描画) ---
+    function downloadAlbumSnapshot(albumId) {
+        playSE('click');
+        const albumItem = gameState.albums.find(a => a.id === albumId);
+        if(!albumItem) return;
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 400;
+        canvas.height = 300;
+        const ctx = canvas.getContext('2d');
+
+        const grad = ctx.createLinearGradient(0, 0, 0, 300);
+        grad.addColorStop(0, '#e3fafc');
+        grad.addColorStop(1, '#99e9f2');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 400, 300);
+
+        ctx.strokeStyle = '#15aabf';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(4, 4, 392, 292);
+
+        ctx.fillStyle = '#2b2b2b';
+        ctx.font = 'bold 16px "Helvetica Neue", Arial, sans-serif';
+        ctx.fillText(`🌟 ウパ旅スナップ 🌟`, 20, 35);
+        
+        ctx.font = '12px "Helvetica Neue", Arial, sans-serif';
+        ctx.fillText(`時間: ${albumItem.time || '記録なし'}`, 20, 60);
+        ctx.fillText(`場所: ${albumItem.loc || '未開の地'}`, 20, 80);
+
+        const rawText = albumItem.text.replace(/\[.*?\]\s*/, ''); 
+        const textWords = rawText.split('');
+        let line = '';
+        let y = 110;
+        for(let i=0; i<textWords.length; i++) {
+            line += textWords[i];
+            if(line.length >= 22) {
+                ctx.fillText(line, 20, y);
+                line = '';
+                y += 20;
+            }
+        }
+        if(line) ctx.fillText(line, 20, y);
+
+        ctx.font = '60px sans-serif';
+        ctx.fillText('🐙', 280, 220); 
+
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillStyle = '#15aabf';
+        ctx.fillText(`© ${gameState.ownerName} & ${gameState.name}`, 20, 275);
+
+        try {
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = `upa_memory_${albumId}.png`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            logMessage("📸 デバイスに思い出の写真を保存しました！", true);
+        } catch(e) {
+            playSE('error');
+            alert("画像保存に失敗しました。お使いの環境による制限の可能性があります。");
+        }
+    }
+
+    // --- その他共通ロジック ---
+    function renderAlbums() {
+        const container = document.getElementById('album-list-container');
+        if(!gameState.albums || gameState.albums.length === 0) { 
+            container.innerHTML = "<div style='text-align:center; color:#adb5bd; font-size:0.8rem;'>まだ写真がありません。<br>遠征から帰るとここに思い出が記録されます。</div>"; 
+            return; 
+        }
+        
+        container.innerHTML = [...gameState.albums].reverse().map(a => {
+            const albumId = a.id || "legacy";
+            return `
+                <div class="album-item">
+                    <div style="flex-grow:1;">📸 <b>思い出の写真</b><br>${a.text}</div>
+                    <button class="type-btn" style="background:#0b7285; color:white; border:none; padding:4px 8px; font-size:0.75rem;" onclick="downloadAlbumSnapshot('${albumId}')">💾 保存</button>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function renderMinigamesMenu() {
+        const menu = document.getElementById('minigame-menu-view'); 
+        menu.innerHTML = '';
+        minigameList.forEach(g => {
+            const btn = document.createElement('button'); 
+            btn.className = 'option-btn';
+            btn.style = "display: flex; flex-direction: column; align-items: center; justify-content: center; height: 110px; margin-bottom: 0;";
+            btn.innerHTML = `<span style="font-size:2rem; margin-bottom:4px;">${g.icon}</span><b style="color:#0b7285; font-size:0.85rem;">${g.name}</b><small style="font-size:0.65rem; color:#666; text-align:center; height:24px; overflow:hidden;">${g.desc}</small>`;
+            btn.onclick = () => startMinigame(g.id, g.name); 
+            menu.appendChild(btn);
         });
+    }
+
+    // --- 各種モジュールフック ---
+    const originalUpdateUI = updateUI;
+    updateUI = function() {
+        ensureNewFeaturesData();
+        if(originalUpdateUI) originalUpdateUI();
+        
+        const genText = document.getElementById('gen-display');
+        if(genText) genText.innerText = `${gameState.generation || 1}代目`;
+        
+        const wSpan = document.getElementById('cnt-wood'); if(wSpan) wSpan.innerText = gameState.materials.wood;
+        const iSpan = document.getElementById('cnt-iron'); if(iSpan) iSpan.innerText = gameState.materials.iron;
+        const dSpan = document.getElementById('cnt-dye');  if(dSpan) dSpan.innerText = gameState.materials.dye;
+        const sSpan = document.getElementById('cnt-shell'); if(sSpan) sSpan.innerText = gameState.materials.shell || 0;
+        const oSpan = document.getElementById('cnt-ore');   if(oSpan) oSpan.innerText = gameState.materials.ore || 0;
+        const stSpan = document.getElementById('cnt-star'); if(stSpan) stSpan.innerText = gameState.materials.star || 0;
+        
+        renderDiyRecipes();
+    };
+
+    function ensureNewFeaturesData() {
+        if (gameState) {
+            if (gameState.generation === undefined) gameState.generation = 1;
+            if (gameState.solvedCount === undefined) gameState.solvedCount = 0;
+            if (gameState.friendLove === undefined) gameState.friendLove = {};
+            if (gameState.materials === undefined) gameState.materials = { wood: 3, iron: 2, dye: 1, shell: 0, ore: 0, star: 0 };
+            if (gameState.materials.shell === undefined) gameState.materials.shell = 0;
+            if (gameState.materials.ore === undefined) gameState.materials.ore = 0;
+            if (gameState.materials.star === undefined) gameState.materials.star = 0;
+            if (gameState.skills === undefined) gameState.skills = { coin: 0, exp: 0, points: 0 };
+            if (gameState.town === undefined) gameState.town = { cafe: 0, park: 0, viewMode: "room" };
+            if (gameState.albums === undefined) gameState.albums = [];
+            if (gameState.totalDIYS === undefined) gameState.totalDIYS = 0;
+            if (gameState.totalExpeditions === undefined) gameState.totalExpeditions = 0;
+            if (gameState.lastInteractDates === undefined) gameState.lastInteractDates = {};
+        }
+    }
+
+    document.getElementById('btn-minigame').onclick = () => {
+        if(isVisiting) { playSE('error'); return alert("訪問中は遊べません！"); }
+        playSE('click');
+        document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場 (全31種)"; 
+        document.getElementById('minigame-menu-view').style.display = 'grid'; 
+        document.getElementById('minigame-play-view').style.display = 'none';
+        renderMinigamesMenu();
         document.getElementById('minigame-modal').style.display = 'flex';
     };
-    document.getElementById('close-minigame').onclick = () => { playSE('click'); closeModal('minigame-modal'); };
-    
+
     let activeGameTimer = null;
-    document.getElementById('btn-abort-game').onclick = () => {
+    
+    // ミニゲーム広場に戻る(安全なリセット付き)
+    function returnToMinigameMenu() {
         playSE('click');
         if(activeGameTimer) { clearInterval(activeGameTimer); activeGameTimer = null; }
-        document.getElementById('minigame-menu-view').style.display = 'grid'; document.getElementById('minigame-play-view').style.display = 'none'; document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場";
-    };
+        document.getElementById('minigame-menu-view').style.display = 'grid'; 
+        document.getElementById('minigame-play-view').style.display = 'none'; 
+        document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場 (全31種)";
+    }
+    window.returnToMinigameMenu = returnToMinigameMenu;
+    document.getElementById('btn-abort-game').onclick = returnToMinigameMenu;
 
     function startMinigame(id, name) {
         playSE('click');
-        document.getElementById('minigame-header-title').innerText = name; document.getElementById('minigame-menu-view').style.display = 'none'; document.getElementById('minigame-play-view').style.display = 'block';
+        document.getElementById('minigame-header-title').innerText = name; 
+        document.getElementById('minigame-menu-view').style.display = 'none'; 
+        document.getElementById('minigame-play-view').style.display = 'block';
+        
         updateMissionProgress('game');
-        if(!gameState.totalMinigames) gameState.totalMinigames = 0; gameState.totalMinigames++;
+        if(!gameState.totalMinigames) gameState.totalMinigames = 0; 
+        gameState.totalMinigames++;
+        
         if(!gameState.minigameStats[id]) gameState.minigameStats[id] = { plays: 0, highscore: 0 };
         gameState.minigameStats[id].plays++;
         
-        const arena = document.getElementById('minigame-arena'); arena.innerHTML = '';
+        const arena = document.getElementById('minigame-arena'); 
+        arena.innerHTML = '';
 
-        if(id === "mole") {
+        const game = minigameList.find(g => g.id === id);
+        const type = game.engine;
+
+        if(type === "mole") {
             let score = 0, time = 15;
+            const emoji = game.icon || "🐙";
             arena.innerHTML = `<h3>残り: <span id="m-time">15</span>秒</h3><div style="height:200px; position:relative; background:#f1f3f5; border-radius:10px; overflow:hidden;" id="mole-field"></div><p>Score: <span id="m-score">0</span></p>`;
             const field = document.getElementById('mole-field');
             const spawnMole = () => {
-                const mole = document.createElement('div'); mole.innerText = "🐙"; mole.style.fontSize = "2.5rem"; mole.style.position = "absolute";
+                const mole = document.createElement('div'); mole.innerText = emoji; mole.style.fontSize = "2.5rem"; mole.style.position = "absolute";
                 mole.style.left = Math.random() * 80 + "%"; mole.style.top = Math.random() * 80 + "%"; mole.style.cursor = "pointer";
-                mole.onmousedown = () => { playSE('click'); score++; document.getElementById('m-score').innerText = score; mole.remove(); };
+                mole.onclick = () => { playSE('click'); score++; document.getElementById('m-score').innerText = score; mole.remove(); };
                 field.appendChild(mole); setTimeout(() => mole.remove(), 800);
             };
-            activeGameTimer = setInterval(() => { time--; document.getElementById('m-time').innerText = time; spawnMole(); if(time<=0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}</p>`; endGamePayout(id, score, score*5, 10); } }, 1000);
+            activeGameTimer = setInterval(() => { time--; document.getElementById('m-time').innerText = time; spawnMole(); if(time<=0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}</p>`; endGamePayout(id, score, score*6, 10); } }, 1000);
         }
-        else if(id === "memory") {
-            const icons = ["🍎","🍎","🍌","🍌","🍇","🍇","🍉","🍉"]; icons.sort(() => Math.random() - 0.5);
+        else if(type === "memory") {
+            const icons = [game.icon, game.icon, "🌟", "🌟", "🍀", "🍀", "💎", "💎"]; icons.sort(() => Math.random() - 0.5);
             let first = null, lock = false, matched = 0, score = 100;
-            arena.innerHTML = `<h3 style="margin-bottom:10px;">神経衰弱</h3><div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;" id="memory-field"></div><p style="margin-top:10px;">Score: <span id="mem-score">100</span></p>`;
+            arena.innerHTML = `<h3 style="margin-bottom:10px;">ペアを揃えよう！</h3><div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;" id="memory-field"></div><p style="margin-top:10px;">Score: <span id="mem-score">100</span></p>`;
             const field = document.getElementById('memory-field');
             icons.forEach((icon, i) => {
                 const card = document.createElement('div');
@@ -1317,7 +2001,7 @@
                                 setTimeout(() => { arena.innerHTML = `<h3>クリア！</h3><p>記録: ${score}</p>`; endGamePayout(id, score, score, 15); }, 500);
                             }
                         } else {
-                            score = Math.max(0, score - 10); document.getElementById('mem-score').innerText = score;
+                            score = Math.max(0, score - 15); document.getElementById('mem-score').innerText = score;
                             setTimeout(() => { first.innerText = ""; card.innerText = ""; first.style.background = "#ced4da"; card.style.background = "#ced4da"; first = null; lock = false; }, 800);
                         }
                     }
@@ -1325,24 +2009,24 @@
                 field.appendChild(card);
             });
         }
-        else if(id === "stop") {
+        else if(type === "stop") {
             let pos = 0, dir = 1;
-            arena.innerHTML = `<h3>ジャストストップ</h3><p>赤いラインで止めろ！</p><div style="width:100%; height:30px; background:#e9ecef; position:relative; margin:20px 0; border-radius:15px; overflow:hidden;"><div style="position:absolute; left:48%; width:4%; height:100%; background:#fa5252; opacity:0.5; z-index:1;"></div><div id="stop-bar" style="width:20px; height:100%; background:#15aabf; position:absolute; left:0; z-index:2; border-radius:10px;"></div></div><button class="start-btn" id="stop-btn">ストップ！</button>`;
+            arena.innerHTML = `<h3>タイミング勝負！</h3><p>赤いラインでタップ！</p><div style="width:100%; height:30px; background:#e9ecef; position:relative; margin:20px 0; border-radius:15px; overflow:hidden;"><div style="position:absolute; left:48%; width:4%; height:100%; background:#fa5252; opacity:0.5; z-index:1;"></div><div id="stop-bar" style="width:20px; height:100%; background:#15aabf; position:absolute; left:0; z-index:2; border-radius:10px;"></div></div><button class="start-btn" id="stop-btn">今だ！</button>`;
             activeGameTimer = setInterval(() => {
-                pos += dir * 3; if (pos > 95 || pos < 0) dir *= -1;
+                pos += dir * 4; if (pos > 95 || pos < 0) dir *= -1;
                 document.getElementById('stop-bar').style.left = pos + "%";
-            }, 20);
+            }, 18);
             document.getElementById('stop-btn').onclick = () => {
                 playSE('click'); clearInterval(activeGameTimer);
                 const diff = Math.abs(pos - 48); let score = 0;
-                if (diff < 2) score = 100; else if (diff < 10) score = 50; else if (diff < 20) score = 20; else score = 5;
+                if (diff < 3) score = 100; else if (diff < 10) score = 55; else if (diff < 20) score = 25; else score = 5;
                 arena.innerHTML = `<h3>結果: ${score}点！</h3><p>ズレ: ${Math.floor(diff)}</p>`;
                 endGamePayout(id, score, score, 10);
             };
         }
-        else if(id === "slot") {
-            const sym = ["🍎", "🍖", "⭐", "💰"];
-            arena.innerHTML = `<h3>スロット</h3><div style="font-size:3rem; margin:20px 0; display:flex; justify-content:center; gap:10px;"><div id="s1">❓</div><div id="s2">❓</div><div id="s3">❓</div></div><button class="start-btn" id="slot-btn">回す！</button>`;
+        else if(type === "slot") {
+            const sym = [game.icon || "🎰", "⭐", "💎", "💰"];
+            arena.innerHTML = `<h3>ウパスロット</h3><div style="font-size:3rem; margin:20px 0; display:flex; justify-content:center; gap:10px;"><div id="s1">❓</div><div id="s2">❓</div><div id="s3">❓</div></div><button class="start-btn" id="slot-btn">回す！</button>`;
             document.getElementById('slot-btn').onclick = () => {
                 playSE('click'); document.getElementById('slot-btn').style.display = 'none';
                 let t = 0;
@@ -1358,18 +2042,18 @@
                         const r3 = sym[Math.floor(Math.random()*sym.length)];
                         document.getElementById('s1').innerText = r1; document.getElementById('s2').innerText = r2; document.getElementById('s3').innerText = r3;
                         let score = 0;
-                        if (r1 === r2 && r2 === r3) score = 150; else if (r1 === r2 || r2 === r3 || r1 === r3) score = 30; else score = 5;
+                        if (r1 === r2 && r2 === r3) score = 150; else if (r1 === r2 || r2 === r3 || r1 === r3) score = 40; else score = 5;
                         arena.innerHTML += `<h3 style="margin-top:15px;">結果: ${score}点</h3>`;
                         endGamePayout(id, score, score, 5);
                     }
-                }, 50);
+                }, 55);
             };
         }
-        else if(id === "math") {
-            let score = 0, time = 5; let ans = 0;
-            arena.innerHTML = `<h3>限界計算サバイバル</h3><p>残り: <span id="math-time">5</span>秒</p><div style="font-size:2rem; font-weight:bold; margin:20px 0;" id="math-q"></div><div style="display:flex; gap:10px;" id="math-opts"></div><p>Score: <span id="math-score">0</span></p>`;
+        else if(type === "math") {
+            let score = 0, time = 6; let ans = 0;
+            arena.innerHTML = `<h3>爆速回答パズル</h3><p>制限時間: <span id="math-time">6</span>秒</p><div style="font-size:1.8rem; font-weight:bold; margin:20px 0;" id="math-q"></div><div style="display:flex; gap:10px;" id="math-opts"></div><p>Score: <span id="math-score">0</span></p>`;
             const genQ = () => {
-                const a = Math.floor(Math.random()*20)+1; const b = Math.floor(Math.random()*20)+1;
+                const a = Math.floor(Math.random()*15)+1; const b = Math.floor(Math.random()*15)+1;
                 const op = Math.random() > 0.5 ? "+" : "-";
                 ans = op === "+" ? a + b : a - b;
                 document.getElementById('math-q').innerText = `${a} ${op} ${b} = ?`;
@@ -1390,18 +2074,18 @@
                 if (time <= 0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}</p>`; endGamePayout(id, score, score, score/2); }
             }, 1000);
         }
-        else if(id === "clicker") {
+        else if(type === "clicker") {
             let score = 0, time = 10;
-            arena.innerHTML = `<h3>10秒連打ラッシュ</h3><p>残り: <span id="clk-time">10</span>秒</p><button id="clk-btn" style="width:150px; height:150px; border-radius:50%; background:#ff922b; color:white; font-size:3rem; border:none; margin:20px auto; display:block; box-shadow:0 10px 0 #d9480f; cursor:pointer;">TAP</button><p>Score: <span id="clk-score">0</span></p>`;
+            arena.innerHTML = `<h3>連打ラッシュ！</h3><p>残り時間: <span id="clk-time">10</span>秒</p><button id="clk-btn" style="width:130px; height:130px; border-radius:50%; background:#ff922b; color:white; font-size:2.2rem; border:none; margin:20px auto; display:block; box-shadow:0 8px 0 #d9480f; cursor:pointer; outline:none;">TAP</button><p>Score: <span id="clk-score">0</span></p>`;
             document.getElementById('clk-btn').onclick = () => { playSE('click'); score++; document.getElementById('clk-score').innerText = score; };
             activeGameTimer = setInterval(() => {
                 time--; document.getElementById('clk-time').innerText = time;
                 if(time <= 0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}回</p>`; endGamePayout(id, score, score*2, 20); }
             }, 1000);
         }
-        else if(id === "catch") {
+        else if(type === "catch") {
             let score = 0, time = 15; let playerX = 40;
-            arena.innerHTML = `<h3>リンゴキャッチ🍎</h3><p>残り: <span id="catch-time">15</span>秒</p><div id="catch-field" style="width:100%; height:200px; background:#e3fafc; position:relative; overflow:hidden; border-radius:12px; border:2px solid #15aabf;">
+            arena.innerHTML = `<h3>キャッチ！</h3><p>残り時間: <span id="catch-time">15</span>秒</p><div id="catch-field" style="width:100%; height:180px; background:#e3fafc; position:relative; overflow:hidden; border-radius:12px; border:2px solid #15aabf;">
                 <div id="catch-player" style="position:absolute; bottom:5px; left:${playerX}%; font-size:2rem; transition:left 0.1s;">🧺</div>
             </div>
             <div style="display:flex; justify-content:space-between; margin-top:10px;">
@@ -1421,7 +2105,7 @@
             const spawnItem = () => {
                 const isBomb = Math.random() > 0.8;
                 const item = document.createElement('div');
-                item.innerText = isBomb ? "💣" : "🍎";
+                item.innerText = isBomb ? "💣" : (game.icon || "🍎");
                 item.style.position = "absolute"; item.style.top = "0px"; item.style.left = Math.floor(Math.random() * 85) + "%"; item.style.fontSize = "1.5rem";
                 field.appendChild(item); items.push({el: item, y: 0, isBomb: isBomb});
             };
@@ -1433,7 +2117,7 @@
                 
                 for(let i=items.length-1; i>=0; i--) {
                     let it = items[i]; it.y += 10; it.el.style.top = it.y + "px";
-                    if(it.y > 160 && it.y < 190) {
+                    if(it.y > 140 && it.y < 170) {
                         let itemX = parseFloat(it.el.style.left);
                         if(Math.abs(itemX - playerX) < 15) {
                             if(it.isBomb) { playSE('error'); score = Math.max(0, score - 5); } else { playSE('coin'); score += 1; }
@@ -1441,24 +2125,107 @@
                             it.el.remove(); items.splice(i, 1); continue;
                         }
                     }
-                    if(it.y > 200) { it.el.remove(); items.splice(i, 1); }
+                    if(it.y > 180) { it.el.remove(); items.splice(i, 1); }
                 }
 
                 if(time <= 0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}個</p>`; endGamePayout(id, score, score*3, 15); }
             }, 100);
         }
+        else if(type === "janken") {
+            let score = 0;
+            arena.innerHTML = `<h3>勝ち続けろ！</h3><div style="font-size:4rem; margin:10px 0;" id="j-opp">✊</div><div style="display:flex; gap:6px;" id="j-choices"><button class="option-btn" onclick="playJanken('✊')">✊</button><button class="option-btn" onclick="playJanken('✌️')">✌️</button><button class="option-btn" onclick="playJanken('🖐️')">🖐️</button></div><p style="margin-top:10px;">Score: <span id="j-score">0</span></p>`;
+            const handIcons = ["✊", "✌️", "🖐️"];
+            let oppHand = handIcons[Math.floor(Math.random()*3)];
+            document.getElementById('j-opp').innerText = oppHand;
+            
+            window.playJanken = (myHand) => {
+                playSE('click');
+                let result = 0; 
+                if (myHand === oppHand) result = 0;
+                else if ((myHand === "✊" && oppHand === "✌️") || (myHand === "✌️" && oppHand === "🖐️") || (myHand === "🖐️" && oppHand === "✊")) result = 1;
+                else result = 2;
+                
+                if(result === 1) {
+                    score += 10; document.getElementById('j-score').innerText = score;
+                    oppHand = handIcons[Math.floor(Math.random()*3)];
+                    document.getElementById('j-opp').innerText = oppHand;
+                } else if(result === 2) {
+                    arena.innerHTML = `<h3>敗北！</h3><p>記録: ${score}点</p>`;
+                    endGamePayout(id, score, score, 10);
+                } else {
+                    oppHand = handIcons[Math.floor(Math.random()*3)];
+                    document.getElementById('j-opp').innerText = oppHand;
+                }
+            };
+        }
+        else if(type === "box") {
+            arena.innerHTML = `<h3>本物はどれ？</h3><p>どれか1つが超大当たりの宝箱！</p><div style="display:flex; justify-content:center; gap:10px; margin:20px 0;"><button class="option-btn" style="font-size:2.5rem; padding:10px;" onclick="selectMimic(0)">🎁</button><button class="option-btn" style="font-size:2.5rem; padding:10px;" onclick="selectMimic(1)">🎁</button><button class="option-btn" style="font-size:2.5rem; padding:10px;" onclick="selectMimic(2)">🎁</button></div>`;
+            const correctIdx = Math.floor(Math.random()*3);
+            window.selectMimic = (idx) => {
+                if(idx === correctIdx) {
+                    playSE('coin'); arena.innerHTML = `<h3>💎 超大成功！</h3><p>100点満点！</p>`;
+                    endGamePayout(id, 100, 100, 20);
+                } else {
+                    playSE('error'); arena.innerHTML = `<h3>👾 ミミック（ハズレ）だった！</h3><p>5点獲得</p>`;
+                    endGamePayout(id, 5, 5, 2);
+                }
+            };
+        }
+        else if(type === "omikuji") {
+            arena.innerHTML = `<h3>神社おみくじ</h3><button class="start-btn" onclick="drawOmikuji()">おみくじを引く</button>`;
+            window.drawOmikuji = () => {
+                playSE('coin');
+                const results = [
+                    { name: "👑 大大吉", score: 120, text: "今日のあなたのウパ運は銀河一！" },
+                    { name: "💮 大吉", score: 80, text: "素晴らしい一日になるでしょう！" },
+                    { name: "🍀 吉", score: 50, text: "のんびり穏やかな一日です。" },
+                    { name: "💀 凶", score: 10, text: "ウパにカジられないように注意！" }
+                ];
+                const r = results[Math.floor(Math.random()*results.length)];
+                arena.innerHTML = `<h3>結果: ${r.name}</h3><p>${r.text}</p>`;
+                endGamePayout(id, r.score, r.score, 10);
+            };
+        }
     }
 
     function endGamePayout(id, score, coinReward, expReward) {
         if(score > gameState.minigameStats[id].highscore) gameState.minigameStats[id].highscore = score;
-        gameState.coins += Math.floor(coinReward); gainExp(Math.floor(expReward));
-        document.getElementById('minigame-arena').innerHTML += `<p style="color:#d9480f; font-weight:bold; margin-top:10px;">報酬: 💰${Math.floor(coinReward)} / ✨${Math.floor(expReward)}EXP</p>`;
+        
+        let cReward = Math.floor(coinReward * (1 + (gameState.skills?.coin || 0) * 0.2));
+        let eReward = Math.floor(expReward * (1 + (gameState.skills?.exp || 0) * 0.2));
+        
+        gameState.coins += cReward; gainExp(eReward);
+        
+        let matMsg = "";
+        
+        // レア素材確率をさらに低下 (全体で10%の確率で素材。そのうちの激レア出現割合を数%に制限)
+        if(Math.random() < 0.10) {
+            const r = Math.random();
+            if(r < 0.5) { gameState.materials.wood++; matMsg = "🪵 木材ゲット！"; }
+            else if(r < 0.8) { gameState.materials.iron++; matMsg = "⚙️ 鉄くずゲット！"; }
+            else if(r < 0.95) { gameState.materials.dye++; matMsg = "🎨 染料ゲット！"; }
+            else { 
+                const rareMats = ['shell', 'ore', 'star'];
+                const selectedRare = rareMats[Math.floor(Math.random()*rareMats.length)];
+                gameState.materials[selectedRare] = (gameState.materials[selectedRare] || 0) + 1;
+                matMsg = `✨ 超激レア【${selectedRare === 'shell' ? '🐚貝殻' : selectedRare === 'ore' ? '💎鉱石' : '⭐星砂'}】ゲット！`;
+            }
+        }
+
+        const arena = document.getElementById('minigame-arena');
+        arena.innerHTML += `<p style="color:#d9480f; font-weight:bold; margin-top:10px;">報酬: 💰${cReward} / ✨${eReward}EXP <br>${matMsg}</p>`;
+        
+        // 戻るボタンを100%確実に表示して「戻れない」を防ぐ
+        arena.innerHTML += `
+            <button class="start-btn" style="background:#40c057; margin-top:15px; width:100%;" onclick="returnToMinigameMenu()">🎮 広場メニューに戻る</button>
+        `;
+        
         saveActiveGame();
     }
 
-    // ボタン類の初期化
-    document.getElementById('btn-shop').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中はショップを使えません！'); } playSE('click'); openShopModal(); };
-    document.getElementById('btn-bag').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中はごはんをあげられません！'); } playSE('click'); openBagModal(); };
+    // ボタン類のバインド
+    document.getElementById('btn-shop').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中は使えません！'); } playSE('click'); openShopModal(); };
+    document.getElementById('btn-bag').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中は使えません！'); } playSE('click'); openBagModal(); };
     document.getElementById('close-shop').onclick = () => { playSE('click'); closeModal('shop-modal'); };
     document.getElementById('close-bag').onclick = () => { playSE('click'); closeModal('bag-modal'); };
     document.getElementById('close-bg-modal').onclick = () => { playSE('click'); closeModal('bg-modal'); };
@@ -1487,11 +2254,95 @@
     document.getElementById('init-body-color-picker').oninput = (e) => { document.querySelectorAll('#preview-char .body-part').forEach(p => p.setAttribute('fill', e.target.value)); };
     document.getElementById('init-gill-color-picker').oninput = (e) => { document.querySelectorAll('#preview-char .gill-part').forEach(p => p.setAttribute('fill', e.target.value)); };
 
+    function triggerNewWorry() { if (hasWorry) return; currentWorry = worryData[Math.floor(Math.random() * worryData.length)]; hasWorry = true; updateUI(); }
+    document.getElementById('worry-lamp').onclick = (e) => {
+        e.stopPropagation(); playSE('click');
+        if (!hasWorry || !currentWorry || isVisiting) return;
+        document.getElementById('modal-worry-title').innerText = `${gameState.name}の相談`; document.getElementById('worry-modal-text').innerText = currentWorry.text;
+        const container = document.getElementById('worry-options-container'); container.innerHTML = '';
+        currentWorry.options.forEach((opt) => {
+            const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt.text;
+            btn.onclick = () => {
+                playSE('click');
+                let cReward = Math.floor(opt.rewardCoin * (1 + (gameState.skills?.coin || 0) * 0.2));
+                let eReward = Math.floor(opt.rewardExp * (1 + (gameState.skills?.exp || 0) * 0.2));
+                
+                gameState.coins += cReward; gameState.fullness = Math.max(gameState.fullness - 5, 0);
+                gainExp(eReward); updateMissionProgress('worry');
+                
+                gameState.solvedCount++;
+                let ptMsg = "";
+                if(gameState.solvedCount % 5 === 0) { gameState.skills.points++; ptMsg = " (✨スキルPt獲得!)"; }
+                
+                logMessage(`💡【解決】${opt.reply}${ptMsg}`);
+                closeModal('worry-modal'); hasWorry = false; currentWorry = null; updateUI();
+            };
+            container.appendChild(btn);
+        });
+        document.getElementById('worry-modal').style.display = 'flex';
+    };
+
+    function openShopModal() { renderFoodShop(); renderBgShop(); renderFurnitureShop(); document.getElementById('shop-modal').style.display = 'flex'; }
+    document.getElementById('tab-food-btn').onclick = () => { playSE('click'); switchShopTab('tab-food-btn', 'shop-food-pane'); };
+    document.getElementById('tab-bg-btn').onclick = () => { playSE('click'); switchShopTab('tab-bg-btn', 'shop-bg-pane'); };
+    document.getElementById('tab-furni-btn').onclick = () => { playSE('click'); switchShopTab('tab-furni-btn', 'shop-furni-pane'); };
+    
+    function switchShopTab(btnId, paneId) { document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.shop-pane').forEach(p => p.style.display = 'none'); document.getElementById(btnId).classList.add('active'); document.getElementById(paneId).style.display = 'block'; }
+    function renderFoodShop() { const container = document.getElementById('shop-food-pane'); container.innerHTML = ''; for (const [key, item] of Object.entries(foodData)) { const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${item.name}</span><span class="item-cost">${item.cost}💰</span></div>`; btn.onclick = () => askPurchaseCount(key, 'food'); container.appendChild(btn); } }
+    function renderBgShop() { const container = document.getElementById('shop-bg-list'); container.innerHTML = ''; bgList.forEach(bg => { const owned = gameState.unlockedBgs.includes(bg.id); const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.disabled = owned; btn.innerHTML = `<div class="shop-item-info"><span>${bg.name}</span>${owned ? '<span class="item-owned">解放済</span>' : `<span class="item-cost">${bg.cost}💰</span>`}</div>`; if(!owned) btn.onclick = () => { playSE('click'); if(gameState.coins >= bg.cost) { gameState.coins -= bg.cost; gameState.unlockedBgs.push(bg.id); updateUI(); saveActiveGame(); renderBgShop(); playSE('coin'); } else { playSE('error'); alert("コインが足りません"); } }; container.appendChild(btn); }); }
+    document.getElementById('custom-bg-uploader').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (evt) => { gameState.customBgData = evt.target.result; gameState.appearance.bgClass = "custom-bg"; updateUI(); saveActiveGame(); }; reader.readAsDataURL(file); };
+    function renderFurnitureShop() { const container = document.getElementById('shop-furni-pane'); container.innerHTML = ''; for (const [key, f] of Object.entries(furnitureData)) { const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${f.emoji} ${f.name}</span><span class="item-cost">${f.cost}💰</span></div>`; btn.onclick = () => askPurchaseCount(key, 'furniture'); container.appendChild(btn); } }
+    
+    function askPurchaseCount(key, type) { playSE('click'); const item = type === 'food' ? foodData[key] : furnitureData[key]; const count = parseInt(prompt(`「${item.name}」をいくつ購入しますか？`, "1")); if(isNaN(count) || count <= 0) return; const total = item.cost * count; if(gameState.coins >= total) { playSE('coin'); gameState.coins -= total; if(type === 'food') gameState.inventory[key] = (gameState.inventory[key] || 0) + count; else gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + count; updateUI(); saveActiveGame(); openShopModal(); } else { playSE('error'); alert("コインが足りません"); } }
+
+    function openFurnitureInventoryModal() { const container = document.getElementById('furniture-inv-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.furnitureInventory)) { if(qty > 0) { const f = furnitureData[key] || diyFurnitureData[key]; if(!f) continue; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerHTML = `${f.emoji}<br>${f.name}(${qty})`; btn.onclick = () => { playSE('click'); gameState.furnitureInventory[key]--; gameState.placedFurniture.push({ id: "f-"+Date.now(), key: key, emoji: f.emoji, x: 100, y: 150 }); closeModal('furniture-inventory-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); } } document.getElementById('furniture-inventory-modal').style.display = 'flex'; }
+    function openBagModal() { const container = document.getElementById('bag-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.inventory)) { if(qty > 0) { const item = foodData[key]; const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${item.name} (${qty}個)</span><span class="item-owned">あげる</span></div>`; btn.onclick = () => { playSE('click'); if(gameState.fullness >= 100) { playSE('error'); return alert("お腹いっぱいです"); } gameState.inventory[key]--; gameState.fullness = Math.min(gameState.fullness + item.full, 100); if(!gameState.totalFeeds) gameState.totalFeeds = 0; gameState.totalFeeds++; logMessage(`🍖 ${item.name} をあげました！`); gainExp(item.exp); updateMissionProgress('feed'); closeModal('bag-modal'); updateUI(); }; container.appendChild(btn); } } document.getElementById('bag-modal').style.display = 'flex'; }
+    function openBgModal() { const container = document.getElementById('bg-container'); container.innerHTML = ''; bgList.forEach(bg => { if(!gameState.unlockedBgs.includes(bg.id)) return; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = bg.name; btn.onclick = () => { playSE('click'); gameState.appearance.bgClass = bg.id; closeModal('bg-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); }); document.getElementById('bg-modal').style.display = 'flex'; }
+
+    function openMakeModal() { document.getElementById('make-modal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    
+    function gainExp(amt) {
+        if(gameState.level >= 12) return;
+        gameState.exp += amt;
+        while(gameState.exp >= gameState.maxExp && gameState.level < 12) {
+            gameState.level++; gameState.exp -= gameState.maxExp; gameState.maxExp = Math.floor(gameState.maxExp * 1.8);
+            logMessage(`🎉 レベルアップ！ Lv.${gameState.level}`, true);
+        }
+        if(gameState.level >= 12) { gameState.level = 12; gameState.exp = gameState.maxExp; }
+        updateUI(); saveActiveGame();
+    }
+
+    document.getElementById('drawer-notice-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; renderNotices(); document.getElementById('notice-modal').style.display = 'flex'; document.getElementById('notice-badge').style.display = 'none'; };
+    document.getElementById('drawer-transfer-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('trans-my-id').innerText = gameState.friendId; document.getElementById('trans-my-pass').innerText = gameState.password || "1234"; document.getElementById('transfer-modal').style.display = 'flex'; };
+    document.getElementById('close-transfer-modal').onclick = () => { playSE('click'); closeModal('transfer-modal'); };
+    document.getElementById('btn-change-pass').onclick = () => { playSE('click'); const p = prompt("新しいパスワードを設定", gameState.password); if(p && p.trim()!=="") { gameState.password = p.trim(); document.getElementById('trans-my-pass').innerText = gameState.password; saveActiveGame(); alert("変更しました！"); } };
+    document.getElementById('drawer-trophy-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('trophy-list-container'); container.innerHTML = ''; if(!gameState.trophies || gameState.trophies.length === 0) { container.innerHTML = '<div style="text-align:center; color:#868e96; margin-top:20px;">まだトロフィーを持っていません。</div>'; } else { gameState.trophies.forEach(t => { const div = document.createElement('div'); div.className = 'trophy-item'; div.innerHTML = `<span>🏆</span> <span>${t}</span>`; container.appendChild(div); }); } document.getElementById('trophy-modal').style.display = 'flex'; };
+    document.getElementById('close-trophy-modal').onclick = () => { playSE('click'); closeModal('trophy-modal'); };
+    document.getElementById('drawer-mission-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('mission-list-container'); container.innerHTML = ''; if(!gameState.dailyMissions) gameState.dailyMissions = []; gameState.dailyMissions.forEach(m => { const div = document.createElement('div'); div.className = `mission-item ${m.completed ? 'completed' : ''}`; div.innerHTML = `<span>${m.desc} (${m.current}/${m.target})</span><b>${m.completed ? '✅' : '未達成'}</b>`; container.appendChild(div); }); document.getElementById('mission-modal').style.display = 'flex'; };
+    document.getElementById('close-mission').onclick = () => { playSE('click'); closeModal('mission-modal'); };
+    document.getElementById('drawer-dress-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('dress-container'); container.innerHTML = ''; gameState.unlockedCostumes.forEach(c => { const btn = document.createElement('button'); btn.className = `type-btn ${gameState.currentCostume === c ? 'active' : ''}`; btn.innerText = c; btn.onclick = () => { playSE('click'); gameState.currentCostume = c; closeModal('dress-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); }); document.getElementById('dress-modal').style.display = 'flex'; };
+    document.getElementById('close-dress').onclick = () => { playSE('click'); closeModal('dress-modal'); };
+    document.getElementById('drawer-furniture-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; openFurnitureInventoryModal(); };
+    document.getElementById('drawer-bg-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; openBgModal(); };
+    document.getElementById('drawer-save-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; saveActiveGame(true); };
+    document.getElementById('drawer-title-btn').onclick = () => { playSE('click'); if(confirm("タイトルへ戻りますか？")) { saveActiveGame(); initTitleScreen(); } };
+
+    // --- 定期トリガーお悩み ---
+    setInterval(() => {
+        if (document.getElementById('title-screen').style.display === 'flex' || document.getElementById('welcome-screen').style.display === 'flex') return;
+        if (Math.random() < 0.2) { triggerNewWorry(); }
+        if (gameState.fullness > 0) {
+            gameState.fullness = Math.max(0, gameState.fullness - 1.5);
+            updateUI();
+        }
+    }, 12000);
+
     // ロード時に実行
     document.getElementById('upa-char').innerHTML = SVG_TEMPLATE;
     document.getElementById('preview-char').innerHTML = SVG_TEMPLATE;
+    setExpedDuration(10, '10秒 (テスト)');
     initTitleScreen();
-
 </script>
 </body>
 </html>
