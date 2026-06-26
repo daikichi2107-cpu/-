@@ -9,232 +9,40 @@
     <link rel="apple-touch-icon" href="icon.png">
     <title>悩み解決！育成ゲーム Ultimate</title>
     <style>
-        /* 基本スタイル設定 */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-            -webkit-user-select: none !important;
-            user-select: none !important;
-        }
+        /* 基本スタイル設定 (少し大きく、縦比率を圧縮) */
+        *, *::before, *::after { box-sizing: border-box; -webkit-tap-highlight-color: rgba(0,0,0,0) !important; -webkit-user-select: none !important; user-select: none !important; }
+        body { margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #2b2b2b; color: #2b2b2b; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; font-size: 16px; }
+        
+        /* 縦比率を少し縮め、画面を少し大きく */
+        .game-container { width: 100%; max-width: 540px; height: 100vh; max-height: 85vh; background-color: #ffffff; box-shadow: 0 0 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; position: relative; padding-top: env(safe-area-inset-top); padding-bottom: env(safe-area-inset-bottom); border-radius: 12px; overflow: hidden; }
+        @media (min-width: 768px) { .game-container { border-radius: 24px; } }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
-            background-color: #2b2b2b;
-            color: #2b2b2b;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow: hidden;
-        }
-
-        /* 画面縦比率をコンパクトに調整 */
-        .game-container {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            max-height: 600px;
-            background-color: #ffffff;
-            box-shadow: 0 0 30px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            padding-top: env(safe-area-inset-top);
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-
-        @media (min-width: 768px) and (min-height: 700px) {
-            .game-container {
-                height: 90vh;
-                border-radius: 24px;
-                overflow: hidden;
-            }
-        }
-
-        /* タイトル画面スタイル */
-        .title-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #e3fafc, #c5f6fa, #99e9f2);
-            z-index: 300;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-            overflow-y: auto;
-        }
-        .title-logo {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #0b7285;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            line-height: 1.3;
-        }
-        .title-btn {
-            width: 80%;
-            padding: 14px;
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: white;
-            background-color: #15aabf;
-            border: none;
-            border-radius: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 4px 12px rgba(21, 170, 191, 0.3);
-            cursor: pointer;
-        }
-        .title-btn.orange {
-            background-color: #ff922b;
-            box-shadow: 0 4px 12px rgba(255, 146, 43, 0.3);
-        }
-        .save-slots-container {
-            width: 100%;
-            max-height: 180px;
-            overflow-y: auto;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .save-slot-card {
-            background: white;
-            border: 2px solid #ced4da;
-            border-radius: 14px;
-            padding: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            text-align: left;
-        }
-        .slot-click-area {
-            flex-grow: 1;
-            cursor: pointer;
-        }
-        .delete-slot-btn {
-            background-color: #fa5252;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 6px 10px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            margin-left: 8px;
-        }
+        /* タイトル画面 */
+        .title-screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #e3fafc, #c5f6fa, #99e9f2); z-index: 300; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; overflow-y: auto; }
+        .title-logo { font-size: 2rem; font-weight: 900; color: #0b7285; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; line-height: 1.3; }
+        .version-text { position: absolute; bottom: 10px; right: 15px; font-size: 0.9rem; color: #0b7285; font-weight: bold; }
+        .title-btn { width: 85%; padding: 16px; font-size: 1.1rem; font-weight: bold; color: white; background-color: #15aabf; border: none; border-radius: 16px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(21, 170, 191, 0.3); cursor: pointer; }
+        .title-btn.orange { background-color: #ff922b; box-shadow: 0 4px 12px rgba(255, 146, 43, 0.3); }
+        .save-slots-container { width: 100%; max-height: 180px; overflow-y: auto; margin-bottom: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .save-slot-card { background: white; border: 2px solid #ced4da; border-radius: 14px; padding: 12px; display: flex; justify-content: space-between; align-items: center; text-align: left; }
+        .slot-click-area { flex-grow: 1; cursor: pointer; }
+        .delete-slot-btn { background-color: #fa5252; color: white; border: none; border-radius: 8px; padding: 8px 12px; font-size: 0.8rem; font-weight: bold; cursor: pointer; margin-left: 8px; }
 
         /* ヘッダー・ステータスエリア */
-        header {
-            background-color: #15aabf;
-            color: white;
-            padding: 10px 14px;
-            text-align: center;
-            border-bottom-left-radius: 16px;
-            border-bottom-right-radius: 16px;
-            z-index: 10;
-            position: relative;
-        }
-
-        .menu-trigger {
-            position: absolute;
-            left: 14px;
-            top: 10px;
-            font-size: 1.5rem;
-            color: white;
-            cursor: pointer;
-            z-index: 12;
-            line-height: 1;
-        }
-
-        h1 {
-            margin: 0 0 2px 0;
-            font-size: 1.15rem;
-            letter-spacing: 1px;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: inline-block;
-            cursor: pointer;
-        }
-        .name-edit-hint {
-            font-size: 0.6rem;
-            display: block;
-            margin-bottom: 4px;
-            opacity: 0.8;
-        }
-
-        .status-bar {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            background-color: rgba(255, 255, 255, 0.23);
-            padding: 6px 10px;
-            border-radius: 12px;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-        }
-
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-        }
-
-        .exp-container {
-            flex-grow: 1;
-            margin: 0 8px;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            height: 10px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .exp-bar {
-            background-color: #ffdeeb;
-            width: 0%;
-            height: 100%;
-            transition: width 0.4s ease;
-        }
-        
-        .next-exp-txt {
-            font-size: 0.7rem;
-            min-width: 55px;
-            text-align: right;
-            opacity: 0.9;
-        }
-
-        .fullness-container {
-            flex-grow: 1;
-            margin-left: 8px;
-            background-color: rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-            height: 10px;
-            overflow: hidden;
-        }
-        .fullness-bar {
-            background-color: #fab005;
-            width: 100%;
-            height: 100%;
-            transition: width 0.4s ease;
-        }
+        header { background-color: #15aabf; color: white; padding: 10px 14px; text-align: center; border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; z-index: 10; position: relative; }
+        .menu-trigger { position: absolute; left: 14px; top: 10px; font-size: 1.6rem; color: white; cursor: pointer; z-index: 12; line-height: 1; }
+        h1 { margin: 0 0 2px 0; font-size: 1.2rem; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-block; cursor: pointer; }
+        .name-edit-hint { font-size: 0.65rem; display: block; margin-bottom: 4px; opacity: 0.8; }
+        .status-bar { display: flex; flex-direction: column; gap: 4px; background-color: rgba(255, 255, 255, 0.23); padding: 8px 10px; border-radius: 12px; backdrop-filter: blur(4px); }
+        .status-row { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; font-weight: bold; }
+        .exp-container { flex-grow: 1; margin: 0 8px; background-color: rgba(255, 255, 255, 0.3); border-radius: 10px; height: 12px; overflow: hidden; position: relative; }
+        .exp-bar { background-color: #ffdeeb; width: 0%; height: 100%; transition: width 0.4s ease; }
+        .next-exp-txt { font-size: 0.75rem; min-width: 55px; text-align: right; opacity: 0.9; }
+        .fullness-container { flex-grow: 1; margin-left: 8px; background-color: rgba(0, 0, 0, 0.15); border-radius: 10px; height: 12px; overflow: hidden; }
+        .fullness-bar { background-color: #fab005; width: 100%; height: 100%; transition: width 0.4s ease; }
 
         /* 背景 */
-        .aquarium {
-            flex-grow: 1;
-            position: relative;
-            overflow: hidden;
-            touch-action: none;
-            transition: background 0.5s ease;
-            background-size: cover !important;
-            background-position: center !important;
-        }
+        .aquarium { flex-grow: 1; position: relative; overflow: hidden; touch-action: none; transition: background 0.5s ease; background-size: cover !important; background-position: center !important; }
         .bg-aquarium { background: linear-gradient(to bottom, #e3fafc, #99e9f2); }
         .bg-garden { background: linear-gradient(to bottom, #ebfbee, #b2f2bb, #d8f5a2); }
         .bg-deepsea { background: linear-gradient(to bottom, #0b1b3d, #020813); }
@@ -244,381 +52,73 @@
         .bg-room { background: linear-gradient(to bottom, #fff9db, #ffe066); }
         .bg-snow { background: linear-gradient(to bottom, #f1f3f5, #ced4da); }
 
-        /* お悩み電球 */
-        .worry-lamp {
-            position: absolute;
-            font-size: 2rem;
-            cursor: pointer;
-            animation: lamp-float 1.5s ease-in-out infinite alternate;
-            z-index: 15;
-            display: none;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-        }
-        @keyframes lamp-float {
-            0% { transform: translateY(0) scale(1); }
-            100% { transform: translateY(-6px) scale(1.05); }
-        }
+        /* キャラクター配置・電球の同期 */
+        .char-wrapper { position: absolute; width: 120px; height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: left 0.8s linear, top 0.8s linear; cursor: pointer; z-index: 6; }
+        .upa-character { width: 110px; height: 110px; position: relative; animation: swim 4s ease-in-out infinite; transition: transform 0.2s; }
+        .upa-character.jump { animation: jump 0.3s ease-out; }
+        .worry-lamp { position: absolute; top: -30px; left: 45px; font-size: 2.2rem; cursor: pointer; animation: lamp-float 1.5s ease-in-out infinite alternate; z-index: 15; display: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        
+        .costume-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; font-size: 2.2rem; pointer-events: none; z-index: 7; }
+        .char-name-label { background-color: rgba(255, 255, 255, 0.9); padding: 2px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; margin-top: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); white-space: nowrap; color: #2b2b2b; border: 1px solid #dee2e6; }
+        
+        @keyframes swim { 0% { transform: translateY(0px) rotate(0deg); } 33% { transform: translateY(-4px) rotate(2deg); } 66% { transform: translateY(4px) rotate(-2deg); } 100% { transform: translateY(0px) rotate(0deg); } }
+        @keyframes lamp-float { 0% { transform: translateY(0) scale(1); } 100% { transform: translateY(-8px) scale(1.05); } }
+        @keyframes jump { 0% { transform: scale(1) translateY(0); } 50% { transform: scale(1.1) translateY(-15px); } 100% { transform: scale(1) translateY(0); } }
 
-        /* キャラクター配置 */
-        .char-wrapper {
-            position: absolute;
-            width: 110px;
-            height: 130px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: left 0.8s linear, top 0.8s linear;
-            cursor: pointer;
-            z-index: 6;
-        }
+        /* 家具 */
+        .placed-furniture { position: absolute; font-size: 2.8rem; cursor: move; z-index: 4; touch-action: none; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15)); }
+        .placed-furniture.editing { border: 2px dashed #15aabf; background-color: rgba(21, 170, 191, 0.1); border-radius: 8px; }
+        .preview-area { width: 120px; height: 130px; margin: 5px auto; position: relative; display: flex; flex-direction: column; align-items: center; }
 
-        .upa-character {
-            width: 100px;
-            height: 100px;
-            position: relative;
-            animation: swim 4s ease-in-out infinite;
-        }
+        /* モーダル・ドロワー */
+        .modal, .side-drawer, .welcome-screen, .fullscreen-modal { display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 100; }
+        .modal { background-color: rgba(0,0,0,0.5); justify-content: center; align-items: flex-end; }
+        .fullscreen-modal { background: linear-gradient(135deg, #f8f9fa, #e9ecef); flex-direction: column; overflow-y: auto; z-index: 200; padding: 16px; color: #2b2b2b; }
+        .fullscreen-modal.dark { background: linear-gradient(135deg, #1a0b2e, #4b1d52); color: white; }
+        
+        .side-drawer { background-color: rgba(0,0,0,0.5); z-index: 150; justify-content: flex-start; }
+        .drawer-content { width: 280px; height: 100%; background-color: white; box-shadow: 10px 0 30px rgba(0,0,0,0.2); display: flex; flex-direction: column; padding: 16px 12px; animation: slideRight 0.3s ease; overflow-y: auto; }
+        @keyframes slideRight { from { transform: translateX(-100%); } to { transform: translateX(0); } }
+        
+        .drawer-header, .modal-header, .welcome-header { font-size: 1.2rem; font-weight: bold; margin-bottom: 14px; text-align: center; }
+        .drawer-header { color: #15aabf; border-bottom: 2px solid #e9ecef; padding-bottom: 8px; }
+        .modal-header, .welcome-header { color: #1c7ed6; }
 
-        .costume-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 2rem;
-            pointer-events: none;
-            z-index: 7;
-        }
+        .drawer-btn { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: none; padding: 12px 10px; font-size: 0.95rem; font-weight: 600; color: #495057; text-align: left; border-radius: 10px; cursor: pointer; margin-bottom: 6px; transition: background 0.2s; }
+        .drawer-btn:active { background-color: #f1f3f5; }
+        .welcome-screen { background: linear-gradient(to bottom, #e3fafc, #c5f6fa); z-index: 200; flex-direction: column; padding: 16px; overflow-y: auto; }
 
-        .char-name-label {
-            background-color: rgba(255, 255, 255, 0.85);
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            margin-top: 2px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            white-space: nowrap;
-            color: #2b2b2b;
-            border: 1px solid #dee2e6;
-        }
+        .modal-content { background-color: rgba(255, 255, 255, 0.98); border-top-left-radius: 20px; border-top-right-radius: 20px; padding: 20px; width: 100%; box-shadow: 0 -10px 30px rgba(0,0,0,0.2); animation: slideUp 0.3s ease; max-height: 85vh; overflow-y: auto; }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        /* 家具配置 */
-        .placed-furniture {
-            position: absolute;
-            font-size: 2.4rem;
-            cursor: move;
-            z-index: 4;
-            user-select: none;
-            touch-action: none;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-        }
-        .placed-furniture.editing {
-            border: 2px dashed #15aabf;
-            background-color: rgba(21, 170, 191, 0.1);
-            border-radius: 8px;
-        }
+        /* UI部品 */
+        .shop-tabs { display: flex; gap: 4px; margin-bottom: 12px; border-bottom: 2px solid #dee2e6; padding-bottom: 6px; }
+        .shop-tab-btn { flex: 1; padding: 8px; border: none; background: #f1f3f5; font-weight: bold; font-size: 0.85rem; border-radius: 8px; cursor: pointer; }
+        .shop-tab-btn.active { background-color: #15aabf; color: white; }
 
-        .preview-area {
-            width: 110px;
-            height: 120px;
-            margin: 5px auto;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        .name-input-box { width: 100%; padding: 12px; font-size: 1rem; border: 2px solid #ced4da; border-radius: 12px; text-align: center; margin-bottom: 12px; outline: none; font-weight: 600; }
+        .option-btn, .shop-item-btn { display: block; width: 100%; background-color: #f8f9fa; border: 1px solid #e9ecef; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; text-align: left; font-size: 0.9rem; font-weight: bold; cursor: pointer; }
+        .shop-item-info { display: flex; justify-content: space-between; align-items: center; }
+        .item-cost { background-color: #fff3bf; color: #d9480f; padding: 4px 10px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
+        .item-owned { background-color: #e3fafc; color: #0b7285; padding: 4px 10px; border-radius: 12px; font-weight: 800; font-size: 0.85rem; }
 
-        @keyframes swim {
-            0% { transform: translateY(0px) rotate(0deg); }
-            33% { transform: translateY(-3px) rotate(2deg); }
-            66% { transform: translateY(3px) rotate(-2deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
+        .close-btn, .start-btn { display: block; width: 100%; border: none; border-radius: 12px; padding: 12px; margin-top: 10px; font-size: 0.95rem; font-weight: bold; text-align: center; cursor: pointer; }
+        .close-btn { background-color: #e9ecef; color: #495057; }
+        .start-btn { background-color: #ff922b; color: white; font-size: 1.05rem; padding: 14px; margin-top: 12px; }
 
-        /* モーダル */
-        .modal {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-            z-index: 100;
-            justify-content: center;
-            align-items: flex-end;
-        }
-
-        .side-drawer {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.4);
-            z-index: 150;
-            justify-content: flex-start;
-        }
-        .drawer-content {
-            width: 260px;
-            height: 100%;
-            background-color: white;
-            box-shadow: 10px 0 30px rgba(0,0,0,0.15);
-            display: flex;
-            flex-direction: column;
-            padding: 16px 12px;
-            animation: slideRight 0.3s ease;
-            overflow-y: auto;
-        }
-        @keyframes slideRight {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
-        }
-        .drawer-header {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: #15aabf;
-            margin-bottom: 14px;
-            border-bottom: 2px solid #e9ecef;
-            padding-bottom: 8px;
-        }
-        .drawer-btn {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            background: none;
-            border: none;
-            padding: 10px 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #495057;
-            text-align: left;
-            border-radius: 10px;
-            cursor: pointer;
-            margin-bottom: 4px;
-        }
-
-        .welcome-screen {
-            display: none;
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #e3fafc, #c5f6fa);
-            z-index: 200;
-            flex-direction: column;
-            padding: 16px;
-            overflow-y: auto;
-        }
-
-        .modal-content {
-            background-color: rgba(255, 255, 255, 0.98);
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            padding: 16px 16px;
-            width: 100%;
-            box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
-            animation: slideUp 0.3s ease;
-            max-height: 85vh;
-            overflow-y: auto;
-        }
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        .modal-header, .welcome-header {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            color: #1c7ed6;
-            text-align: center;
-        }
-
-        .shop-tabs {
-            display: flex;
-            gap: 4px;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #dee2e6;
-            padding-bottom: 4px;
-        }
-        .shop-tab-btn {
-            flex: 1;
-            padding: 6px;
-            border: none;
-            background: #f1f3f5;
-            font-weight: bold;
-            font-size: 0.8rem;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-        .shop-tab-btn.active {
-            background-color: #15aabf;
-            color: white;
-        }
-
-        .name-input-box {
-            width: 100%;
-            padding: 10px;
-            font-size: 0.95rem;
-            border: 2px solid #ced4da;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 10px;
-            outline: none;
-            font-weight: 600;
-        }
-
-        .option-btn, .shop-item-btn, .close-btn, .menu-btn, .type-btn, .start-btn {
-            pointer-events: auto !important;
-            cursor: pointer !important;
-            touch-action: manipulation;
-        }
-
-        .option-btn, .shop-item-btn {
-            display: block;
-            width: 100%;
-            background-color: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            text-align: left;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .shop-item-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .item-cost {
-            background-color: #fff3bf;
-            color: #d9480f;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-        .item-owned {
-            background-color: #e3fafc;
-            color: #0b7285;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 700;
-            font-size: 0.8rem;
-        }
-
-        .close-btn, .start-btn {
-            display: block;
-            width: 100%;
-            background-color: #e9ecef;
-            color: #495057;
-            border: none;
-            border-radius: 12px;
-            padding: 10px;
-            margin-top: 8px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-align: center;
-        }
-        .start-btn {
-            background-color: #ff922b;
-            color: white;
-            font-size: 1rem;
-            padding: 12px;
-            margin-top: 10px;
-        }
-
-        .color-picker-title {
-            font-size: 0.8rem;
-            font-weight: bold;
-            margin: 6px 0 4px 0;
-            color: #495057;
-        }
-        .color-options {
-            display: flex;
-            gap: 6px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .custom-color-picker {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 40px;
-            height: 30px;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-        }
+        .color-picker-title { font-size: 0.85rem; font-weight: bold; margin: 8px 0 6px 0; color: #495057; }
+        .color-options { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+        .custom-color-picker { -webkit-appearance: none; width: 44px; height: 34px; background-color: transparent; border: none; cursor: pointer; }
         .custom-color-picker::-webkit-color-swatch { border-radius: 8px; border: 2px solid #ced4da; }
+        .type-btn { background-color: #f1f3f5; border: 1px solid #ced4da; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; }
+        .type-btn.active { background-color: #15aabf; color: white; border-color: #15aabf; }
 
-        .type-btn {
-            background-color: #f1f3f5;
-            border: 1px solid #ced4da;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .type-btn.active {
-            background-color: #15aabf;
-            color: white;
-            border-color: #15aabf;
-        }
-
-        footer {
-            background-color: #f8f9fa;
-            padding: 8px;
-            border-top: 1px solid #e9ecef;
-            z-index: 10;
-        }
-
-        .action-menu {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-        }
-
-        .menu-btn {
-            background-color: #15aabf;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 10px 4px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(21, 170, 191, 0.2);
-        }
+        footer { background-color: #f8f9fa; padding: 10px; border-top: 1px solid #e9ecef; z-index: 10; }
+        .action-menu { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+        .menu-btn { background-color: #15aabf; color: white; border: none; border-radius: 14px; padding: 12px 4px; font-size: 0.9rem; font-weight: 800; text-align: center; box-shadow: 0 4px 8px rgba(21, 170, 191, 0.2); cursor: pointer; }
         .menu-btn.orange { background-color: #ff922b; }
         .menu-btn.green { background-color: #40c057; }
-
-        .game-log {
-            background-color: #f1f3f5;
-            border-radius: 10px;
-            padding: 8px;
-            margin-top: 6px;
-            font-size: 0.8rem;
-            color: #495057;
-            min-height: 38px;
-            max-height: 38px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            font-weight: 500;
-        }
+        .game-log { background-color: #f1f3f5; border-radius: 10px; padding: 10px; margin-top: 8px; font-size: 0.85rem; color: #495057; min-height: 42px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; }
         .game-log.alert-flash { background-color: #fff0f6; color: #d6336c; }
 
         .char-part { display: none; }
@@ -630,107 +130,34 @@
         [data-char-type="bear"] .part-bear { display: inline; }
         [data-char-type="rabbit"] .part-rabbit { display: inline; }
 
-        .minigame-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            max-height: 260px;
-            overflow-y: auto;
-            padding: 2px;
-        }
-        .game-panel {
-            background: #e3fafc;
-            border: 1px solid #99e9f2;
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-        }
+        /* ミニゲーム全画面 */
+        .minigame-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .game-panel { background: #fff; border-radius: 16px; padding: 20px; text-align: center; color: #2b2b2b; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .mg-title { font-size: 1.6rem; color: #fcc419; margin-bottom: 15px; text-shadow: 0 2px 4px rgba(0,0,0,0.5); text-align: center; font-weight: 900; }
 
-        .mission-item {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 8px;
-            margin-bottom: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.8rem;
-            border-left: 4px solid #ced4da;
-        }
+        .mission-item { background: #f8f9fa; border-radius: 12px; padding: 10px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; border-left: 5px solid #ced4da; font-weight: bold; }
         .mission-item.completed { border-left-color: #40c057; background: #ebfbee; }
-        
-        .gacha-box {
-            text-align: center;
-            padding: 14px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 14px;
-            margin-bottom: 10px;
-            color: white;
-            position: relative;
-            z-index: 2;
-        }
+        .trophy-item { background: #fff3bf; border: 1px solid #fcc419; border-radius: 10px; padding: 10px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; font-size: 0.9rem; font-weight: bold; color: #d9480f; }
 
-        /* ガチャ豪華演出用 */
-        .gacha-full-screen {
-            background: linear-gradient(135deg, #1a0b2e, #4b1d52, #99326d);
-            border-radius: 0 !important;
-            height: 100vh !important;
-            max-height: none !important;
-            color: white;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-        .gacha-full-screen::before {
-            content: '';
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
-            animation: spin 10s linear infinite;
-        }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        .gacha-machine {
-            font-size: 6rem;
-            margin-bottom: 20px;
-            z-index: 2;
-            transition: transform 0.1s;
-        }
-        .shake-anim { animation: gacha-shake 0.4s infinite; }
-        @keyframes gacha-shake {
-            0% { transform: translate(2px, 2px) rotate(0deg); }
-            25% { transform: translate(-2px, -2px) rotate(-5deg); }
-            50% { transform: translate(-2px, 2px) rotate(5deg); }
-            75% { transform: translate(2px, -2px) rotate(-5deg); }
-            100% { transform: translate(2px, 2px) rotate(0deg); }
-        }
-        .gacha-result-item {
-            font-size: 5rem;
-            animation: zoom-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 2;
-        }
-        @keyframes zoom-in {
-            from { transform: scale(0) rotate(-180deg); opacity: 0; }
-            to { transform: scale(1) rotate(0); opacity: 1; }
-        }
+        /* 見開き称号辞典 */
+        .book-spread { display: flex; width: 100%; max-height: 60vh; background: #fdf6e3; border-radius: 12px; box-shadow: inset 0 0 15px rgba(0,0,0,0.1), 0 10px 20px rgba(0,0,0,0.2); border: 2px solid #e6ca8a; position: relative; }
+        .book-spread::after { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 4px; background: linear-gradient(to right, rgba(0,0,0,0.1), rgba(0,0,0,0.05), rgba(0,0,0,0.1)); transform: translateX(-50%); }
+        .book-page { flex: 1; padding: 10px; overflow-y: auto; }
+        .dict-item { background: rgba(255,255,255,0.6); border: 1px solid #e6ca8a; padding: 8px; margin-bottom: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .dict-item.unlocked { background: #e3fafc; border-color: #15aabf; }
 
-        .trophy-item {
-            background: #fff3bf;
-            border: 1px solid #fcc419;
-            border-radius: 8px;
-            padding: 8px;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: #d9480f;
-        }
+        /* ログインボーナススタンプ */
+        .login-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+        .login-cell { background: #f1f3f5; border: 2px solid #ced4da; border-radius: 8px; padding: 10px 5px; text-align: center; font-size: 0.75rem; font-weight: bold; position: relative; }
+        .login-cell.stamped::after { content: '💮'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); font-size: 1.8rem; color: #fa5252; opacity: 0.8; }
+
+        /* フレンドリスト (専用画面) */
+        .f-list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid #dee2e6; }
+        .f-fav-btn { font-size: 1.5rem; background: none; border: none; cursor: pointer; outline: none; padding: 0 10px; color: #ccc; transition: color 0.2s; }
+        .f-fav-btn.active { color: #fcc419; }
+        
+        .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 0.9rem; }
+        .setting-slider { width: 60%; }
     </style>
 </head>
 <body>
@@ -738,38 +165,54 @@
 <audio id="bgm-main" loop src="https://dova-s.jp/_contents/bgm/play/dummy_main.mp3"></audio>
 <audio id="bgm-title" loop src="https://dova-s.jp/_contents/bgm/play/dummy_title.mp3"></audio>
 <audio id="bgm-gacha" loop src="https://dova-s.jp/_contents/bgm/play/dummy_gacha.mp3"></audio>
+<audio id="se-click" src="https://dova-s.jp/_contents/se/play/dummy_click.mp3"></audio>
+<audio id="se-coin" src="https://dova-s.jp/_contents/se/play/dummy_coin.mp3"></audio>
+<audio id="se-jump" src="https://dova-s.jp/_contents/se/play/dummy_jump.mp3"></audio>
+<audio id="se-error" src="https://dova-s.jp/_contents/se/play/dummy_error.mp3"></audio>
 
 <div class="game-container">
     <div class="title-screen" id="title-screen">
         <div class="title-logo">🌟 悩み解決！ 🌟<br>育成ゲーム Ultimate</div>
-        
         <button class="title-btn orange" id="title-start-new-btn">✨ 初めからあそぶ</button>
         <button class="title-btn" id="title-load-menu-btn">💾 続きからあそぶ</button>
 
         <div id="title-load-pane" style="display:none; width:100%; margin-top:6px;">
-            <div style="font-size:0.75rem; font-weight:bold; color:#495057; margin-bottom:4px;">セーブデータを選んでね</div>
+            <div style="font-size:0.8rem; font-weight:bold; color:#495057; margin-bottom:6px;">セーブデータを選んでね</div>
             <div class="save-slots-container" id="save-slots-container"></div>
             
-            <div style="margin-top: 10px; padding: 10px; background: #fff3bf; border-radius: 10px; border: 1px solid #fcc419;">
-                <div style="font-size:0.8rem; font-weight:bold; color:#d9480f; margin-bottom:4px;">🔄 データ引き継ぎ</div>
-                <input type="text" id="title-transfer-id" placeholder="引き継ぎ元フレンドIDを入力" class="name-input-box" style="padding:6px; font-size:0.8rem; margin-bottom:6px;">
-                <input type="password" id="title-transfer-pass" placeholder="パスワードを入力" class="name-input-box" style="padding:6px; font-size:0.8rem; margin-bottom:6px;">
-                <button id="btn-title-execute-transfer" style="width:100%; font-size:0.8rem; font-weight:bold; background:#d9480f; color:white; border:none; padding:8px; border-radius:6px;">この端末に同期する</button>
+            <div style="margin-top: 15px; padding: 12px; background: #fff3bf; border-radius: 12px; border: 1px solid #fcc419;">
+                <div style="font-size:0.9rem; font-weight:bold; color:#d9480f; margin-bottom:6px;">🔄 データ引き継ぎ</div>
+                <input type="text" id="title-transfer-id" placeholder="フレンドID" class="name-input-box" style="padding:8px; font-size:0.9rem; margin-bottom:8px;">
+                <input type="password" id="title-transfer-pass" placeholder="パスワード" class="name-input-box" style="padding:8px; font-size:0.9rem; margin-bottom:8px;">
+                <button id="btn-title-execute-transfer" style="width:100%; font-size:0.9rem; font-weight:bold; background:#d9480f; color:white; border:none; padding:10px; border-radius:8px;">この端末に同期する</button>
             </div>
+            <button class="close-btn" id="btn-back-to-title" style="padding:10px; font-size:0.9rem; margin-top:10px;">もどる</button>
+        </div>
+        <div class="version-text">ver.beta1.17</div>
+    </div>
 
-            <button class="close-btn" id="btn-back-to-title" style="padding:6px; font-size:0.8rem; margin-top:6px;">もどる</button>
+    <div class="modal" id="transfer-slot-modal" style="z-index: 400;">
+        <div class="modal-content">
+            <div class="modal-header">保存先スロットの選択</div>
+            <p style="font-size:0.85rem; text-align:center; margin-bottom:12px; font-weight:bold;">引き継いだデータを保存する場所を選んでください。<br><span style="color:red;">※既存データは上書きされます。</span></p>
+            <button class="option-btn" id="tslot-0-btn" style="text-align:center;">スロット 1 に保存</button>
+            <button class="option-btn" id="tslot-1-btn" style="text-align:center;">スロット 2 に保存</button>
+            <button class="close-btn" id="close-tslot-modal">キャンセル</button>
         </div>
     </div>
 
     <div class="welcome-screen" id="welcome-screen">
         <div class="welcome-header">🌟 新しいお友達づくり 🌟</div>
-        <input type="text" class="name-input-box" id="init-name-input" placeholder="なまえを入力" maxlength="12" value="ウパのココロ">
-
+        
+        <div class="color-picker-title">👤 飼い主（あなた）の名前</div>
+        <input type="text" class="name-input-box" id="init-owner-name-input" placeholder="あなたの名前を入力" maxlength="12" value="あなた">
+        
+        <div class="color-picker-title">🐾 ペットの名前</div>
+        <input type="text" class="name-input-box" id="init-name-input" placeholder="ペットの名前を入力" maxlength="12" value="ウパのココロ">
+        
         <div class="preview-area">
-            <div class="upa-character" id="preview-char" data-char-type="upa" style="margin:0; width:90px; height:90px;"></div>
-            <div class="char-name-label" id="preview-name-label">ウパのココロ</div>
+            <div class="upa-character" id="preview-char" data-char-type="upa" style="margin:0; width:100px; height:100px;"></div>
         </div>
-
         <div class="color-picker-title">🐾 どうぶつの種類</div>
         <div class="color-options" id="init-char-types">
             <button class="type-btn active" data-type="upa">ウパ</button>
@@ -780,17 +223,10 @@
             <button class="type-btn" data-type="bear">くま</button>
             <button class="type-btn" data-type="rabbit">うさぎ</button>
         </div>
-
         <div class="color-picker-title">🎨 からだの色</div>
-        <div class="color-options">
-            <input type="color" class="custom-color-picker" id="init-body-color-picker" value="#fff0f3">
-        </div>
-
+        <div class="color-options"><input type="color" class="custom-color-picker" id="init-body-color-picker" value="#fff0f3"></div>
         <div class="color-picker-title">🌸 かざり・パーツの色</div>
-        <div class="color-options">
-            <input type="color" class="custom-color-picker" id="init-gill-color-picker" value="#ff85a2">
-        </div>
-
+        <div class="color-options"><input type="color" class="custom-color-picker" id="init-gill-color-picker" value="#ff85a2"></div>
         <button class="start-btn" id="btn-start-game">この子と暮らす！</button>
     </div>
 
@@ -810,23 +246,21 @@
                 <span style="min-width: 50px; text-align: right;" id="fullness-text">100%</span>
             </div>
             <div class="status-row">
-                <span id="personality-display" style="background:rgba(0,0,0,0.15); padding:1px 4px; border-radius:4px;">称号: 見習い</span>
+                <span id="personality-display" style="background:rgba(0,0,0,0.15); padding:2px 6px; border-radius:6px;">称号: 見習い</span>
                 <span id="love-display">💖 なつき度: Lv.0</span>
-                <span id="game-slot-indicator" style="background:rgba(0,0,0,0.15); padding:1px 4px; border-radius:4px;">Slot1</span>
-                <span id="coin-display">💰 150</span>
+                <span id="game-slot-indicator" style="background:rgba(0,0,0,0.15); padding:2px 6px; border-radius:6px;">Slot1</span>
+                <span id="coin-display" style="font-size:0.9rem; color:#fcc419; text-shadow:1px 1px 2px #000;">💰 150</span>
             </div>
         </div>
     </header>
 
     <div class="aquarium bg-aquarium" id="aquarium">
-        <div class="worry-lamp" id="worry-lamp">💡</div>
-
         <div class="char-wrapper" id="char-wrapper">
+            <div class="worry-lamp" id="worry-lamp">💡</div>
             <div class="upa-character" id="upa-char" data-char-type="upa"></div>
             <div class="costume-layer" id="costume-layer"></div>
             <div class="char-name-label" id="main-name-label">ウパのココロ</div>
         </div>
-        
         <div id="furniture-placement-layer" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none;"></div>
     </div>
 
@@ -843,6 +277,8 @@
         <div class="drawer-content">
             <div class="drawer-header">メニュー</div>
             <button class="drawer-btn" id="drawer-profile-btn">👤 プロフィール</button>
+            <button class="drawer-btn" id="drawer-title-dict-btn">📖 称号辞典</button>
+            <button class="drawer-btn" id="drawer-mg-record-btn">🏆 ミニゲーム記録</button>
             <button class="drawer-btn" id="drawer-mission-btn">📅 ミッション・ログボ</button>
             <button class="drawer-btn" id="drawer-gacha-btn">🪙 家具・衣装ガチャ</button>
             <button class="drawer-btn" id="drawer-dress-btn">👗 きがえ・クローゼット</button>
@@ -851,193 +287,123 @@
             <button class="drawer-btn" id="drawer-friend-btn">🤝 フレンド</button>
             <button class="drawer-btn" id="drawer-trophy-btn" style="background:#fff3bf; color:#d9480f;">🏆 トロフィー</button>
             <button class="drawer-btn" id="drawer-transfer-btn" style="background:#e3fafc; color:#0b7285;">🔑 ID確認・パスワード</button>
+            <button class="drawer-btn" id="drawer-settings-btn">⚙️ 設定</button>
             <button class="drawer-btn" id="drawer-save-btn" style="background:#f8f9fa; border: 1px solid #ced4da;">💾 データを保存</button>
             <button class="drawer-btn" id="drawer-title-btn" style="margin-top:10px; background:#f1f3f5;">🚪 タイトルへ戻る</button>
             <button class="close-btn" id="close-drawer" style="margin-top:20px;">閉じる</button>
         </div>
     </div>
 
+    <div class="modal" id="login-bonus-modal" style="z-index: 250;">
+        <div class="modal-content">
+            <div class="modal-header">📅 ログインボーナス (30日)</div>
+            <p style="text-align:center; font-weight:bold; font-size:0.9rem; color:#0b7285;">毎日ログインしてご褒美をもらおう！<br>本日のボーナス: 💰30</p>
+            <div class="login-grid" id="login-stamp-grid"></div>
+            <button class="start-btn" id="close-login-bonus" style="margin-top:20px;">受け取る！</button>
+        </div>
+    </div>
+
     <div class="modal" id="profile-modal">
         <div class="modal-content" style="text-align: center;">
             <div class="modal-header">プロフィール</div>
-            <div style="font-size:1rem; font-weight:bold; margin-bottom:6px;" id="prof-name"></div>
-            <div style="font-size:0.85rem; margin-bottom:4px;" id="prof-level"></div>
-            <div style="font-size:0.85rem; margin-bottom:4px; font-weight:bold; color:#d9480f;" id="prof-title">称号: 見習い</div>
-            <div style="font-size:0.85rem; margin-bottom:4px;" id="prof-coins"></div>
-            <div style="font-size:0.85rem; margin-bottom:4px; color:#15aabf;" id="prof-stats"></div>
-            <div style="font-size:0.85rem; margin-bottom:8px; color:#e64980;" id="prof-login-days"></div>
+            <div style="font-size:1.1rem; font-weight:bold; margin-bottom:8px; color:#1c7ed6;" id="prof-owner-pet"></div>
+            <div style="font-size:0.9rem; margin-bottom:6px;" id="prof-level"></div>
+            <div style="font-size:0.9rem; margin-bottom:6px; font-weight:bold; color:#d9480f;" id="prof-title"></div>
+            <div style="font-size:0.9rem; margin-bottom:6px;" id="prof-coins"></div>
+            <div style="font-size:0.85rem; margin-bottom:6px; color:#15aabf;" id="prof-stats"></div>
+            <div style="font-size:0.85rem; margin-bottom:10px; color:#e64980;" id="prof-login-days"></div>
             <button class="close-btn" id="close-profile">閉じる</button>
         </div>
     </div>
 
-    <div class="modal" id="transfer-modal">
+    <div class="fullscreen-modal" id="title-dict-modal">
+        <div class="modal-header" style="font-size:1.5rem; margin-bottom:5px;">📖 称号辞典</div>
+        <p style="font-size:0.85rem; text-align:center; margin-bottom:15px; font-weight:bold;">解放した称号をタップでセットできます</p>
+        <div class="book-spread">
+            <div class="book-page" id="dict-page-left"></div>
+            <div class="book-page" id="dict-page-right"></div>
+        </div>
+        <button class="close-btn" id="close-title-dict" style="margin-top:20px; font-size:1.1rem; padding:12px;">辞典を閉じる</button>
+    </div>
+
+    <div class="modal" id="mg-record-modal">
         <div class="modal-content">
-            <div class="modal-header">🔑 アカウント情報</div>
-            <div style="background:#f1f3f5; padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:10px; text-align:center;">
-                タイトル画面から引き継ぐ際に必要な情報です。<br><br>
-                <b>あなたのフレンドID:</b> <br><span id="trans-my-id" style="color:#15aabf; font-size:1.1rem; font-weight:bold;">---</span><br><br>
-                <b>現在のパスワード:</b> <br><span id="trans-my-pass" style="color:#d6336c; font-size:1.1rem; font-weight:bold;">---</span>
-            </div>
-            <button id="btn-change-pass" style="width:100%; font-size:0.9rem; font-weight:bold; background:#e3fafc; color:#0b7285; border:1px solid #15aabf; padding:10px; border-radius:6px; margin-bottom:10px;">パスワードを変更する</button>
-            <button class="close-btn" id="close-transfer-modal">閉じる</button>
+            <div class="modal-header">🏆 ミニゲーム記録</div>
+            <div id="mg-record-container" style="max-height: 300px; overflow-y: auto;"></div>
+            <button class="close-btn" id="close-mg-record">閉じる</button>
         </div>
     </div>
 
-    <div class="modal" id="trophy-modal">
+    <div class="modal" id="settings-modal">
         <div class="modal-content">
-            <div class="modal-header">🏆 獲得トロフィー</div>
-            <div id="trophy-list-container" style="max-height: 300px; overflow-y: auto;"></div>
-            <button class="close-btn" id="close-trophy-modal">閉じる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="mission-modal">
-        <div class="modal-content">
-            <div class="modal-header">📅 デイリー要素</div>
-            <div style="background:#e8f7ff; padding:10px; border-radius:10px; text-align:center; font-size:0.85rem; margin-bottom:10px;" id="login-bonus-zone"></div>
-            <div style="font-weight:bold; font-size:0.85rem; margin-bottom:6px;">今日のミッション:</div>
-            <div id="mission-list-container"></div>
-            <button class="close-btn" id="close-mission">閉じる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="gacha-modal">
-        <div class="modal-content gacha-full-screen">
-            <div class="modal-header" style="color:white; z-index:2; font-size:1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">🪙 よろずアイテムガチャ</div>
-            <div class="gacha-box" id="gacha-ui-box">
-                <p style="font-size:0.9rem; margin-bottom:14px; font-weight:bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">1回 <b>💰 50 コイン</b>で挑戦！<br>限定衣装や高級家具を手に入れよう！</p>
-                <div id="gacha-machine" class="gacha-machine">🎰</div>
-                <button class="start-btn" id="btn-play-gacha" style="margin:0 auto; width:80%; font-size:1.1rem; background:#fcc419; color:#d9480f; box-shadow: 0 4px 0 #e67700;">ガチャを引く 🎲</button>
+            <div class="modal-header">⚙️ 設定</div>
+            
+            <div class="setting-row">
+                <span>🎵 BGM音量</span>
+                <input type="range" min="0" max="1" step="0.1" value="0.5" class="setting-slider" id="bgm-vol-slider">
             </div>
-            <div id="gacha-result-area" style="display:none; flex-direction:column; align-items:center; z-index:2;">
-                <div id="gacha-result-icon" class="gacha-result-item"></div>
-                <div id="gacha-result-text" style="font-weight:bold; font-size:1.2rem; margin-top:10px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
-                <button class="start-btn" id="btn-gacha-next" style="margin-top:20px; width:200px; background:#40c057;">もう一度引く</button>
+            <div class="setting-row">
+                <span>🔊 SE音量</span>
+                <input type="range" min="0" max="1" step="0.1" value="0.5" class="setting-slider" id="se-vol-slider">
             </div>
-            <button class="close-btn" id="close-gacha" style="position:absolute; bottom:20px; width:80%; z-index:2; background:rgba(255,255,255,0.2); color:white;">ガチャをやめる</button>
+
+            <hr style="border:0; border-top:1px solid #ced4da; margin:15px 0;">
+            
+            <button class="option-btn" id="btn-admin-login" style="background:#fa5252; color:white; font-weight:bold; text-align:center;">🛠️ 管理者メニューを開く</button>
+            <div id="admin-panel" style="display:none; background:#f8f9fa; border:2px dashed #fa5252; padding:12px; border-radius:10px; margin-top:10px;">
+                <h4 style="margin:0 0 10px 0; color:#fa5252;">チート / デバッグ</h4>
+                <button class="type-btn" id="cheat-coin">+10000 コイン</button>
+                <button class="type-btn" id="cheat-exp">+9999 EXP</button>
+                <button class="type-btn" id="cheat-full">満腹度MAX</button>
+                <button class="type-btn" id="cheat-furni">全家具+1</button>
+                <button class="type-btn" id="cheat-ceo" style="background:#fcc419; color:#2b2b2b;">👑 隠し称号「代表取締役」解放</button>
+            </div>
+            <button class="close-btn" id="close-settings">閉じる</button>
         </div>
     </div>
 
-    <div class="modal" id="dress-modal">
-        <div class="modal-content">
-            <div class="modal-header">👗 クローゼット（きがえ）</div>
-            <div id="dress-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:200px; overflow-y:auto;"></div>
-            <button class="close-btn" id="close-dress">閉じる</button>
+    <div class="fullscreen-modal" id="friend-modal">
+        <div class="modal-header" style="font-size:1.5rem;">🤝 フレンド広場</div>
+        <div style="background:white; padding:15px; border-radius:12px; text-align:center; font-weight:bold; margin-bottom:15px; font-size:1rem; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+            あなたのID: <span id="my-friend-id" style="color:#15aabf; font-size:1.2rem; user-select:all;">---</span>
         </div>
+        <div style="display:flex; gap:8px; margin-bottom:15px;">
+            <input type="text" class="name-input-box" id="friend-id-input" placeholder="友達のIDを検索" style="margin:0; padding:10px; font-size:1rem;">
+            <button class="start-btn" id="btn-add-friend" style="margin:0; width:100px; padding:10px;">検索追加</button>
+        </div>
+        
+        <p style="font-size:0.85rem; font-weight:bold; color:#495057; margin-bottom:5px;">お互いに⭐(お気に入り)にすると<br>💖ベストフレンドになってお小遣いが送れます。</p>
+        <div id="friend-list-container" style="flex-grow:1; overflow-y:auto; background:#f8f9fa; padding:10px; border-radius:12px; border:2px solid #dee2e6;"></div>
+        
+        <button class="close-btn" id="close-friend" style="margin-top:20px; font-size:1.1rem; padding:14px;">広場を出る</button>
     </div>
 
-    <div class="modal" id="friend-modal">
-        <div class="modal-content">
-            <div class="modal-header">フレンド機能</div>
-            <div style="background:#f1f3f5; padding:8px; border-radius:10px; text-align:center; font-weight:bold; margin-bottom:8px; font-size:0.85rem;">
-                あなたのフレンドID: <span id="my-friend-id" style="color:#15aabf;">---</span>
-            </div>
-            <div style="display:flex; gap:4px; margin-bottom:8px;">
-                <input type="text" class="name-input-box" id="friend-id-input" placeholder="友達のIDを入力" style="margin:0; padding:6px; font-size:0.85rem;">
-                <button class="type-btn" id="btn-add-friend" style="background:#15aabf; color:white; border:none;">登録</button>
-            </div>
-            <div id="friend-list-container" style="max-height:120px; overflow-y:auto; background:#f8f9fa; font-size:0.8rem; padding:4px; border-radius:8px;"></div>
-            <button class="close-btn" id="close-friend">閉じる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="friend-detail-modal" style="z-index:160;">
+    <div class="modal" id="friend-visit-modal" style="z-index: 170;">
         <div class="modal-content" style="text-align: center;">
-            <div class="modal-header">フレンド情報</div>
-            <div style="font-size:1.1rem; font-weight:bold; color:#15aabf;" id="f-detail-name"></div>
-            <div id="f-detail-level" style="font-size:0.85rem;"></div>
-            <div id="f-detail-coin" style="font-size:0.85rem;"></div>
-            <button class="close-btn" id="close-friend-detail">戻る</button>
+            <div class="modal-header">訪問メニュー</div>
+            <p id="visit-f-name" style="font-weight:bold; font-size:1.1rem; margin-bottom:15px;"></p>
+            <button class="start-btn" id="btn-do-visit" style="background:#40c057; margin-bottom:10px;">🏠 お家に行く</button>
+            <button class="start-btn" id="btn-send-money" style="background:#fcc419; color:#d9480f; display:none; margin-bottom:10px;">💰 お小遣いを100送る</button>
+            <button class="close-btn" id="close-visit-modal">もどる</button>
         </div>
     </div>
 
-    <div class="modal" id="furniture-inventory-modal">
-        <div class="modal-content">
-            <div class="modal-header">もっている家具を設置</div>
-            <div id="furniture-inv-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:200px; overflow-y:auto;"></div>
-            <button class="close-btn" id="close-furniture-inv">とじる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="worry-modal">
-        <div class="modal-content">
-            <div class="modal-header" id="modal-worry-title">お悩みをきく</div>
-            <p style="text-align: center; font-weight: bold; font-size: 0.95rem; margin-bottom: 14px;" id="worry-modal-text"></p>
-            <div id="worry-options-container"></div>
-            <button class="close-btn" id="close-worry">とじる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="shop-modal">
-        <div class="modal-content">
-            <div class="modal-header">よろずショップ</div>
-            <div class="shop-tabs">
-                <button class="shop-tab-btn active" id="tab-food-btn">🍖 エサ</button>
-                <button class="shop-tab-btn" id="tab-bg-btn">🖼️ 背景</button>
-                <button class="shop-tab-btn" id="tab-furni-btn">🛋️ 家具</button>
-            </div>
-            <div id="shop-food-pane" class="shop-pane"></div>
-            <div id="shop-bg-pane" class="shop-pane" style="display:none;">
-                <input type="file" id="custom-bg-uploader" accept="image/*" style="margin-bottom:6px; font-size:0.75rem; width:100%;">
-                <div id="shop-bg-list"></div>
-            </div>
-            <div id="shop-furni-pane" class="shop-pane" style="display:none; max-height:220px; overflow-y:auto;"></div>
-            <button class="close-btn" id="close-shop">とじる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="bag-modal">
-        <div class="modal-content">
-            <div class="modal-header">持っているごはん</div>
-            <div id="bag-container" style="max-height:200px; overflow-y:auto;"></div>
-            <button class="close-btn" id="close-bag">とじる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="bg-modal">
-        <div class="modal-content">
-            <div class="modal-header">背景の模様替え</div>
-            <div id="bg-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:180px; overflow-y:auto;"></div>
-            <button class="close-btn" id="close-bg-modal">とじる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="minigame-modal">
-        <div class="modal-content">
-            <div class="modal-header" id="minigame-header-title">🎮 ミニゲーム広場</div>
-            <div id="minigame-menu-view" class="minigame-grid"></div>
-            <div id="minigame-play-view" style="display:none; padding:6px 0;">
-                <div id="minigame-arena" class="game-panel"></div>
-                <button class="close-btn" id="btn-abort-game" style="background-color:#fa5252; color:white; margin-top:10px;">をやめる</button>
-            </div>
-            <button class="close-btn" id="close-minigame">とじる</button>
-        </div>
-    </div>
-
-    <div class="modal" id="make-modal">
-        <div class="modal-content">
-            <div class="modal-header">キャラクターメイク</div>
-            <div class="color-picker-title">🐾 どうぶつの種類</div>
-            <div class="color-options" id="char-types">
-                <button class="type-btn" data-type="upa">ウパ</button>
-                <button class="type-btn" data-type="cat">ねこ</button>
-                <button class="type-btn" data-type="chick">ひよこ</button>
-                <button class="type-btn" data-type="fish">さかな</button>
-                <button class="type-btn" data-type="dog">いぬ</button>
-                <button class="type-btn" data-type="bear">くま</button>
-                <button class="type-btn" data-type="rabbit">うさぎ</button>
-            </div>
-            <div class="color-picker-title">🎨 からだの色</div>
-            <div class="color-options"><input type="color" class="custom-color-picker" id="body-color-picker"></div>
-            <div class="color-picker-title">🌸 かざり・パーツの色</div>
-            <div class="color-options"><input type="color" class="custom-color-picker" id="gill-color-picker"></div>
-            <button class="close-btn" id="close-make">決定する</button>
-        </div>
-    </div>
+    <div class="modal" id="transfer-modal"><div class="modal-content"><div class="modal-header">🔑 アカウント情報</div><div style="background:#f1f3f5; padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:10px; text-align:center;"><b>あなたのID:</b> <br><span id="trans-my-id" style="color:#15aabf; font-size:1.1rem; font-weight:bold;">---</span><br><br><b>現在のパスワード:</b> <br><span id="trans-my-pass" style="color:#d6336c; font-size:1.1rem; font-weight:bold;">---</span></div><button id="btn-change-pass" style="width:100%; font-size:0.9rem; font-weight:bold; background:#e3fafc; color:#0b7285; border:1px solid #15aabf; padding:10px; border-radius:6px; margin-bottom:10px;">パスワードを変更する</button><button class="close-btn" id="close-transfer-modal">閉じる</button></div></div>
+    <div class="modal" id="trophy-modal"><div class="modal-content"><div class="modal-header">🏆 獲得トロフィー</div><div id="trophy-list-container" style="max-height: 300px; overflow-y: auto;"></div><button class="close-btn" id="close-trophy-modal">閉じる</button></div></div>
+    <div class="fullscreen-modal dark" id="minigame-modal"><div class="mg-title" id="minigame-header-title">🎮 ミニゲーム広場</div><div id="minigame-menu-view" class="minigame-grid"></div><div id="minigame-play-view" style="display:none; padding:10px 0; width:100%; max-width:400px; margin:0 auto;"><div id="minigame-arena" class="game-panel"></div><button class="close-btn" id="btn-abort-game" style="background-color:#fa5252; color:white; margin-top:15px; font-size:1.1rem; padding:12px;">やめる</button></div><button class="close-btn" id="close-minigame" style="background:rgba(255,255,255,0.2); color:white; margin-top:20px; font-size:1.1rem; padding:12px;">広場を出る</button></div>
+    <div class="modal" id="mission-modal"><div class="modal-content"><div class="modal-header">📅 デイリー要素</div><div style="font-weight:bold; font-size:0.9rem; margin-bottom:6px;">今日のミッション:</div><div id="mission-list-container"></div><button class="close-btn" id="close-mission">閉じる</button></div></div>
+    <div class="modal" id="gacha-modal"><div class="modal-content" style="background: linear-gradient(135deg, #1a0b2e, #4b1d52, #99326d); color:white; height:100vh; border-radius:0; max-height:none; display:flex; flex-direction:column; justify-content:center; align-items:center;"><div class="modal-header" style="color:white; z-index:2; font-size:1.6rem;">🪙 よろずガチャ</div><div style="text-align:center; padding:20px; background:rgba(255,255,255,0.2); border-radius:16px; margin-bottom:10px;" id="gacha-ui-box"><p style="font-size:1rem; margin-bottom:15px; font-weight:bold;">1回 <b>💰 50</b></p><div id="gacha-machine" style="font-size:6rem; margin-bottom:20px;">🎰</div><button class="start-btn" id="btn-play-gacha" style="background:#fcc419; color:#d9480f; font-size:1.2rem; padding:16px;">ガチャを引く</button></div><div id="gacha-result-area" style="display:none; flex-direction:column; align-items:center;"><div id="gacha-result-icon" style="font-size:6rem;"></div><div id="gacha-result-text" style="font-weight:bold; font-size:1.4rem; margin-top:15px;"></div><button class="start-btn" id="btn-gacha-next" style="margin-top:25px; background:#40c057; font-size:1.1rem;">もう一度引く</button></div><button class="close-btn" id="close-gacha" style="background:rgba(255,255,255,0.2); color:white; margin-top:30px; font-size:1.1rem;">やめる</button></div></div>
+    <div class="modal" id="dress-modal"><div class="modal-content"><div class="modal-header">👗 クローゼット</div><div id="dress-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:250px; overflow-y:auto;"></div><button class="close-btn" id="close-dress">閉じる</button></div></div>
+    <div class="modal" id="furniture-inventory-modal"><div class="modal-content"><div class="modal-header">家具を設置</div><div id="furniture-inv-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:250px; overflow-y:auto;"></div><button class="close-btn" id="close-furniture-inv">とじる</button></div></div>
+    <div class="modal" id="worry-modal"><div class="modal-content"><div class="modal-header" id="modal-worry-title">お悩み</div><p style="text-align:center; font-weight:bold; font-size:1rem; margin-bottom:15px;" id="worry-modal-text"></p><div id="worry-options-container"></div><button class="close-btn" id="close-worry">とじる</button></div></div>
+    <div class="modal" id="shop-modal"><div class="modal-content"><div class="modal-header">よろずショップ</div><div class="shop-tabs"><button class="shop-tab-btn active" id="tab-food-btn">🍖 エサ</button><button class="shop-tab-btn" id="tab-bg-btn">🖼️ 背景</button><button class="shop-tab-btn" id="tab-furni-btn">🛋️ 家具</button></div><div id="shop-food-pane" class="shop-pane" style="max-height:280px; overflow-y:auto;"></div><div id="shop-bg-pane" class="shop-pane" style="display:none;"><input type="file" id="custom-bg-uploader" accept="image/*" style="margin-bottom:8px; font-size:0.8rem; width:100%;"><div id="shop-bg-list"></div></div><div id="shop-furni-pane" class="shop-pane" style="display:none; max-height:280px; overflow-y:auto;"></div><button class="close-btn" id="close-shop">とじる</button></div></div>
+    <div class="modal" id="bag-modal"><div class="modal-content"><div class="modal-header">持っているごはん</div><div id="bag-container" style="max-height:250px; overflow-y:auto;"></div><button class="close-btn" id="close-bag">とじる</button></div></div>
+    <div class="modal" id="bg-modal"><div class="modal-content"><div class="modal-header">背景の模様替え</div><div id="bg-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:200px; overflow-y:auto;"></div><button class="close-btn" id="close-bg-modal">とじる</button></div></div>
+    <div class="modal" id="make-modal"><div class="modal-content"><div class="modal-header">キャラクターメイク</div><div class="color-picker-title">🐾 種類</div><div class="color-options" id="char-types"><button class="type-btn" data-type="upa">ウパ</button><button class="type-btn" data-type="cat">ねこ</button><button class="type-btn" data-type="chick">ひよこ</button><button class="type-btn" data-type="fish">さかな</button><button class="type-btn" data-type="dog">いぬ</button><button class="type-btn" data-type="bear">くま</button><button class="type-btn" data-type="rabbit">うさぎ</button></div><div class="color-picker-title">🎨 からだ</div><div class="color-options"><input type="color" class="custom-color-picker" id="body-color-picker"></div><div class="color-picker-title">🌸 かざり</div><div class="color-options"><input type="color" class="custom-color-picker" id="gill-color-picker"></div><button class="close-btn" id="close-make">決定</button></div></div>
 </div>
 
 <script>
-    // --- SVG定義 ---
+    // --- SVG定義 (手足追加版) ---
     const SVG_TEMPLATE = `
         <svg viewBox="0 0 100 120" width="100%" height="100%">
             <path class="char-part part-upa gill-part" d="M 25,40 C 10,35 5,50 25,50" />
@@ -1067,404 +433,275 @@
             <path class="char-part part-dog gill-part" d="M 23,32 C 12,32 10,62 25,56" />
             <path class="char-part part-dog gill-part" d="M 77,32 C 88,32 90,62 65,56" />
             <path class="char-part part-dog body-part" d="M 30,55 C 26,75 30,102 50,102 C 70,102 74,75 70,55 Z" />
+            <circle class="char-part part-dog gill-part" cx="35" cy="95" r="7" /> <circle class="char-part part-dog gill-part" cx="65" cy="95" r="7" />
+            <circle class="char-part part-dog gill-part" cx="28" cy="70" r="6" /> <circle class="char-part part-dog gill-part" cx="72" cy="70" r="6" />
             <circle class="char-part part-dog body-part" cx="50" cy="44" r="24" />
-            <circle class="char-part part-bear gill-part" cx="30" cy="26" r="8" />
-            <circle class="char-part part-bear gill-part" cx="70" cy="26" r="8" />
+            <circle class="char-part part-bear gill-part" cx="30" cy="26" r="8" /> <circle class="char-part part-bear gill-part" cx="70" cy="26" r="8" />
             <path class="char-part part-bear body-part" d="M 32,55 C 26,75 30,102 50,102 C 70,102 74,75 70,55 Z" />
+            <ellipse class="char-part part-bear body-part" cx="32" cy="95" rx="8" ry="6" /> <ellipse class="char-part part-bear body-part" cx="68" cy="95" rx="8" ry="6" />
+            <circle class="char-part part-bear body-part" cx="26" cy="68" r="7" /> <circle class="char-part part-bear body-part" cx="74" cy="68" r="7" />
             <circle class="char-part part-bear body-part" cx="50" cy="44" r="23" />
             <ellipse class="char-part part-bear" cx="50" cy="51" rx="8" ry="6" fill="#ffffff" />
-            <ellipse class="char-part part-rabbit gill-part" cx="34" cy="22" rx="6" ry="16" transform="rotate(-10 34 22)" />
-            <ellipse class="char-part part-rabbit gill-part" cx="66" cy="22" rx="6" ry="16" transform="rotate(10 66 22)" />
+            <ellipse class="char-part part-rabbit gill-part" cx="34" cy="22" rx="6" ry="16" transform="rotate(-10 34 22)" /> <ellipse class="char-part part-rabbit gill-part" cx="66" cy="22" rx="6" ry="16" transform="rotate(10 66 22)" />
             <path class="char-part part-rabbit body-part" d="M 32,55 C 26,75 30,102 50,102 C 70,102 74,75 70,55 Z" />
             <circle class="char-part part-rabbit body-part" cx="50" cy="46" r="21" />
-            
-            <circle cx="40" cy="43" r="3.5" fill="#2b2b2b" />
-            <circle cx="60" cy="43" r="3.5" fill="#2b2b2b" />
-            <circle cx="33" cy="49" r="3.5" fill="#ffb3c1" opacity="0.6" />
-            <circle cx="67" cy="49" r="3.5" fill="#ffb3c1" opacity="0.6" />
+            <circle cx="40" cy="43" r="3.5" fill="#2b2b2b" /> <circle cx="60" cy="43" r="3.5" fill="#2b2b2b" />
+            <circle cx="33" cy="49" r="3.5" fill="#ffb3c1" opacity="0.6" /> <circle cx="67" cy="49" r="3.5" fill="#ffb3c1" opacity="0.6" />
             <path d="M 47,50 Q 50,53 53,50" stroke="#2b2b2b" stroke-width="2" fill="none" stroke-linecap="round" />
             <polygon class="char-part part-dog part-bear" points="48,47 52,47 50,49" fill="#2b2b2b" />
         </svg>
     `;
 
-    // --- セーブデータの永続化とマイグレーション処理 ---
+    // ==========================================
+    // --- セーブデータの永続化 (変更なし・完全保持) ---
+    // ==========================================
     const SAVE_KEY = 'upa_slots_ultimate_v1';
     const ACCOUNT_POOL_KEY = 'upa_account_pool_ultimate_v1';
 
-    // ゲームの完全なデフォルト構造
     function createInitialState() {
         return {
-            name: "ウパのココロ", level: 1, exp: 0, maxExp: 30, coins: 150, fullness: 80,
+            name: "ウパのココロ", ownerName: "あなた", level: 1, exp: 0, maxExp: 30, coins: 150, fullness: 80,
             friendId: "FC-" + Math.floor(100000 + Math.random() * 900000), password: "1234",
-            friends: [],
-            inventory: { pellet: 1, worm: 0, shrimp: 0, cookie: 0, cake: 0, premium: 0, apple: 0, banana: 0, melon: 0, strawberry: 0, meat: 0, fish_bone: 0, cheese: 0, milk: 0, yogurt: 0, pudding: 0, donut: 0, chocolate: 0, icecream: 0, candy: 0, popcorn: 0, burger: 0, pizza: 0, ramen: 0, sushi: 0, steak: 0 },
-            unlockedBgs: ["bg-aquarium"], customBgData: "", furnitureInventory: {}, placedFurniture: [],
+            friends: [], favorites: [], minigameStats: {}, unlockedHiddenTitles: [], loginBonusDay: 1,
+            inventory: {}, unlockedBgs: ["bg-aquarium"], customBgData: "",
+            furnitureInventory: {}, placedFurniture: [],
             appearance: { type: "upa", bodyColor: "#fff0f3", gillColor: "#ff85a2", bgClass: "bg-aquarium" },
             lastLoginDate: "", currentLoginStreak: 0, maxLoginStreak: 0,
             loveLevel: 0, loveExp: 0, maxLoveExp: 10,
-            unlockedCostumes: ["なし"], currentCostume: "なし",
+            unlockedCostumes: ["なし"], currentCostume: "なし", currentTitle: "見習い",
             dailyMissions: [
                 { id: "feed", desc: "ごはんを1回あげる", target: 1, current: 0, completed: false },
                 { id: "game", desc: "ミニゲームを1回遊ぶ", target: 1, current: 0, completed: false },
                 { id: "worry", desc: "お悩みを1回解決する", target: 1, current: 0, completed: false }
             ],
-            lastMissionDate: "",
-            totalFeeds: 0, totalMinigames: 0, trophies: []
+            lastMissionDate: "", totalFeeds: 0, totalMinigames: 0, trophies: []
         };
     }
 
-    // データ読み込み時に不足している項目を補完するマイグレーション関数
     function migrateData(savedData) {
         const defaultState = createInitialState();
         if (!savedData) return defaultState;
-        
-        // ネストされたオブジェクトも安全にマージする
         return {
-            ...defaultState,
-            ...savedData,
+            ...defaultState, ...savedData,
             appearance: { ...defaultState.appearance, ...(savedData.appearance || {}) },
             inventory: { ...defaultState.inventory, ...(savedData.inventory || {}) },
-            furnitureInventory: { ...defaultState.furnitureInventory, ...(savedData.furnitureInventory || {}) }
+            furnitureInventory: { ...defaultState.furnitureInventory, ...(savedData.furnitureInventory || {}) },
+            minigameStats: { ...defaultState.minigameStats, ...(savedData.minigameStats || {}) },
+            unlockedHiddenTitles: savedData.unlockedHiddenTitles || [],
+            favorites: savedData.favorites || [],
+            loginBonusDay: savedData.loginBonusDay || 1
         };
     }
 
-    // --- ゲームデータ管理（メモリ上） ---
-    let gameState = createInitialState(); // 現在プレイ中の動的な「ゲームデータ」
-    
+    let gameState = createInitialState();
     let currentSlotIndex = 0;
-    let logTimer = null;
-    let isMoving = false;
-    let bgmMode = 'title'; // 'title', 'main', 'gacha'
-
-    // --- セーブデータ管理（ストレージ） ---
-    function getGlobalSaves() {
-        const saves = localStorage.getItem(SAVE_KEY);
-        return saves ? JSON.parse(saves) : [null, null]; // ストレージ上の「セーブデータ」群
-    }
-    function saveAllSlots(arr) {
-        localStorage.setItem(SAVE_KEY, JSON.stringify(arr));
-    }
-    function getAccountPool() {
-        const pool = localStorage.getItem(ACCOUNT_POOL_KEY);
-        return pool ? JSON.parse(pool) : [];
-    }
+    
+    function getGlobalSaves() { const saves = localStorage.getItem(SAVE_KEY); return saves ? JSON.parse(saves) : [null, null]; }
+    function saveAllSlots(arr) { localStorage.setItem(SAVE_KEY, JSON.stringify(arr)); }
+    function getAccountPool() { const pool = localStorage.getItem(ACCOUNT_POOL_KEY); return pool ? JSON.parse(pool) : []; }
     function registerToAccountPool(state) {
-        let pool = getAccountPool();
-        pool = pool.filter(acc => acc.friendId !== state.friendId);
-        pool.push(JSON.parse(JSON.stringify(state)));
-        localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool));
+        let pool = getAccountPool(); pool = pool.filter(acc => acc.friendId !== state.friendId);
+        pool.push(JSON.parse(JSON.stringify(state))); localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool));
     }
 
     function saveActiveGame(showFlash = false) {
-        let slots = getGlobalSaves();
-        slots[currentSlotIndex] = gameState; // 現在のゲームデータをセーブデータに反映
-        saveAllSlots(slots);
-        registerToAccountPool(gameState);
+        let slots = getGlobalSaves(); slots[currentSlotIndex] = gameState;
+        saveAllSlots(slots); registerToAccountPool(gameState);
         if (showFlash) logMessage("💾 セーブデータを保存しました！", true);
     }
+    // ==========================================
 
-    // --- 各種データ定義 ---
+    let logTimer = null; let isMoving = false; let bgmMode = 'title';
+    let currentWorry = null; let hasWorry = false;
+    let tempTransferData = null; 
+    let sessionTouchCount = 0;
+
+    function playSE(id) { 
+        try { 
+            const se = document.getElementById(`se-${id}`); 
+            if(se) { se.currentTime = 0; se.play().catch(()=>{}); }
+        } catch(e){} 
+    }
+    function playBGM(mode) {
+        bgmMode = mode; const main = document.getElementById('bgm-main'); const title = document.getElementById('bgm-title'); const gacha = document.getElementById('bgm-gacha');
+        try { main.pause(); title.pause(); gacha.pause(); } catch(e){}
+        try { if(mode==='title') title.play().catch(()=>{}); else if(mode==='main') main.play().catch(()=>{}); else if(mode==='gacha') gacha.play().catch(()=>{}); } catch(e){}
+    }
+    document.getElementById('bgm-vol-slider').oninput = (e) => { const v = e.target.value; ['bgm-main','bgm-title','bgm-gacha'].forEach(id => document.getElementById(id).volume = v); };
+    document.getElementById('se-vol-slider').oninput = (e) => { const v = e.target.value; ['se-click','se-coin','se-jump','se-error'].forEach(id => document.getElementById(id).volume = v); };
+
     const foodData = {
-        pellet: { name: "ひかりウパ（粒餌）", cost: 10, exp: 5, full: 10 }, worm: { name: "冷凍赤虫", cost: 25, exp: 15, full: 20 }, shrimp: { name: "乾燥淡水エビ", cost: 50, exp: 32, full: 25 }, cookie: { name: "どうぶつクッキー", cost: 80, exp: 55, full: 30 }, cake: { name: "ミニパンケーキ", cost: 150, exp: 110, full: 50 }, premium: { name: "高級ゴールド極エサ", cost: 300, exp: 240, full: 70 }, apple: { name: "しゃきしゃき林檎", cost: 15, exp: 8, full: 12 }, banana: { name: "完熟バナナ", cost: 18, exp: 10, full: 15 }, melon: { name: "高級マスクメロン", cost: 120, exp: 85, full: 40 }, strawberry: { name: "真っ赤なイチゴ", cost: 22, exp: 14, full: 10 }, meat: { name: "ほねつき肉", cost: 60, exp: 42, full: 35 }, fish_bone: { name: "美味しいお魚", cost: 35, exp: 22, full: 20 }, cheese: { name: "濃厚まろやかチーズ", cost: 30, exp: 18, full: 18 }, milk: { name: "新鮮しぼりたてミルク", cost: 12, exp: 6, full: 10 }, yogurt: { name: "健康プレーンヨーグルト", cost: 20, exp: 12, full: 14 }, pudding: { name: "窯出しとろけるプリン", cost: 45, exp: 28, full: 22 }, donut: { name: "もちもち極上ドーナツ", cost: 40, exp: 25, full: 20 }, chocolate: { name: "カカオ高配合チョコ", cost: 55, exp: 38, full: 15 }, icecream: { name: "濃厚バニラアイス", cost: 50, exp: 35, full: 18 }, candy: { name: "カラフル渦巻きアメ", cost: 8, exp: 3, full: 5 }, popcorn: { name: "弾けるバターポップコーン", cost: 28, exp: 16, full: 15 }, burger: { name: "ジューシーハンバーガー", cost: 95, exp: 65, full: 45 }, pizza: { name: "とろ〜り熱々ピザ", cost: 110, exp: 78, full: 50 }, ramen: { name: "こだわり醤油ラーメン", cost: 100, exp: 72, full: 48 }, sushi: { name: "職人が握った特上寿司", cost: 180, exp: 135, full: 55 }, steak: { name: "極厚A5和牛ステーキ", cost: 250, exp: 195, full: 65 }
+        pellet: { name: "ひかりウパ（粒餌）", cost: 10, exp: 5, full: 10 }, worm: { name: "冷凍赤虫", cost: 25, exp: 15, full: 20 }, shrimp: { name: "乾燥淡水エビ", cost: 50, exp: 32, full: 25 }, cookie: { name: "どうぶつクッキー", cost: 80, exp: 55, full: 30 }, cake: { name: "ミニパンケーキ", cost: 150, exp: 110, full: 50 }, premium: { name: "高級極エサ", cost: 300, exp: 240, full: 70 }, apple: { name: "林檎", cost: 15, exp: 8, full: 12 }, meat: { name: "ほねつき肉", cost: 60, exp: 42, full: 35 }, sushi: { name: "特上寿司", cost: 180, exp: 135, full: 55 }, steak: { name: "和牛ステーキ", cost: 250, exp: 195, full: 65 }, golden_apple: { name: "黄金のりんご", cost: 1000, exp: 900, full: 100 }
     };
+    const bgList = [ { id: "bg-aquarium", name: "🫧 アクアリウム", cost: 0 }, { id: "bg-garden", name: "🏡 ひろいお庭", cost: 100 }, { id: "bg-deepsea", name: "⚓ 深海", cost: 150 }, { id: "bg-space", name: "🌌 宇宙", cost: 200 }, { id: "bg-sunset", name: "🌇 夕焼け空", cost: 120 }, { id: "bg-candy", name: "🍬 お菓子の国", cost: 180 }, { id: "bg-room", name: "🛋️ マイルーム", cost: 80 } ];
+    const furnitureData = { f_table: { name: "木製テーブル", emoji: "🟫", cost: 30 }, f_bed: { name: "お布団", emoji: "🛏️", cost: 100 }, f_tv: { name: "テレビ", emoji: "📺", cost: 120 }, f_bear: { name: "クマ", emoji: "🧸", cost: 50 }, f_game: { name: "ゲーム", emoji: "🕹️", cost: 90 }, f_sofa: { name: "ソファ", emoji: "🛋️", cost: 150 }, f_tent: { name: "テント", emoji: "⛺", cost: 220 }, f_crystal: { name: "水晶", emoji: "🔮", cost: 250 }, f_gold_chest: { name: "宝箱", emoji: "🪙", cost: 400 } };
+    const costumeData = { "なし": { emoji: "" }, "🎀 リボン": { emoji: "🎀" }, "👑 王冠": { emoji: "👑" }, "🎩 ハット": { emoji: "🎩" }, "👓 メガネ": { emoji: "👓" }, "🐱 猫耳": { emoji: "🐱" }, "👼 天使": { emoji: "👼" }, "🌸 お花": { emoji: "🌸" } };
+    const worryData = [ { text: "角に頭をぶつけちゃう…", options: [ { text: "クッションを貼る", correct: true, rewardCoin: 30, rewardExp: 10, reply: "いたくなくなった！" }, { text: "ヘルメットを渡す", correct: false, rewardCoin: 10, rewardExp: 2, reply: "重いよぉ…" } ] }, { text: "なんだかツヤがない…", options: [ { text: "お水を綺麗にする", correct: true, rewardCoin: 50, rewardExp: 20, reply: "ピカピカ元気！" }, { text: "ペンで塗る", correct: false, rewardCoin: 0, rewardExp: 0, reply: "汚れちゃう！" } ] } ];
 
-    const bgList = [
-        { id: "bg-aquarium", name: "🫧 アクアリウム", cost: 0 }, { id: "bg-garden", name: "🏡 ひろいお庭", cost: 100 }, { id: "bg-deepsea", name: "⚓ 静かな深海", cost: 150 }, { id: "bg-space", name: "🌌 きらきら宇宙", cost: 200 }, { id: "bg-sunset", name: "🌇 夕焼け空", cost: 120 }, { id: "bg-candy", name: "🍬 お菓子の国", cost: 180 }, { id: "bg-room", name: "🛋️ マイルーム", cost: 80 }, { id: "bg-snow", name: "❄️ スノーランド", cost: 140 }
-    ];
-
-    const furnitureData = {
-        f_table: { name: "木製ローテーブル", emoji: "🟫", cost: 30 }, f_chair: { name: "ふかふかクッション", emoji: "🟡", cost: 15 }, f_bed: { name: "おひるねお布団", emoji: "🛏️", cost: 100 }, f_tv: { name: "液晶テレビ", emoji: "📺", cost: 120 }, f_plant: { name: "癒やしの観葉植物", emoji: "🪴", cost: 40 }, f_bear: { name: "クマのぬいぐるみ", emoji: "🧸", cost: 50 }, f_game: { name: "レトロゲーム機", emoji: "🕹️", cost: 90 }, f_clock: { name: "ハト時計", emoji: "🕰️", cost: 60 }, f_lamp: { name: "おしゃれスタンドライト", emoji: "💡", cost: 35 }, f_carpet: { name: "しましまラグカーペット", emoji: "🟥", cost: 45 }, f_bookshelf: { name: "ちいさな本棚", emoji: "📚", cost: 70 }, f_aquarium: { name: "お友達のミニ水槽", emoji: "🐟", cost: 110 }, f_sofa: { name: "２人掛けソファ", emoji: "🛋️", cost: 150 }, f_mirror: { name: "姿見ミラー", emoji: "🪞", cost: 55 }, f_cattower: { name: "キャットタワー", emoji: "🐾", cost: 180 }, f_piano: { name: "ミニトイピアノ", emoji: "🎹", cost: 200 }, f_cake_stand: { name: "ティースタンド", emoji: "🍰", cost: 85 }, f_balloon: { name: "ぷかぷか風船セット", emoji: "🎈", cost: 25 }, f_chest: { name: "おもちゃ箱", emoji: "🧰", cost: 40 }, f_window: { name: "いつでも晴れ窓枠", emoji: "🪟", cost: 95 }, f_fan: { name: "レトロ扇風機", emoji: "🌀", cost: 30 }, f_daruma: { name: "必勝だるま", emoji: "🏮", cost: 65 }, f_bonsai: { name: "高級な盆栽", emoji: "🌲", cost: 140 }, f_tent: { name: "秘密基地テント", emoji: "⛺", cost: 220 }, f_surf: { name: "サーフボード", emoji: "🏄", cost: 75 }, f_guitar: { name: "アコースティックギター", emoji: "🎸", cost: 130 }, f_radio: { name: "蓄音機風ラジオ", emoji: "📻", cost: 85 }, f_painting: { name: "名画のレプリカ", emoji: "🖼️", cost: 105 }, f_robot: { name: "お掃除ロボット", emoji: "🤖", cost: 160 }, f_fountain: { name: "卓上ミニ噴水", emoji: "⛲", cost: 115 }, f_hammock: { name: "ハンモック", emoji: "🕸️", cost: 175 }, f_crystal: { name: "魔法の水晶", emoji: "🔮", cost: 250 }, f_chandelier: { name: "シャンデリア", emoji: "👑", cost: 320 }, f_throne: { name: "玉座", emoji: "👑", cost: 500 }, f_gaming: { name: "ゲーミングチェア", emoji: "💺", cost: 180 }, f_gold_chest: { name: "黄金の宝箱", emoji: "🪙", cost: 400 }
-    };
-
-    const costumeData = {
-        "なし": { emoji: "" }, "🎀 リボン": { emoji: "🎀" }, "👑 王冠": { emoji: "👑" }, "🎩 シルクハット": { emoji: "🎩" }, "🎓 博士帽": { emoji: "🎓" }, "👓 メガネ": { emoji: "👓" }, "🕶️ サングラス": { emoji: "🕶️" }, "🐱 猫耳": { emoji: "🐱" }, "👼 天使の輪": { emoji: "👼" }, "🍀 クローバー": { emoji: "🍀" }, "🌸 お花": { emoji: "🌸" }
-    };
-
-    const worryData = [
-        { text: "水槽のまがり角に、よく頭をぶつけちゃうんだ…", options: [ { text: "水槽の角にクッションを貼る", correct: true, rewardCoin: 30, rewardExp: 10, reply: "わーい！頭がいたくなくなったよ！" }, { text: "ヘルメットをプレゼントする", correct: false, rewardCoin: 10, rewardExp: 2, reply: "重くて沈んじゃうよ〜…" } ] },
-        { text: "となりの部屋のテレビの音が気になって眠れないの。", options: [ { text: "静かな場所に移動させる", correct: true, rewardCoin: 40, rewardExp: 15, reply: "すやすや…よく眠れるようになったよ！" }, { text: "一緒にテレビを見に行く", correct: false, rewardCoin: 10, rewardExp: 2, reply: "外に出られないよ〜！" } ] },
-        { text: "なんだか最近、エラや体のツヤが薄い気がする…", options: [ { text: "お水を綺麗にしてあげる", correct: true, rewardCoin: 50, rewardExp: 20, reply: "お水がピカピカ！元気が出たよ！" }, { text: "ペンで塗る", correct: false, rewardCoin: 0, rewardExp: 0, reply: "お水が汚れちゃうよぅ！" } ] },
-        { text: "なんだかつまんないなぁ。一緒になにかミニゲームで遊びたいな！", options: [ { text: "広場でミニゲームを遊んであげる", correct: true, rewardCoin: 40, rewardExp: 15, reply: "あそんでくれてありがとう！とっても楽しかった！" } ] }
+    const TITLE_DICT = [
+        { id: 't1', name: '見習い', cond: () => true, hint: '最初から' },
+        { id: 't2', name: '駆け出し', cond: () => gameState.level >= 2, hint: 'レベル2到達' },
+        { id: 't3', name: '一人前', cond: () => gameState.level >= 3, hint: 'レベル3到達' },
+        { id: 't4', name: '中堅', cond: () => gameState.level >= 4, hint: 'レベル4到達' },
+        { id: 't5', name: 'ベテラン', cond: () => gameState.level >= 5, hint: 'レベル5到達' },
+        { id: 't6', name: '熟練者', cond: () => gameState.level >= 6, hint: 'レベル6到達' },
+        { id: 't7', name: '達人', cond: () => gameState.level >= 7, hint: 'レベル7到達' },
+        { id: 't8', name: 'マスター', cond: () => gameState.level >= 8, hint: 'レベル8到達' },
+        { id: 't9', name: 'グランドマスター', cond: () => gameState.level >= 10, hint: 'レベル10到達' },
+        { id: 't10', name: '神', cond: () => gameState.level >= 12, hint: 'レベル12到達' },
+        { id: 't11', name: '腹ペコ', cond: () => gameState.totalFeeds >= 10, hint: 'エサを10回あげる' },
+        { id: 't12', name: 'くいしんぼう', cond: () => gameState.totalFeeds >= 50, hint: 'エサを50回あげる' },
+        { id: 't13', name: 'グルメ', cond: () => gameState.totalFeeds >= 100, hint: 'エサを100回あげる' },
+        { id: 't14', name: '満腹王', cond: () => gameState.totalFeeds >= 300, hint: 'エサを300回あげる' },
+        { id: 't15', name: '爆食神', cond: () => gameState.totalFeeds >= 500, hint: 'エサを500回あげる' },
+        { id: 't16', name: '遊び好き', cond: () => gameState.totalMinigames >= 10, hint: 'ゲームを10回遊ぶ' },
+        { id: 't17', name: 'ゲーマー', cond: () => gameState.totalMinigames >= 50, hint: 'ゲームを50回遊ぶ' },
+        { id: 't18', name: 'スピードスター', cond: () => gameState.totalMinigames >= 100, hint: 'ゲームを100回遊ぶ' },
+        { id: 't19', name: 'ゲームマスター', cond: () => gameState.totalMinigames >= 300, hint: 'ゲームを300回遊ぶ' },
+        { id: 't20', name: '遊びの神', cond: () => gameState.totalMinigames >= 500, hint: 'ゲームを500回遊ぶ' },
+        { id: 't21', name: 'おこづかい', cond: () => gameState.coins >= 1000, hint: 'コイン1,000所持' },
+        { id: 't22', name: '貯金家', cond: () => gameState.coins >= 5000, hint: 'コイン5,000所持' },
+        { id: 't23', name: '成金', cond: () => gameState.coins >= 10000, hint: 'コイン10,000所持' },
+        { id: 't24', name: '大富豪', cond: () => gameState.coins >= 50000, hint: 'コイン50,000所持' },
+        { id: 't25', name: '億万長者', cond: () => gameState.coins >= 100000, hint: 'コイン100,000所持' },
+        { id: 't26', name: 'ぼっち回避', cond: () => gameState.friends.length >= 1, hint: 'フレンド1人' },
+        { id: 't27', name: '人気者', cond: () => gameState.friends.length >= 5, hint: 'フレンド5人' },
+        { id: 't28', name: 'カリスマ', cond: () => gameState.friends.length >= 10, hint: 'フレンド10人' },
+        { id: 't29', name: 'みんなのアイドル', cond: () => gameState.friends.length >= 20, hint: 'フレンド20人' },
+        { id: 't30', name: 'ズッ友', cond: () => gameState.favorites.length >= 1, hint: 'お気に入りを1人作る' },
+        { id: 't31', name: '三日坊主', cond: () => gameState.maxLoginStreak >= 3, hint: '連続ログイン3日' },
+        { id: 't32', name: '継続は力', cond: () => gameState.maxLoginStreak >= 10, hint: '連続ログイン10日' },
+        { id: 't33', name: 'ログインの鬼', cond: () => gameState.maxLoginStreak >= 30, hint: '連続ログイン30日' },
+        { id: 'h1', name: '代表取締役', cond: () => gameState.unlockedHiddenTitles.includes('代表取締役'), hint: '' },
+        { id: 'h2', name: '愛情たっぷり', cond: () => gameState.unlockedHiddenTitles.includes('愛情たっぷり'), hint: '' }
     ];
 
     const minigames = [
-        { id: "omikuji", name: "1. ウパおみくじ🔮", desc: "今日の運勢を占ってコインゲット" },
-        { id: "clicker", name: "2. コインラッシュ🔨", desc: "10秒間連打しまくろう！" },
-        { id: "highlow", name: "3. 数あてハイ＆ロー🃏", desc: "次の数字が大きいか小さいか予想" },
-        { id: "janken", name: "4. じゃんけんバトル✊", desc: "ウパにじゃんけんで勝利せよ" },
-        { id: "math", name: "5. スピード計算算数🧮", desc: "簡単な計算問題を早く解こう" },
-        { id: "reflex", name: "6. 反射神経テスト⏱️", desc: "「今だ！」の合図で最速タップ" },
-        { id: "typing", name: "7. エサやりタイピング⌨️", desc: "画面に出るワードを素早く打とう" },
-        { id: "color", name: "8. カラーマッチ脳トレ🎨", desc: "色と文字の意味が一致してるか判定" },
-        { id: "findupa", name: "9. ウパを探せ！📦", desc: "3つの箱からウパの隠れ場所を当てる" },
-        { id: "dice", name: "10. ラッキーダイス🎲", desc: "サイコロを振ってゾロ目を目指そう！" }
+        { id: "mole", name: "ウパたたき🔨", desc: "ランダムに現れるウパをタップ！" },
+        { id: "memory", name: "神経衰弱🃏", desc: "同じ絵柄を当てよう" },
+        { id: "stop", name: "ジャストストップ⏱️", desc: "ゲージが中央に来た瞬間に止めろ！" },
+        { id: "slot", name: "ウパスロット🎰", desc: "絵柄を揃えろ！" },
+        { id: "math", name: "限界計算サバイバル🧮", desc: "間違えるまで続く" },
+        { id: "clicker", name: "10秒連打ラッシュ👆", desc: "ひたすら叩きまくれ！" },
+        { id: "catch", name: "リンゴキャッチ🍎", desc: "落ちてくるリンゴを拾おう！" }
     ];
 
-    let currentWorry = null;
-    let hasWorry = false;
-
-    // --- 音声管理 ---
-    function playBGM(mode) {
-        bgmMode = mode;
-        const main = document.getElementById('bgm-main');
-        const title = document.getElementById('bgm-title');
-        const gacha = document.getElementById('bgm-gacha');
-        
-        try { main.pause(); title.pause(); gacha.pause(); } catch(e){}
-        
-        try {
-            if (mode === 'title') title.play().catch(()=>{});
-            else if (mode === 'main') main.play().catch(()=>{});
-            else if (mode === 'gacha') gacha.play().catch(()=>{});
-        } catch(e) {}
-    }
-
-    // --- タイトル・初期化フロー ---
+    // --- タイトル・ロード・引き継ぎ ---
     function initTitleScreen() {
-        document.getElementById('title-screen').style.display = 'flex';
-        document.getElementById('title-load-pane').style.display = 'none';
-        document.getElementById('title-start-new-btn').style.display = 'block';
-        document.getElementById('title-load-menu-btn').style.display = 'block';
+        document.getElementById('title-screen').style.display = 'flex'; document.getElementById('title-load-pane').style.display = 'none';
+        document.getElementById('title-start-new-btn').style.display = 'block'; document.getElementById('title-load-menu-btn').style.display = 'block';
         playBGM('title');
     }
-
     function renderSaveSlots() {
-        const container = document.getElementById('save-slots-container');
-        container.innerHTML = '';
+        const container = document.getElementById('save-slots-container'); container.innerHTML = '';
         const slots = getGlobalSaves();
-
         slots.forEach((slot, idx) => {
-            const card = document.createElement('div');
-            card.className = 'save-slot-card';
+            const card = document.createElement('div'); card.className = 'save-slot-card';
             if (slot) {
-                card.innerHTML = `
-                    <div class="slot-click-area" id="slot-click-${idx}">
-                        <b style="color:#15aabf; font-size:1rem;">${slot.name}</b><br>
-                        <small style="color:#868e96;">Lv.${slot.level} | 💰${slot.coins} | ID:${slot.friendId}</small>
-                    </div>
-                    <button class="delete-slot-btn" id="slot-del-btn-${idx}">🗑️ 消去</button>
-                `;
+                card.innerHTML = `<div class="slot-click-area" id="slot-click-${idx}"><b style="color:#15aabf;">${slot.name}</b><br><small>Lv.${slot.level} | 💰${slot.coins}</small></div><button class="delete-slot-btn" id="slot-del-btn-${idx}">🗑️</button>`;
                 container.appendChild(card);
-
-                // --- データのロードとマイグレーションの実行 ---
-                document.getElementById(`slot-click-${idx}`).onclick = () => {
-                    currentSlotIndex = idx;
-                    // 保存されたセーブデータを読み込み、不足分を補完してゲームデータ(gameState)にする
-                    gameState = migrateData(slot); 
-
-                    document.getElementById('title-screen').style.display = 'none';
-                    document.getElementById('game-slot-indicator').innerText = `Slot ${idx+1}`;
-                    checkLoginStreakAndMissions();
-                    updateUI();
-                    logMessage(`🚪 スロット ${idx+1} から再開したよ。`);
-                    playBGM('main');
+                document.getElementById(`slot-click-${idx}`).onclick = () => { 
+                    currentSlotIndex = idx; gameState = migrateData(slot); 
+                    document.getElementById('title-screen').style.display = 'none'; 
+                    document.getElementById('game-slot-indicator').innerText = `Slot ${idx+1}`; 
+                    checkLoginStreakAndMissions(); updateUI(); playBGM('main'); 
                 };
-
-                document.getElementById(`slot-del-btn-${idx}`).onclick = () => {
-                    if(confirm(`⚠️ 警告：スロット ${idx+1} のデータ「${slot.name}」を完全に消去しますか？（二度と復活できません）`)) {
-                        let freshSlots = getGlobalSaves();
-                        let pool = getAccountPool().filter(acc => acc.friendId !== slot.friendId);
-                        localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool));
-                        freshSlots[idx] = null;
-                        saveAllSlots(freshSlots);
-                        renderSaveSlots();
-                    }
-                };
+                document.getElementById(`slot-del-btn-${idx}`).onclick = () => { if(confirm(`スロット ${idx+1} を完全に消去しますか？`)) { let fresh = getGlobalSaves(); fresh[idx] = null; saveAllSlots(fresh); renderSaveSlots(); } };
             } else {
-                card.innerHTML = `<div style="color:#adb5bd; font-style:italic; flex-grow:1;">空のセーブデータ (スロット ${idx+1})</div>`;
+                card.innerHTML = `<div style="color:#adb5bd; font-style:italic; flex-grow:1; padding:4px;">空のデータ (スロット ${idx+1})</div>`;
                 card.onclick = () => { currentSlotIndex = idx; startNewGameFlow(); };
                 container.appendChild(card);
             }
         });
     }
 
-    function startNewGameFlow() {
-        playBGM('main');
-        document.getElementById('title-screen').style.display = 'none';
-        document.getElementById('welcome-screen').style.display = 'flex';
-        gameState = createInitialState(); // 新規ゲームデータの発行
-        applyAppearance();
-    }
-
-    document.getElementById('title-start-new-btn').onclick = () => {
-        playBGM('main');
-        const slots = getGlobalSaves();
-        if (slots[0] && slots[1]) {
-            if (!confirm("セーブ枠が満杯です。スロット1を上書きして新しく始めますか？")) return;
-            currentSlotIndex = 0;
-        } else {
-            currentSlotIndex = slots[0] ? 1 : 0;
-        }
-        startNewGameFlow();
-    };
-
-    document.getElementById('title-load-menu-btn').onclick = () => {
-        playBGM('title');
-        document.getElementById('title-start-new-btn').style.display = 'none';
-        document.getElementById('title-load-menu-btn').style.display = 'none';
-        document.getElementById('title-load-pane').style.display = 'block';
-        renderSaveSlots();
-    };
-
+    function startNewGameFlow() { playBGM('main'); document.getElementById('title-screen').style.display = 'none'; document.getElementById('welcome-screen').style.display = 'flex'; gameState = createInitialState(); applyAppearance(); }
+    document.getElementById('title-start-new-btn').onclick = () => { const slots = getGlobalSaves(); if(slots[0] && slots[1]){ if(!confirm("スロット1を上書きして始めますか？")) return; currentSlotIndex = 0; } else { currentSlotIndex = slots[0] ? 1 : 0; } startNewGameFlow(); };
+    document.getElementById('title-load-menu-btn').onclick = () => { document.getElementById('title-start-new-btn').style.display = 'none'; document.getElementById('title-load-menu-btn').style.display = 'none'; document.getElementById('title-load-pane').style.display = 'block'; renderSaveSlots(); };
     document.getElementById('btn-back-to-title').onclick = initTitleScreen;
 
-    // タイトル画面からの引き継ぎ実行
     document.getElementById('btn-title-execute-transfer').onclick = () => {
-        const idInput = document.getElementById('title-transfer-id').value.trim();
-        const passInput = document.getElementById('title-transfer-pass').value.trim();
+        const idInput = document.getElementById('title-transfer-id').value.trim(); const passInput = document.getElementById('title-transfer-pass').value.trim();
         if(!idInput || !passInput) return alert("すべて入力してください");
-
-        const pool = getAccountPool();
-        const targetAcc = pool.find(acc => acc.friendId === idInput);
-
-        if(!targetAcc) return alert("❌ 指定されたフレンドIDは見つかりません。");
-        if(targetAcc.password !== passInput) return alert("❌ パスワードが一致しません。");
-
-        if(confirm(`アカウント「${targetAcc.name}」を引き継ぎ、空いているスロット(またはスロット1)に保存しますか？`)) {
-            // 引き継ぎデータに対してもマイグレーションを通してゲームデータ化
-            gameState = migrateData(JSON.parse(JSON.stringify(targetAcc)));
-            
-            let slots = getGlobalSaves();
-            if(!slots[0]) currentSlotIndex = 0;
-            else if(!slots[1]) currentSlotIndex = 1;
-            else currentSlotIndex = 0; // 上書き
-
-            slots[currentSlotIndex] = gameState;
-            saveAllSlots(slots);
-            renderSaveSlots();
-            alert("✅ 引き継ぎが完了しました！リストから選択して遊んでください。");
-            document.getElementById('title-transfer-id').value = "";
-            document.getElementById('title-transfer-pass').value = "";
-        }
+        const pool = getAccountPool(); const targetAcc = pool.find(acc => acc.friendId === idInput);
+        if(!targetAcc) { playSE('error'); return alert("❌ 指定されたIDは見つかりません。"); }
+        if(targetAcc.password !== passInput) { playSE('error'); return alert("❌ パスワードが一致しません。"); }
+        tempTransferData = migrateData(JSON.parse(JSON.stringify(targetAcc)));
+        document.getElementById('transfer-slot-modal').style.display = 'flex';
     };
+    document.getElementById('tslot-0-btn').onclick = () => executeTransferToSlot(0);
+    document.getElementById('tslot-1-btn').onclick = () => executeTransferToSlot(1);
+    document.getElementById('close-tslot-modal').onclick = () => closeModal('transfer-slot-modal');
 
-    // --- ゲーム内ロジックとUI ---
+    function executeTransferToSlot(slotIdx) {
+        currentSlotIndex = slotIdx; gameState = tempTransferData;
+        let slots = getGlobalSaves(); slots[currentSlotIndex] = gameState; saveAllSlots(slots);
+        closeModal('transfer-slot-modal'); renderSaveSlots();
+        alert(`✅ スロット ${slotIdx+1} に引き継ぎが完了しました！リストから選択して遊んでください。`);
+        document.getElementById('title-transfer-id').value = ""; document.getElementById('title-transfer-pass').value = "";
+    }
+
     function logMessage(msg, isAlert = false) {
-        const logBox = document.getElementById('game-log');
-        logBox.innerText = msg;
-        if(isAlert) logBox.classList.add('alert-flash');
-        else logBox.classList.remove('alert-flash');
+        const logBox = document.getElementById('game-log'); logBox.innerText = msg;
+        if(isAlert) logBox.classList.add('alert-flash'); else logBox.classList.remove('alert-flash');
         if(logTimer) clearTimeout(logTimer);
         logTimer = setTimeout(() => { logBox.innerText = "のんびり過ごしているよ。"; logBox.classList.remove('alert-flash'); }, 5000);
     }
 
-    function getTitle() {
-        if(gameState.totalFeeds >= 100 && gameState.totalMinigames >= 50) return "マスター飼育員";
-        if(gameState.totalFeeds >= 50 && gameState.level >= 20) return "ベテラン飼育員";
-        if(gameState.totalMinigames >= 20) return "あそびの達人";
-        if(gameState.level >= 10) return "一人前飼育員";
-        return "見習い飼育員";
-    }
-
     function checkLoginStreakAndMissions() {
-        const now = new Date();
-        const today = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
-        
+        const now = new Date(); const today = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
         if (gameState.lastLoginDate !== today) {
-            if (!gameState.currentLoginStreak) gameState.currentLoginStreak = 0;
-            if (!gameState.maxLoginStreak) gameState.maxLoginStreak = 0;
-
-            const yesterday = new Date(now);
-            yesterday.setDate(yesterday.getDate() - 1);
-            const yesterdayStr = `${yesterday.getFullYear()}-${yesterday.getMonth()+1}-${yesterday.getDate()}`;
-
-            if (gameState.lastLoginDate === yesterdayStr) gameState.currentLoginStreak++;
-            else gameState.currentLoginStreak = 1;
-
-            if (gameState.currentLoginStreak > gameState.maxLoginStreak) {
-                gameState.maxLoginStreak = gameState.currentLoginStreak;
-            }
-
-            gameState.coins += 30; // ログボ
-            gameState.lastLoginDate = today;
-            document.getElementById('login-bonus-zone').innerText = `🎉 今日のログインボーナスを獲得したよ！ (💰+30) 連続ログイン: ${gameState.currentLoginStreak}日目`;
-        } else {
-            document.getElementById('login-bonus-zone').innerText = `📅 今日のログインボーナスは獲得済みだよ。連続ログイン: ${gameState.currentLoginStreak}日目`;
+            const yesterday = new Date(now); yesterday.setDate(yesterday.getDate() - 1); const yesterdayStr = `${yesterday.getFullYear()}-${yesterday.getMonth()+1}-${yesterday.getDate()}`;
+            if (gameState.lastLoginDate === yesterdayStr) gameState.currentLoginStreak++; else gameState.currentLoginStreak = 1;
+            if (gameState.currentLoginStreak > gameState.maxLoginStreak) gameState.maxLoginStreak = gameState.currentLoginStreak;
+            
+            gameState.loginBonusDay = ((gameState.loginBonusDay || 0) % 30) + 1;
+            gameState.coins += 30; gameState.lastLoginDate = today;
+            showLoginBonusModal();
         }
 
         if (gameState.lastMissionDate !== today) {
-            gameState.dailyMissions = [
-                { id: "feed", desc: "ごはんを1回あげる", target: 1, current: 0, completed: false },
-                { id: "game", desc: "ミニゲームを1回遊ぶ", target: 1, current: 0, completed: false },
-                { id: "worry", desc: "お悩みを1回解決する", target: 1, current: 0, completed: false }
-            ];
+            gameState.dailyMissions = [ { id: "feed", desc: "ごはんを1回あげる", target: 1, current: 0, completed: false }, { id: "game", desc: "ミニゲームを1回遊ぶ", target: 1, current: 0, completed: false }, { id: "worry", desc: "お悩みを1回解決する", target: 1, current: 0, completed: false } ];
             gameState.lastMissionDate = today;
         }
+        if(!gameState.currentTitle) gameState.currentTitle = "見習い";
+        if(!gameState.ownerName) gameState.ownerName = "あなた";
+        if(!gameState.minigameStats) gameState.minigameStats = {};
     }
 
-    function addLoveExp(amt) {
-        if (gameState.loveLevel >= 99) return;
-        gameState.loveExp += amt;
-        while (gameState.loveExp >= gameState.maxLoveExp && gameState.loveLevel < 99) {
-            gameState.loveLevel++;
-            gameState.loveExp -= gameState.maxLoveExp;
-            gameState.maxLoveExp = Math.floor(gameState.maxLoveExp * 1.5);
-            logMessage(`💖 なつき度が Lv.${gameState.loveLevel} に上がった！`);
+    function showLoginBonusModal() {
+        const grid = document.getElementById('login-stamp-grid'); grid.innerHTML = '';
+        for(let i=1; i<=30; i++) {
+            const cell = document.createElement('div'); cell.className = `login-cell ${i <= gameState.loginBonusDay ? 'stamped' : ''}`;
+            cell.innerText = `${i}日目`; grid.appendChild(cell);
         }
-        if (gameState.loveLevel >= 99) {
-            gameState.loveLevel = 99;
-            gameState.loveExp = 0;
-        }
+        document.getElementById('login-bonus-modal').style.display = 'flex';
+        playSE('coin');
     }
+    document.getElementById('close-login-bonus').onclick = () => closeModal('login-bonus-modal');
 
     function updateMissionProgress(id) {
         if(!gameState.dailyMissions) return;
         const m = gameState.dailyMissions.find(x => x.id === id);
-        if (m && !m.completed) {
-            m.current++;
-            if (m.current >= m.target) {
-                m.completed = true;
-                gameState.coins += 20;
-                logMessage(`🎯 ミッション【${m.desc}】達成！ 💰+20`);
-                addLoveExp(10);
-            }
-            saveActiveGame();
-        }
+        if (m && !m.completed) { m.current++; if (m.current >= m.target) { m.completed = true; gameState.coins += 20; logMessage(`🎯 ミッション達成！ 💰+20`); } saveActiveGame(); }
     }
 
     function updateUI() {
-        document.getElementById('level-display').innerText = `Lv.${gameState.level}`;
-        document.getElementById('coin-display').innerText = `💰 ${gameState.coins}`;
-        
-        const expPercent = Math.min((gameState.exp / gameState.maxExp) * 100, 100);
-        document.getElementById('exp-bar').style.width = `${expPercent}%`;
-        document.getElementById('next-exp-display').innerText = `あと ${gameState.maxExp - gameState.exp} EXP`;
-
-        const fullPercent = Math.min(Math.max(gameState.fullness, 0), 100);
-        document.getElementById('fullness-bar').style.width = `${fullPercent}%`;
-        document.getElementById('fullness-text').innerText = `${Math.floor(fullPercent)}%`;
-
-        document.getElementById('personality-display').innerText = `称号: ${getTitle()}`;
-        document.getElementById('love-display').innerText = `💖 なつき度: Lv.${gameState.loveLevel || 0}`;
-
+        document.getElementById('level-display').innerText = `Lv.${gameState.level}`; document.getElementById('coin-display').innerText = `💰 ${gameState.coins}`;
+        document.getElementById('exp-bar').style.width = `${Math.min((gameState.exp / gameState.maxExp) * 100, 100)}%`; document.getElementById('next-exp-display').innerText = `あと ${gameState.maxExp - gameState.exp} EXP`;
+        document.getElementById('fullness-bar').style.width = `${Math.min(Math.max(gameState.fullness, 0), 100)}%`; document.getElementById('fullness-text').innerText = `${Math.floor(Math.max(gameState.fullness, 0))}%`;
+        document.getElementById('personality-display').innerText = `称号: ${gameState.currentTitle}`; document.getElementById('love-display').innerText = `💖 なつき度: Lv.${gameState.loveLevel || 0}`;
         document.getElementById('main-name-label').innerText = gameState.name;
-        document.getElementById('preview-name-label').innerText = gameState.name;
-
-        const cos = costumeData[gameState.currentCostume || "なし"];
-        document.getElementById('costume-layer').innerText = cos ? cos.emoji : "";
-
+        document.getElementById('preview-name-label') && (document.getElementById('preview-name-label').innerText = gameState.name);
+        const cos = costumeData[gameState.currentCostume || "なし"]; document.getElementById('costume-layer').innerText = cos ? cos.emoji : "";
         const aq = document.getElementById('aquarium');
-        if (gameState.appearance.bgClass === "custom-bg" && gameState.customBgData) {
-            bgList.forEach(bg => aq.classList.remove(bg.id));
-            aq.style.background = `url(${gameState.customBgData})`;
-        } else {
-            aq.style.background = "";
-            bgList.forEach(bg => aq.classList.remove(bg.id));
-            aq.classList.add(gameState.appearance.bgClass);
-        }
+        if (gameState.appearance.bgClass === "custom-bg" && gameState.customBgData) { bgList.forEach(bg => aq.classList.remove(bg.id)); aq.style.background = `url(${gameState.customBgData})`; }
+        else { aq.style.background = ""; bgList.forEach(bg => aq.classList.remove(bg.id)); aq.classList.add(gameState.appearance.bgClass); }
 
         const lamp = document.getElementById('worry-lamp');
-        if (hasWorry && currentWorry) {
-            lamp.style.display = 'block';
-            const wrapper = document.getElementById('char-wrapper');
-            lamp.style.left = `${wrapper.offsetLeft + 40}px`;
-            lamp.style.top = `${wrapper.offsetTop - 25}px`;
-        } else {
-            lamp.style.display = 'none';
-        }
+        if (hasWorry && currentWorry) lamp.style.display = 'block'; else lamp.style.display = 'none';
 
-        renderPlacedFurniture();
-        applyAppearance();
+        renderPlacedFurniture(); applyAppearance();
     }
 
     function applyAppearance() {
@@ -1475,264 +712,239 @@
             charEl.querySelectorAll('.body-part').forEach(part => part.setAttribute('fill', gameState.appearance.bodyColor));
             charEl.querySelectorAll('.gill-part').forEach(part => part.setAttribute('fill', gameState.appearance.gillColor));
         });
-
-        document.getElementById('init-body-color-picker').value = gameState.appearance.bodyColor;
-        document.getElementById('init-gill-color-picker').value = gameState.appearance.gillColor;
-        document.getElementById('body-color-picker').value = gameState.appearance.bodyColor;
-        document.getElementById('gill-color-picker').value = gameState.appearance.gillColor;
-
-        updateActiveClass('#char-types .type-btn', gameState.appearance.type, 'data-type');
-        updateActiveClass('#init-char-types .type-btn', gameState.appearance.type, 'data-type');
-    }
-
-    function updateActiveClass(selector, value, attr) {
-        document.querySelectorAll(selector).forEach(el => {
-            if(el.getAttribute(attr) === value) el.classList.add('active');
-            else el.classList.remove('active');
-        });
+        document.getElementById('body-color-picker').value = gameState.appearance.bodyColor; document.getElementById('gill-color-picker').value = gameState.appearance.gillColor;
+        document.querySelectorAll('#char-types .type-btn').forEach(el => { if(el.getAttribute('data-type') === gameState.appearance.type) el.classList.add('active'); else el.classList.remove('active'); });
     }
 
     function moveCharacter(targetX, targetY, duration = 800) {
-        const wrapper = document.getElementById('char-wrapper');
-        const aquarium = document.getElementById('aquarium');
-        const maxX = aquarium.clientWidth - wrapper.clientWidth;
-        const maxY = aquarium.clientHeight - wrapper.clientHeight;
-        const finalX = Math.min(Math.max(0, targetX), maxX);
-        const finalY = Math.min(Math.max(30, targetY), maxY);
-
+        const wrapper = document.getElementById('char-wrapper'); const aquarium = document.getElementById('aquarium');
+        const finalX = Math.min(Math.max(0, targetX), aquarium.clientWidth - wrapper.clientWidth);
+        const finalY = Math.min(Math.max(30, targetY), aquarium.clientHeight - wrapper.clientHeight);
         const charImg = document.getElementById('upa-char');
-        if (finalX > wrapper.offsetLeft) charImg.style.transform = "scaleX(-1)";
-        else if (finalX < wrapper.offsetLeft) charImg.style.transform = "scaleX(1)";
-
+        if (finalX > wrapper.offsetLeft) charImg.style.transform = "scaleX(-1)"; else if (finalX < wrapper.offsetLeft) charImg.style.transform = "scaleX(1)";
         wrapper.style.transition = `left ${duration}ms linear, top ${duration}ms linear`;
-        wrapper.style.left = `${finalX}px`;
-        wrapper.style.top = `${finalY}px`;
-
-        setTimeout(() => {
-            const lamp = document.getElementById('worry-lamp');
-            if (hasWorry) {
-                lamp.style.left = `${finalX + 40}px`;
-                lamp.style.top = `${finalY - 25}px`;
-            }
-        }, duration / 2);
+        wrapper.style.left = `${finalX}px`; wrapper.style.top = `${finalY}px`;
     }
 
     setInterval(() => {
         if (document.getElementById('title-screen').style.display === 'flex' || document.getElementById('welcome-screen').style.display === 'flex' || isMoving) return;
-        const aq = document.getElementById('aquarium');
-        moveCharacter(Math.random() * (aq.clientWidth - 90), Math.random() * (aq.clientHeight - 140), 1500);
+        moveCharacter(Math.random() * (document.getElementById('aquarium').clientWidth - 90), Math.random() * (document.getElementById('aquarium').clientHeight - 140), 1500);
     }, 4000);
 
+    document.getElementById('char-wrapper').onclick = (e) => {
+        if(e.target.id === 'worry-lamp') return;
+        playSE('jump');
+        const charImg = document.getElementById('upa-char');
+        charImg.classList.add('jump');
+        setTimeout(() => charImg.classList.remove('jump'), 300);
+        
+        sessionTouchCount++;
+        if(sessionTouchCount === 100 && !gameState.unlockedHiddenTitles.includes('愛情たっぷり')) {
+            gameState.unlockedHiddenTitles.push('愛情たっぷり');
+            alert('🏆 隠し称号「愛情たっぷり」を解放しました！');
+            saveActiveGame();
+        }
+    };
+    
     document.getElementById('aquarium').onclick = (e) => {
         if (e.target.id !== 'aquarium' && e.target.id !== 'furniture-placement-layer') return;
-        const rect = document.getElementById('aquarium').getBoundingClientRect();
-        isMoving = true;
+        const rect = document.getElementById('aquarium').getBoundingClientRect(); isMoving = true;
         moveCharacter(e.clientX - rect.left - 55, e.clientY - rect.top - 55, 800);
         setTimeout(() => { isMoving = false; }, 800);
     };
 
-    // --- メニューやモーダル群の制御 ---
     const sideDrawer = document.getElementById('side-drawer');
-    document.getElementById('menu-trigger').onclick = () => { sideDrawer.style.display = 'flex'; };
-    document.getElementById('close-drawer').onclick = () => { sideDrawer.style.display = 'none'; };
+    document.getElementById('menu-trigger').onclick = () => { playSE('click'); sideDrawer.style.display = 'flex'; };
+    document.getElementById('close-drawer').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; };
 
     document.getElementById('drawer-profile-btn').onclick = () => {
-        sideDrawer.style.display = 'none';
-        document.getElementById('prof-name').innerText = `なまえ: ${gameState.name}`;
+        playSE('click'); sideDrawer.style.display = 'none';
+        document.getElementById('prof-owner-pet').innerText = `${gameState.ownerName} の ${gameState.name}`;
         document.getElementById('prof-level').innerText = `レベル: Lv.${gameState.level}`;
-        document.getElementById('prof-title').innerText = `称号: ${getTitle()}`;
-        document.getElementById('prof-coins').innerText = `お財布: 💰 ${gameState.coins}`;
-        document.getElementById('prof-stats').innerText = `総エサやり: ${gameState.totalFeeds||0}回 / 総ミニゲーム: ${gameState.totalMinigames||0}回`;
-        document.getElementById('prof-login-days').innerText = `🔥現在連続: ${gameState.currentLoginStreak || 1}日 / 🏆最高連続: ${gameState.maxLoginStreak || 1}日`;
+        document.getElementById('prof-title').innerText = `称号: ${gameState.currentTitle}`; document.getElementById('prof-coins').innerText = `お財布: 💰 ${gameState.coins}`;
+        document.getElementById('prof-stats').innerText = `総エサ: ${gameState.totalFeeds||0}回 / 総ゲーム: ${gameState.totalMinigames||0}回`;
+        document.getElementById('prof-login-days').innerText = `🔥連続: ${gameState.currentLoginStreak || 1}日 / 🏆最高: ${gameState.maxLoginStreak || 1}日`;
         document.getElementById('profile-modal').style.display = 'flex';
     };
-    document.getElementById('close-profile').onclick = () => closeModal('profile-modal');
+    document.getElementById('close-profile').onclick = () => { playSE('click'); closeModal('profile-modal'); };
     
-    document.getElementById('drawer-transfer-btn').onclick = () => {
-        sideDrawer.style.display = 'none';
-        document.getElementById('trans-my-id').innerText = gameState.friendId;
-        document.getElementById('trans-my-pass').innerText = gameState.password || "1234";
-        document.getElementById('transfer-modal').style.display = 'flex';
+    document.getElementById('drawer-title-dict-btn').onclick = () => {
+        playSE('click'); sideDrawer.style.display = 'none';
+        const pLeft = document.getElementById('dict-page-left'); pLeft.innerHTML = '';
+        const pRight = document.getElementById('dict-page-right'); pRight.innerHTML = '';
+        
+        TITLE_DICT.forEach((t, i) => {
+            const unlocked = t.cond();
+            const div = document.createElement('div'); div.className = `dict-item ${unlocked ? 'unlocked' : ''}`;
+            div.innerHTML = `<div><b style="color:${unlocked ? '#0b7285' : '#868e96'};">${unlocked ? t.name : '？？？'}</b><br><small>${t.hint}</small></div>`;
+            if(unlocked) {
+                const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = 'ｾｯﾄ'; btn.style.padding = '4px'; btn.style.fontSize = '0.7rem';
+                if(gameState.currentTitle === t.name) { btn.innerText = 'ｾｯﾄ中'; btn.style.background = '#40c057'; btn.style.color = 'white'; }
+                else { 
+                    btn.onclick = () => { 
+                        playSE('click'); gameState.currentTitle = t.name; updateUI(); saveActiveGame(); 
+                        closeModal('title-dict-modal'); alert(`称号を「${t.name}」にセットしました！`); 
+                    }; 
+                }
+                div.appendChild(btn);
+            } else { div.innerHTML += `<span style="font-size:1.2rem; opacity:0.3;">🔒</span>`; }
+            
+            if(i < TITLE_DICT.length / 2) pLeft.appendChild(div); else pRight.appendChild(div);
+        });
+        document.getElementById('title-dict-modal').style.display = 'flex';
     };
-    document.getElementById('close-transfer-modal').onclick = () => closeModal('transfer-modal');
-    document.getElementById('btn-change-pass').onclick = () => {
-        const p = prompt("新しいパスワードを設定してください（現在の設定: " + gameState.password + "）", gameState.password);
-        if(p && p.trim() !== "") {
-            gameState.password = p.trim();
-            document.getElementById('trans-my-pass').innerText = gameState.password;
-            saveActiveGame();
-            alert("パスワードを変更しました！");
-        }
-    };
+    document.getElementById('close-title-dict').onclick = () => { playSE('click'); closeModal('title-dict-modal'); };
 
-    document.getElementById('drawer-trophy-btn').onclick = () => {
-        sideDrawer.style.display = 'none';
-        const container = document.getElementById('trophy-list-container');
-        container.innerHTML = '';
-        if(!gameState.trophies || gameState.trophies.length === 0) {
-            container.innerHTML = '<div style="text-align:center; color:#868e96; margin-top:20px;">まだトロフィーを持っていません。<br>レベルを上げて獲得しよう！</div>';
-        } else {
-            gameState.trophies.forEach(t => {
-                const div = document.createElement('div');
-                div.className = 'trophy-item';
-                div.innerHTML = `<span>🏆</span> <span>${t}</span>`;
-                container.appendChild(div);
-            });
-        }
-        document.getElementById('trophy-modal').style.display = 'flex';
-    };
-    document.getElementById('close-trophy-modal').onclick = () => closeModal('trophy-modal');
-
-    document.getElementById('drawer-mission-btn').onclick = () => {
-        sideDrawer.style.display = 'none';
-        const container = document.getElementById('mission-list-container');
-        container.innerHTML = '';
-        if(!gameState.dailyMissions) gameState.dailyMissions = [];
-        gameState.dailyMissions.forEach(m => {
-            const div = document.createElement('div');
-            div.className = `mission-item ${m.completed ? 'completed' : ''}`;
-            div.innerHTML = `<span>${m.desc} (${m.current}/${m.target})</span><b>${m.completed ? '✅ 達成(+20💰)' : '未達成'}</b>`;
+    document.getElementById('drawer-mg-record-btn').onclick = () => {
+        playSE('click'); sideDrawer.style.display = 'none';
+        const container = document.getElementById('mg-record-container'); container.innerHTML = '';
+        minigames.forEach(g => {
+            const stats = gameState.minigameStats[g.id] || { plays: 0, highscore: 0 };
+            const div = document.createElement('div'); div.className = 'mission-item';
+            div.innerHTML = `<span>🎮 ${g.name}</span><div style="text-align:right;"><small>回数: ${stats.plays}回</small><br><b style="color:#d9480f;">最高: ${stats.highscore}</b></div>`;
             container.appendChild(div);
         });
-        document.getElementById('mission-modal').style.display = 'flex';
-    };
-    document.getElementById('close-mission').onclick = () => closeModal('mission-modal');
+        document.getElementById('mg-record-modal').style.display = 'flex';
+    }
+    document.getElementById('close-mg-record').onclick = () => { playSE('click'); closeModal('mg-record-modal'); };
 
-    document.getElementById('drawer-gacha-btn').onclick = () => {
-        sideDrawer.style.display = 'none';
-        playBGM('gacha');
-        document.getElementById('gacha-ui-box').style.display = 'block';
-        document.getElementById('gacha-result-area').style.display = 'none';
-        document.getElementById('gacha-modal').style.display = 'flex';
+    document.getElementById('drawer-settings-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('admin-panel').style.display = 'none'; document.getElementById('settings-modal').style.display = 'flex'; };
+    document.getElementById('close-settings').onclick = () => { playSE('click'); closeModal('settings-modal'); };
+    document.getElementById('btn-admin-login').onclick = () => {
+        playSE('click'); const pw = prompt("管理者パスワードを入力:");
+        if(pw === "aka.kataoka1025") { document.getElementById('admin-panel').style.display = 'block'; alert("管理者モードを有効化しました。"); } else { playSE('error'); alert("パスワードが違います。"); }
     };
-    document.getElementById('close-gacha').onclick = () => { 
-        playBGM('main'); 
-        closeModal('gacha-modal'); 
-    };
+    document.getElementById('cheat-coin').onclick = () => { playSE('coin'); gameState.coins += 10000; updateUI(); saveActiveGame(true); alert("10000コイン追加"); };
+    document.getElementById('cheat-exp').onclick = () => { playSE('coin'); gainExp(9999); alert("9999EXP追加"); };
+    document.getElementById('cheat-full').onclick = () => { playSE('click'); gameState.fullness = 100; updateUI(); saveActiveGame(true); alert("満腹度MAX"); };
+    document.getElementById('cheat-furni').onclick = () => { playSE('click'); for (const k in furnitureData) { gameState.furnitureInventory[k] = (gameState.furnitureInventory[k]||0)+1; } saveActiveGame(true); alert("全家具+1"); };
+    document.getElementById('cheat-ceo').onclick = () => { playSE('click'); if(!gameState.unlockedHiddenTitles.includes('代表取締役')) { gameState.unlockedHiddenTitles.push('代表取締役'); alert("称号「代表取締役」を解放しました！"); saveActiveGame(true); } };
 
-    document.getElementById('btn-play-gacha').onclick = () => {
-        if(gameState.coins < 50) return alert("コインが足りないよ(1回50💰)");
-        gameState.coins -= 50;
-        updateUI();
-        
-        const machine = document.getElementById('gacha-machine');
-        const btn = document.getElementById('btn-play-gacha');
-        btn.style.display = 'none';
-        machine.classList.add('shake-anim');
-
-        setTimeout(() => {
-            machine.classList.remove('shake-anim');
-            document.getElementById('gacha-ui-box').style.display = 'none';
-            document.getElementById('gacha-result-area').style.display = 'flex';
-            
-            const isCostume = Math.random() > 0.5;
-            let prizeName = "";
-            let prizeIcon = "";
-            
-            if (isCostume) {
-                const list = Object.keys(costumeData).filter(x => x !== "なし");
-                prizeName = list[Math.floor(Math.random() * list.length)];
-                prizeIcon = costumeData[prizeName].emoji || "🎁";
-                if(!gameState.unlockedCostumes.includes(prizeName)) gameState.unlockedCostumes.push(prizeName);
-                document.getElementById('gacha-result-text').innerText = `衣装「${prizeName}」をGET!`;
-            } else {
-                const list = Object.keys(furnitureData);
-                const key = list[Math.floor(Math.random() * list.length)];
-                prizeName = furnitureData[key].name;
-                prizeIcon = furnitureData[key].emoji;
-                gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + 1;
-                document.getElementById('gacha-result-text').innerText = `家具「${prizeName}」をGET!`;
-            }
-            
-            const iconEl = document.getElementById('gacha-result-icon');
-            iconEl.innerText = prizeIcon;
-            
-            iconEl.style.animation = 'none';
-            iconEl.offsetHeight; 
-            iconEl.style.animation = null;
-            
-            saveActiveGame();
-        }, 1200);
-    };
-
-    document.getElementById('btn-gacha-next').onclick = () => {
-        document.getElementById('gacha-ui-box').style.display = 'block';
-        document.getElementById('gacha-result-area').style.display = 'none';
-        document.getElementById('btn-play-gacha').style.display = 'block';
-    };
-
-    document.getElementById('drawer-dress-btn').onclick = () => {
-        sideDrawer.style.display = 'none';
-        const container = document.getElementById('dress-container');
-        container.innerHTML = '';
-        if(!gameState.unlockedCostumes) gameState.unlockedCostumes = ["なし"];
-        gameState.unlockedCostumes.forEach(c => {
-            const btn = document.createElement('button');
-            btn.className = `type-btn ${gameState.currentCostume === c ? 'active' : ''}`;
-            btn.innerText = c;
-            btn.onclick = () => {
-                gameState.currentCostume = c;
-                closeModal('dress-modal');
-                updateUI();
-                saveActiveGame();
-            };
-            container.appendChild(btn);
-        });
-        document.getElementById('dress-modal').style.display = 'flex';
-    };
-    document.getElementById('close-dress').onclick = () => closeModal('dress-modal');
-
-    document.getElementById('drawer-friend-btn').onclick = () => { sideDrawer.style.display = 'none'; document.getElementById('my-friend-id').innerText = gameState.friendId; renderFriendList(); document.getElementById('friend-modal').style.display = 'flex'; };
-    document.getElementById('close-friend').onclick = () => closeModal('friend-modal');
+    document.getElementById('drawer-friend-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('my-friend-id').innerText = gameState.friendId; renderFriendList(); document.getElementById('friend-modal').style.display = 'flex'; };
+    document.getElementById('close-friend').onclick = () => { playSE('click'); closeModal('friend-modal'); };
+    
     document.getElementById('btn-add-friend').onclick = () => {
-        const fid = document.getElementById('friend-id-input').value.trim();
-        if(!fid || fid === gameState.friendId || gameState.friends.some(f => f.id === fid)) return alert("エラー：不正なID、または追加済みです。");
-        gameState.friends.push({ id: fid, name: "ウパッチ", level: 5, coins: 300 });
-        renderFriendList(); saveActiveGame();
+        playSE('click'); const fid = document.getElementById('friend-id-input').value.trim();
+        if(!fid || fid === gameState.friendId || gameState.friends.some(f => f.id === fid)) { playSE('error'); return alert("エラー：不正なID、または追加済みです。"); }
+        
+        const pool = getAccountPool(); const targetAcc = pool.find(acc => acc.friendId === fid);
+        if(!targetAcc) { playSE('error'); return alert("見つかりません"); }
+
+        if(confirm(`「${targetAcc.ownerName} の ${targetAcc.name}」さんにフレンド申請しますか？`)) {
+            gameState.friends.push({ id: targetAcc.friendId, name: targetAcc.name, ownerName: targetAcc.ownerName, level: targetAcc.level, bg: targetAcc.appearance?.bgClass, app: targetAcc.appearance });
+            renderFriendList();
+            if(gameState.friends.length % 3 === 0) {
+                const rank = gameState.friends.length === 3 ? "ブロンズ" : gameState.friends.length === 6 ? "シルバー" : "ゴールド";
+                const tName = `友情の証・${rank} (${gameState.friends.length}人)`;
+                if(!gameState.trophies.includes(tName)) { gameState.trophies.push(tName); alert(`🏆 新しいトロフィーを獲得しました！\n「${tName}」`); }
+            }
+            saveActiveGame(); alert("フレンドになりました！");
+        }
     };
+
     function renderFriendList() {
         const container = document.getElementById('friend-list-container');
-        container.innerHTML = gameState.friends.map((f, i) => `<div style="padding:6px; background:white; margin-bottom:4px; display:flex; justify-content:space-between; cursor:pointer;" onclick="openFriendDetail(${i})"><span>👤 ${f.name}</span><span>➔</span></div>`).join("");
+        if(!gameState.favorites) gameState.favorites = [];
+        container.innerHTML = gameState.friends.map((f, i) => {
+            const isFav = gameState.favorites.includes(f.id);
+            return `<div class="f-list-item">
+                <div style="flex-grow:1; cursor:pointer;" onclick="openFriendVisit('${f.id}')">
+                    <b style="color:#0b7285; font-size:1rem;">${f.ownerName}の ${f.name}</b><br><small>Lv.${f.level} | 🏠 訪問する</small>
+                </div>
+                <button class="f-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${f.id}')">⭐</button>
+            </div>`;
+        }).join("");
     }
-    window.openFriendDetail = function(i) {
-        const f = gameState.friends[i]; if(!f) return;
-        document.getElementById('f-detail-name').innerText = f.name;
-        document.getElementById('f-detail-level').innerText = `Lv.${f.level}`;
-        document.getElementById('f-detail-coin').innerText = `💰${f.coins}`;
-        document.getElementById('friend-detail-modal').style.display = 'flex';
+
+    window.toggleFav = function(fid) {
+        playSE('click');
+        if(gameState.favorites.includes(fid)) { gameState.favorites = gameState.favorites.filter(id => id !== fid); }
+        else { gameState.favorites.push(fid); }
+        renderFriendList(); saveActiveGame();
     };
-    document.getElementById('close-friend-detail').onclick = () => closeModal('friend-detail-modal');
+    
+    let targetVisitFriendData = null;
+    let targetVisitFriendSave = null;
+    window.openFriendVisit = function(fid) {
+        playSE('click');
+        targetVisitFriendData = gameState.friends.find(f => f.id === fid);
+        if(!targetVisitFriendData) return;
+        
+        const pool = getAccountPool(); targetVisitFriendSave = pool.find(acc => acc.friendId === fid);
+        document.getElementById('visit-f-name').innerText = `${targetVisitFriendData.ownerName} さんのお家`;
+        
+        const amIFavorited = targetVisitFriendSave && targetVisitFriendSave.favorites && targetVisitFriendSave.favorites.includes(gameState.friendId);
+        const didIFavorite = gameState.favorites && gameState.favorites.includes(fid);
+        const btnSend = document.getElementById('btn-send-money');
+        if(amIFavorited && didIFavorite) {
+            document.getElementById('visit-f-name').innerHTML += `<br><span style="color:#e64980; font-size:0.9rem;">💖 ベストフレンド</span>`;
+            btnSend.style.display = 'block';
+        } else { btnSend.style.display = 'none'; }
+        
+        document.getElementById('friend-visit-modal').style.display = 'flex';
+    };
+    document.getElementById('close-visit-modal').onclick = () => { playSE('click'); closeModal('friend-visit-modal'); };
 
-    document.getElementById('drawer-furniture-btn').onclick = () => { sideDrawer.style.display = 'none'; openFurnitureInventoryModal(); };
-    document.getElementById('drawer-bg-btn').onclick = () => { sideDrawer.style.display = 'none'; openBgModal(); };
-    document.getElementById('drawer-save-btn').onclick = () => { sideDrawer.style.display = 'none'; saveActiveGame(true); };
-    document.getElementById('drawer-title-btn').onclick = () => { if(confirm("タイトルへ戻りますか？")) { saveActiveGame(); initTitleScreen(); } };
+    document.getElementById('btn-send-money').onclick = () => {
+        playSE('click');
+        if(gameState.coins < 100) { playSE('error'); return alert("お金が足りません (100コイン必要です)"); }
+        gameState.coins -= 100;
+        
+        let pool = getAccountPool(); let targetIndex = pool.findIndex(a => a.friendId === targetVisitFriendData.id);
+        if(targetIndex !== -1) {
+            pool[targetIndex].coins += 100;
+            localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); 
+        }
+        playSE('coin'); updateUI(); saveActiveGame(); alert("ベストフレンドにお小遣いを100コイン送りました！");
+    };
 
-    function triggerNewWorry() {
-        if (hasWorry) return;
-        currentWorry = worryData[Math.floor(Math.random() * worryData.length)];
-        hasWorry = true;
-        updateUI();
-    }
-    document.getElementById('worry-lamp').onclick = () => {
+    document.getElementById('btn-do-visit').onclick = () => {
+        playSE('click'); closeModal('friend-visit-modal'); closeModal('friend-modal');
+        const aq = document.getElementById('aquarium'); const originalBg = gameState.appearance.bgClass;
+        bgList.forEach(bg => aq.classList.remove(bg.id)); aq.classList.add(targetVisitFriendData.bg || 'bg-room');
+        
+        const charEl = document.getElementById('upa-char');
+        charEl.setAttribute('data-char-type', targetVisitFriendData.app?.type || 'cat');
+        charEl.querySelectorAll('.body-part').forEach(part => part.setAttribute('fill', targetVisitFriendData.app?.bodyColor || '#ffffff'));
+        charEl.querySelectorAll('.gill-part').forEach(part => part.setAttribute('fill', targetVisitFriendData.app?.gillColor || '#ff85a2'));
+        
+        document.getElementById('main-name-label').innerText = targetVisitFriendData.name;
+        document.getElementById('game-title').innerText = `【訪問中】${targetVisitFriendData.ownerName}のお家`;
+        
+        const backBtn = document.createElement('button'); backBtn.id = 'visit-return-btn'; backBtn.innerText = '🏠 自分の家に帰る';
+        backBtn.style.position = 'absolute'; backBtn.style.top = '60px'; backBtn.style.left = '50%'; backBtn.style.transform = 'translateX(-50%)'; backBtn.style.zIndex = '50'; backBtn.style.padding = '12px 24px'; backBtn.style.background = '#fa5252'; backBtn.style.color = 'white'; backBtn.style.border = 'none'; backBtn.style.borderRadius = '24px'; backBtn.style.fontWeight = 'bold'; backBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)'; backBtn.style.cursor = 'pointer';
+        
+        backBtn.onclick = () => { playSE('click'); backBtn.remove(); document.getElementById('game-title').innerText = "悩み解決！育成ゲーム"; updateUI(); };
+        document.getElementById('aquarium').appendChild(backBtn);
+    };
+
+    document.getElementById('drawer-transfer-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('trans-my-id').innerText = gameState.friendId; document.getElementById('trans-my-pass').innerText = gameState.password || "1234"; document.getElementById('transfer-modal').style.display = 'flex'; };
+    document.getElementById('close-transfer-modal').onclick = () => { playSE('click'); closeModal('transfer-modal'); };
+    document.getElementById('btn-change-pass').onclick = () => { playSE('click'); const p = prompt("新しいパスワードを設定", gameState.password); if(p && p.trim()!=="") { gameState.password = p.trim(); document.getElementById('trans-my-pass').innerText = gameState.password; saveActiveGame(); alert("変更しました！"); } };
+    document.getElementById('drawer-trophy-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('trophy-list-container'); container.innerHTML = ''; if(!gameState.trophies || gameState.trophies.length === 0) { container.innerHTML = '<div style="text-align:center; color:#868e96; margin-top:20px;">まだトロフィーを持っていません。</div>'; } else { gameState.trophies.forEach(t => { const div = document.createElement('div'); div.className = 'trophy-item'; div.innerHTML = `<span>🏆</span> <span>${t}</span>`; container.appendChild(div); }); } document.getElementById('trophy-modal').style.display = 'flex'; };
+    document.getElementById('close-trophy-modal').onclick = () => { playSE('click'); closeModal('trophy-modal'); };
+    document.getElementById('drawer-mission-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('mission-list-container'); container.innerHTML = ''; if(!gameState.dailyMissions) gameState.dailyMissions = []; gameState.dailyMissions.forEach(m => { const div = document.createElement('div'); div.className = `mission-item ${m.completed ? 'completed' : ''}`; div.innerHTML = `<span>${m.desc} (${m.current}/${m.target})</span><b>${m.completed ? '✅' : '未達成'}</b>`; container.appendChild(div); }); document.getElementById('mission-modal').style.display = 'flex'; };
+    document.getElementById('close-mission').onclick = () => { playSE('click'); closeModal('mission-modal'); };
+    document.getElementById('drawer-dress-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; const container = document.getElementById('dress-container'); container.innerHTML = ''; gameState.unlockedCostumes.forEach(c => { const btn = document.createElement('button'); btn.className = `type-btn ${gameState.currentCostume === c ? 'active' : ''}`; btn.innerText = c; btn.onclick = () => { playSE('click'); gameState.currentCostume = c; closeModal('dress-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); }); document.getElementById('dress-modal').style.display = 'flex'; };
+    document.getElementById('close-dress').onclick = () => { playSE('click'); closeModal('dress-modal'); };
+    document.getElementById('drawer-furniture-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; openFurnitureInventoryModal(); };
+    document.getElementById('drawer-bg-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; openBgModal(); };
+    document.getElementById('drawer-save-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; saveActiveGame(true); };
+    document.getElementById('drawer-title-btn').onclick = () => { playSE('click'); if(confirm("タイトルへ戻りますか？")) { saveActiveGame(); initTitleScreen(); } };
+
+    function triggerNewWorry() { if (hasWorry) return; currentWorry = worryData[Math.floor(Math.random() * worryData.length)]; hasWorry = true; updateUI(); }
+    document.getElementById('worry-lamp').onclick = (e) => {
+        e.stopPropagation(); playSE('click');
         if (!hasWorry || !currentWorry) return;
-        document.getElementById('modal-worry-title').innerText = `${gameState.name}の相談`;
-        document.getElementById('worry-modal-text').innerText = currentWorry.text;
-        const container = document.getElementById('worry-options-container');
-        container.innerHTML = '';
+        document.getElementById('modal-worry-title').innerText = `${gameState.name}の相談`; document.getElementById('worry-modal-text').innerText = currentWorry.text;
+        const container = document.getElementById('worry-options-container'); container.innerHTML = '';
         currentWorry.options.forEach((opt) => {
-            const btn = document.createElement('button');
-            btn.className = 'option-btn';
-            btn.innerText = opt.text;
+            const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = opt.text;
             btn.onclick = () => {
-                gameState.coins += opt.rewardCoin;
-                gameState.fullness = Math.max(gameState.fullness - 5, 0);
-                logMessage(`💡【解決】${opt.reply}`);
-                gainExp(opt.rewardExp);
-                updateMissionProgress('worry');
-                closeModal('worry-modal');
-                hasWorry = false; currentWorry = null;
-                updateUI();
+                playSE('click');
+                gameState.coins += opt.rewardCoin; gameState.fullness = Math.max(gameState.fullness - 5, 0);
+                logMessage(`💡【解決】${opt.reply}`); gainExp(opt.rewardExp); updateMissionProgress('worry');
+                closeModal('worry-modal'); hasWorry = false; currentWorry = null; updateUI();
             };
             container.appendChild(btn);
         });
@@ -1740,281 +952,281 @@
     };
 
     function openShopModal() { renderFoodShop(); renderBgShop(); renderFurnitureShop(); document.getElementById('shop-modal').style.display = 'flex'; }
-    document.getElementById('tab-food-btn').onclick = () => switchShopTab('tab-food-btn', 'shop-food-pane');
-    document.getElementById('tab-bg-btn').onclick = () => switchShopTab('tab-bg-btn', 'shop-bg-pane');
-    document.getElementById('tab-furni-btn').onclick = () => switchShopTab('tab-furni-btn', 'shop-furni-pane');
-    function switchShopTab(btnId, paneId) {
-        document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.shop-pane').forEach(p => p.style.display = 'none');
-        document.getElementById(btnId).classList.add('active');
-        document.getElementById(paneId).style.display = 'block';
-    }
-    function renderFoodShop() {
-        const container = document.getElementById('shop-food-pane'); container.innerHTML = '';
-        for (const [key, item] of Object.entries(foodData)) {
-            const btn = document.createElement('button'); btn.className = 'shop-item-btn';
-            btn.innerHTML = `<div class="shop-item-info"><span>${item.name}</span><span class="item-cost">${item.cost}💰</span></div>`;
-            btn.onclick = () => askPurchaseCount(key, 'food');
-            container.appendChild(btn);
-        }
-    }
-    function renderBgShop() {
-        const container = document.getElementById('shop-bg-list'); container.innerHTML = '';
-        bgList.forEach(bg => {
-            const owned = gameState.unlockedBgs.includes(bg.id);
-            const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.disabled = owned;
-            btn.innerHTML = `<div class="shop-item-info"><span>${bg.name}</span>${owned ? '<span class="item-owned">解放済</span>' : `<span class="item-cost">${bg.cost}💰</span>`}</div>`;
-            if(!owned) btn.onclick = () => { if(gameState.coins >= bg.cost) { gameState.coins -= bg.cost; gameState.unlockedBgs.push(bg.id); updateUI(); saveActiveGame(); renderBgShop(); } };
-            container.appendChild(btn);
-        });
-    }
-    document.getElementById('custom-bg-uploader').onchange = (e) => {
-        const file = e.target.files[0]; if(!file) return;
-        const reader = new FileReader();
-        reader.onload = (evt) => { gameState.customBgData = evt.target.result; gameState.appearance.bgClass = "custom-bg"; updateUI(); saveActiveGame(); };
-        reader.readAsDataURL(file);
-    };
-    function renderFurnitureShop() {
-        const container = document.getElementById('shop-furni-pane'); container.innerHTML = '';
-        for (const [key, f] of Object.entries(furnitureData)) {
-            const btn = document.createElement('button'); btn.className = 'shop-item-btn';
-            btn.innerHTML = `<div class="shop-item-info"><span>${f.emoji} ${f.name}</span><span class="item-cost">${f.cost}💰</span></div>`;
-            btn.onclick = () => askPurchaseCount(key, 'furniture');
-            container.appendChild(btn);
-        }
-    }
-    function askPurchaseCount(key, type) {
-        const item = type === 'food' ? foodData[key] : furnitureData[key];
-        const count = parseInt(prompt(`「${item.name}」をいくつ購入しますか？`, "1"));
-        if(isNaN(count) || count <= 0) return;
-        const total = item.cost * count;
-        if(gameState.coins >= total) {
-            gameState.coins -= total;
-            if(type === 'food') gameState.inventory[key] = (gameState.inventory[key] || 0) + count;
-            else gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + count;
-            updateUI(); saveActiveGame(); openShopModal();
-        } else alert("コインが足りません");
-    }
+    document.getElementById('tab-food-btn').onclick = () => { playSE('click'); switchShopTab('tab-food-btn', 'shop-food-pane'); };
+    document.getElementById('tab-bg-btn').onclick = () => { playSE('click'); switchShopTab('tab-bg-btn', 'shop-bg-pane'); };
+    document.getElementById('tab-furni-btn').onclick = () => { playSE('click'); switchShopTab('tab-furni-btn', 'shop-furni-pane'); };
+    function switchShopTab(btnId, paneId) { document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active')); document.querySelectorAll('.shop-pane').forEach(p => p.style.display = 'none'); document.getElementById(btnId).classList.add('active'); document.getElementById(paneId).style.display = 'block'; }
+    function renderFoodShop() { const container = document.getElementById('shop-food-pane'); container.innerHTML = ''; for (const [key, item] of Object.entries(foodData)) { const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${item.name}</span><span class="item-cost">${item.cost}💰</span></div>`; btn.onclick = () => askPurchaseCount(key, 'food'); container.appendChild(btn); } }
+    function renderBgShop() { const container = document.getElementById('shop-bg-list'); container.innerHTML = ''; bgList.forEach(bg => { const owned = gameState.unlockedBgs.includes(bg.id); const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.disabled = owned; btn.innerHTML = `<div class="shop-item-info"><span>${bg.name}</span>${owned ? '<span class="item-owned">解放済</span>' : `<span class="item-cost">${bg.cost}💰</span>`}</div>`; if(!owned) btn.onclick = () => { playSE('click'); if(gameState.coins >= bg.cost) { gameState.coins -= bg.cost; gameState.unlockedBgs.push(bg.id); updateUI(); saveActiveGame(); renderBgShop(); playSE('coin'); } else { playSE('error'); alert("コインが足りません"); } }; container.appendChild(btn); }); }
+    document.getElementById('custom-bg-uploader').onchange = (e) => { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (evt) => { gameState.customBgData = evt.target.result; gameState.appearance.bgClass = "custom-bg"; updateUI(); saveActiveGame(); }; reader.readAsDataURL(file); };
+    function renderFurnitureShop() { const container = document.getElementById('shop-furni-pane'); container.innerHTML = ''; for (const [key, f] of Object.entries(furnitureData)) { const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${f.emoji} ${f.name}</span><span class="item-cost">${f.cost}💰</span></div>`; btn.onclick = () => askPurchaseCount(key, 'furniture'); container.appendChild(btn); } }
+    function askPurchaseCount(key, type) { playSE('click'); const item = type === 'food' ? foodData[key] : furnitureData[key]; const count = parseInt(prompt(`「${item.name}」をいくつ購入しますか？`, "1")); if(isNaN(count) || count <= 0) return; const total = item.cost * count; if(gameState.coins >= total) { playSE('coin'); gameState.coins -= total; if(type === 'food') gameState.inventory[key] = (gameState.inventory[key] || 0) + count; else gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + count; updateUI(); saveActiveGame(); openShopModal(); } else { playSE('error'); alert("コインが足りません"); } }
 
-    function openFurnitureInventoryModal() {
-        const container = document.getElementById('furniture-inv-container'); container.innerHTML = '';
-        for (const [key, qty] of Object.entries(gameState.furnitureInventory)) {
-            if(qty > 0) {
-                const f = furnitureData[key]; const btn = document.createElement('button'); btn.className = 'type-btn';
-                btn.innerHTML = `${f.emoji}<br>${f.name}(${qty})`;
-                btn.onclick = () => {
-                    gameState.furnitureInventory[key]--;
-                    gameState.placedFurniture.push({ id: "f-"+Date.now(), key: key, emoji: f.emoji, x: 100, y: 150 });
-                    closeModal('furniture-inventory-modal'); updateUI(); saveActiveGame();
-                };
-                container.appendChild(btn);
-            }
-        }
-        document.getElementById('furniture-inventory-modal').style.display = 'flex';
-    }
-    function renderPlacedFurniture() {
-        const layer = document.getElementById('furniture-placement-layer'); layer.innerHTML = '';
-        if(!gameState.placedFurniture) gameState.placedFurniture = [];
-        gameState.placedFurniture.forEach(f => {
-            const div = document.createElement('div'); div.className = 'placed-furniture'; div.innerText = f.emoji;
-            div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; div.style.pointerEvents = 'auto';
-            let drag = false; let sx, sy;
-            const start = (cx, cy) => { drag = true; div.classList.add('editing'); sx = cx - div.offsetLeft; sy = cy - div.offsetTop; };
-            const move = (cx, cy) => { if(!drag) return; f.x = cx - sx; f.y = cy - sy; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; };
-            const end = () => { if(drag) { drag = false; div.classList.remove('editing'); saveActiveGame(); } };
-            div.onmousedown = (e) => { start(e.clientX, e.clientY); e.stopPropagation(); };
-            window.onmousemove = (e) => move(e.clientX, e.clientY); window.onmouseup = end;
-            div.ontouchstart = (e) => { start(e.touches[0].clientX, e.touches[0].clientY); e.stopPropagation(); };
-            window.ontouchmove = (e) => { if(drag) move(e.touches[0].clientX, e.touches[0].clientY); }; window.ontouchend = end;
-            let lt = 0;
-            div.onclick = (e) => {
-                let now = Date.now();
-                if(now - lt < 300) {
-                    gameState.furnitureInventory[f.key] = (gameState.furnitureInventory[f.key] || 0) + 1;
-                    gameState.placedFurniture = gameState.placedFurniture.filter(x => x.id !== f.id);
-                    updateUI(); saveActiveGame();
-                }
-                lt = now; e.stopPropagation();
-            };
-            layer.appendChild(div);
-        });
-    }
+    function openFurnitureInventoryModal() { const container = document.getElementById('furniture-inv-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.furnitureInventory)) { if(qty > 0) { const f = furnitureData[key]; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerHTML = `${f.emoji}<br>${f.name}(${qty})`; btn.onclick = () => { playSE('click'); gameState.furnitureInventory[key]--; gameState.placedFurniture.push({ id: "f-"+Date.now(), key: key, emoji: f.emoji, x: 100, y: 150 }); closeModal('furniture-inventory-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); } } document.getElementById('furniture-inventory-modal').style.display = 'flex'; }
+    function renderPlacedFurniture() { const layer = document.getElementById('furniture-placement-layer'); layer.innerHTML = ''; if(!gameState.placedFurniture) gameState.placedFurniture = []; gameState.placedFurniture.forEach(f => { const div = document.createElement('div'); div.className = 'placed-furniture'; div.innerText = f.emoji; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; div.style.pointerEvents = 'auto'; let drag = false; let sx, sy; const start = (cx, cy) => { drag = true; div.classList.add('editing'); sx = cx - div.offsetLeft; sy = cy - div.offsetTop; }; const move = (cx, cy) => { if(!drag) return; f.x = cx - sx; f.y = cy - sy; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; }; const end = () => { if(drag) { drag = false; div.classList.remove('editing'); saveActiveGame(); } }; div.onmousedown = (e) => { start(e.clientX, e.clientY); e.stopPropagation(); }; window.onmousemove = (e) => move(e.clientX, e.clientY); window.onmouseup = end; div.ontouchstart = (e) => { start(e.touches[0].clientX, e.touches[0].clientY); e.stopPropagation(); }; window.ontouchmove = (e) => { if(drag) move(e.touches[0].clientX, e.touches[0].clientY); }; window.ontouchend = end; let lt = 0; div.onclick = (e) => { let now = Date.now(); if(now - lt < 300) { playSE('click'); gameState.furnitureInventory[f.key] = (gameState.furnitureInventory[f.key] || 0) + 1; gameState.placedFurniture = gameState.placedFurniture.filter(x => x.id !== f.id); updateUI(); saveActiveGame(); } lt = now; e.stopPropagation(); }; layer.appendChild(div); }); }
 
-    function openBagModal() {
-        const container = document.getElementById('bag-container'); container.innerHTML = '';
-        for (const [key, qty] of Object.entries(gameState.inventory)) {
-            if(qty > 0) {
-                const item = foodData[key]; const btn = document.createElement('button'); btn.className = 'shop-item-btn';
-                btn.innerHTML = `<div class="shop-item-info"><span>${item.name} (${qty}個)</span><span class="item-owned">あげる</span></div>`;
-                btn.onclick = () => {
-                    if(gameState.fullness >= 100) return alert("お腹いっぱいです");
-                    gameState.inventory[key]--; gameState.fullness = Math.min(gameState.fullness + item.full, 100);
-                    if(!gameState.totalFeeds) gameState.totalFeeds = 0;
-                    gameState.totalFeeds++;
-                    logMessage("🍖 ごはんをあげました！"); gainExp(item.exp); updateMissionProgress('feed');
-                    closeModal('bag-modal'); updateUI();
-                };
-                container.appendChild(btn);
-            }
-        }
-        document.getElementById('bag-modal').style.display = 'flex';
-    }
-
-    function openBgModal() {
-        const container = document.getElementById('bg-container'); container.innerHTML = '';
-        bgList.forEach(bg => {
-            if(!gameState.unlockedBgs.includes(bg.id)) return;
-            const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = bg.name;
-            btn.onclick = () => { gameState.appearance.bgClass = bg.id; closeModal('bg-modal'); updateUI(); saveActiveGame(); };
-            container.appendChild(btn);
-        });
-        document.getElementById('bg-modal').style.display = 'flex';
-    }
+    function openBagModal() { const container = document.getElementById('bag-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.inventory)) { if(qty > 0) { const item = foodData[key]; const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${item.name} (${qty}個)</span><span class="item-owned">あげる</span></div>`; btn.onclick = () => { playSE('click'); if(gameState.fullness >= 100) { playSE('error'); return alert("お腹いっぱいです"); } gameState.inventory[key]--; gameState.fullness = Math.min(gameState.fullness + item.full, 100); if(!gameState.totalFeeds) gameState.totalFeeds = 0; gameState.totalFeeds++; logMessage(`🍖 ${item.name} をあげました！`); gainExp(item.exp); updateMissionProgress('feed'); closeModal('bag-modal'); updateUI(); }; container.appendChild(btn); } } document.getElementById('bag-modal').style.display = 'flex'; }
+    function openBgModal() { const container = document.getElementById('bg-container'); container.innerHTML = ''; bgList.forEach(bg => { if(!gameState.unlockedBgs.includes(bg.id)) return; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = bg.name; btn.onclick = () => { playSE('click'); gameState.appearance.bgClass = bg.id; closeModal('bg-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); }); document.getElementById('bg-modal').style.display = 'flex'; }
 
     function openMakeModal() { document.getElementById('make-modal').style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     
     function gainExp(amt) {
-        if(gameState.level >= 255) return;
+        if(gameState.level >= 12) return;
         gameState.exp += amt;
-        while(gameState.exp >= gameState.maxExp && gameState.level < 255) {
-            gameState.level++; 
-            gameState.exp -= gameState.maxExp; 
-            gameState.maxExp = Math.floor(gameState.maxExp * 1.8);
+        while(gameState.exp >= gameState.maxExp && gameState.level < 12) {
+            gameState.level++; gameState.exp -= gameState.maxExp; gameState.maxExp = Math.floor(gameState.maxExp * 1.8);
             logMessage(`🎉 レベルアップ！ Lv.${gameState.level}`, true);
-            
-            if (gameState.level % 5 === 0) {
-                if(!gameState.trophies) gameState.trophies = [];
-                const tName = `レベル${gameState.level}到達記念`;
-                if(!gameState.trophies.includes(tName)) {
-                    gameState.trophies.push(tName);
-                    setTimeout(() => alert(`🏆 新しいトロフィーを獲得しました！\n「${tName}」`), 500);
-                }
+            if (gameState.level === 12) {
+                if(!gameState.trophies) gameState.trophies = []; const tName = `最大レベル到達記念`;
+                if(!gameState.trophies.includes(tName)) { gameState.trophies.push(tName); setTimeout(() => alert(`🏆 新しいトロフィーを獲得しました！\n「${tName}」`), 500); }
             }
         }
-        if(gameState.level >= 255) {
-            gameState.level = 255;
-            gameState.exp = gameState.maxExp;
-        }
+        if(gameState.level >= 12) { gameState.level = 12; gameState.exp = gameState.maxExp; }
         updateUI(); saveActiveGame();
     }
 
-    function startMinigame(id, name) {
-        document.getElementById('minigame-header-title').innerText = name;
-        document.getElementById('minigame-menu-view').style.display = 'none';
-        document.getElementById('minigame-play-view').style.display = 'block';
-        updateMissionProgress('game');
-        if(!gameState.totalMinigames) gameState.totalMinigames = 0;
-        gameState.totalMinigames++;
-        
-        const arena = document.getElementById('minigame-arena'); arena.innerHTML = '';
-
-        if(id === "omikuji") {
-            arena.innerHTML = `<button class="start-btn" id="g-omi-btn">おみくじを引く</button>`;
-            document.getElementById('g-omi-btn').onclick = () => {
-                arena.innerHTML = `<h3>結果: 大吉🌟</h3><p>30コイン と 10 EXP を獲得！</p>`;
-                endGamePayout(30, 10);
-            };
-        }
-        else if(id === "clicker") {
-            let count = 0, sec = 10, t = null;
-            arena.innerHTML = `<p>残り: <b id="g-c-time">10</b>秒</p><button class="start-btn" id="g-c-btn">連打！ (<span id="g-c-score">0</span>)</button>`;
-            document.getElementById('g-c-btn').onclick = () => {
-                if(!t) { t = setInterval(() => { sec--; document.getElementById('g-c-time').innerText = sec; if(sec<=0){ clearInterval(t); arena.innerHTML=`<h3>終了!</h3><p>叩いた数: ${count}</p>`; endGamePayout(count*2, 5); } }, 1000); }
-                count++; document.getElementById('g-c-score').innerText = count;
-            };
-        }
-        else if(id === "highlow") {
-            let cur = 5; arena.innerHTML = `<p>現在の数: <b>${cur}</b></p><button class="type-btn" id="hl-h">HIGH</button> <button class="type-btn" id="hl-l">LOW</button>`;
-            const hl = (h) => { let n = 7; arena.innerHTML = `<h3>次の数: ${n}</h3><p>正解！ +30💰</p>`; endGamePayout(30, 5); };
-            document.getElementById('hl-h').onclick = () => hl(true); document.getElementById('hl-l').onclick = () => hl(false);
-        }
-        else if(id === "janken") {
-            arena.innerHTML = `<button class="type-btn" id="jk-btn">✊ グーを出して勝負！</button>`;
-            document.getElementById('jk-btn').onclick = () => { arena.innerHTML = `<h3>勝ち！🎉</h3><p>+30💰 獲得</p>`; endGamePayout(30, 5); };
-        }
-        else if(id === "math") {
-            arena.innerHTML = `<p>3 + 5 = ?</p><button class="type-btn" id="m-btn">8</button>`;
-            document.getElementById('m-btn').onclick = () => { arena.innerHTML = `<h3>正解！💮</h3>`; endGamePayout(30, 5); };
-        }
-        else if(id === "reflex") {
-            arena.innerHTML = `<button class="start-btn" id="rf-btn">🟢 今だ！タップ！</button>`;
-            document.getElementById('rf-btn').onclick = () => { arena.innerHTML = `<h3>ナイス反射神経！</h3>`; endGamePayout(35, 5); };
-        }
-        else if(id === "typing") {
-            arena.innerHTML = `<p>「UPA」と入力</p><input type="text" id="t-in" class="name-input-box">`;
-            document.getElementById('t-in').oninput = (e) => { if(e.target.value.toUpperCase()==="UPA"){ arena.innerHTML=`<h3>クリア！</h3>`; endGamePayout(30, 5); } };
-        }
-        else if(id === "color") {
-            arena.innerHTML = `<h1 style="color:red;">あか</h1><button class="type-btn" id="c-y">〇 一致</button>`;
-            document.getElementById('c-y').onclick = () => { arena.innerHTML = `<h3>正解！</h3>`; endGamePayout(30, 5); };
-        }
-        else if(id === "findupa") {
-            arena.innerHTML = `<button class="type-btn" id="f-0">📦 こっちの箱</button>`;
-            document.getElementById('f-0').onclick = () => { arena.innerHTML = `<h3>見つけた！🎉</h3>`; endGamePayout(35, 5); };
-        }
-        else if(id === "dice") {
-            arena.innerHTML = `<button class="start-btn" id="d-btn">🎲 振る</button>`;
-            document.getElementById('d-btn').onclick = () => { arena.innerHTML = `<h3>🎲【5】【5】 ゾロ目！</h3>`; endGamePayout(50, 10); };
-        }
-    }
-
-    function endGamePayout(c, e) { gameState.coins += c; updateUI(); gainExp(e); saveActiveGame(); }
-
+    // --- ミニゲーム ---
     document.getElementById('btn-minigame').onclick = () => {
-        document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場";
-        document.getElementById('minigame-menu-view').style.display = 'grid';
-        document.getElementById('minigame-play-view').style.display = 'none';
+        playSE('click');
+        document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場"; document.getElementById('minigame-menu-view').style.display = 'grid'; document.getElementById('minigame-play-view').style.display = 'none';
         const menu = document.getElementById('minigame-menu-view'); menu.innerHTML = '';
         minigames.forEach(g => {
             const btn = document.createElement('button'); btn.className = 'option-btn';
-            btn.innerHTML = `<b>${g.name}</b><br><small>${g.desc}</small>`;
-            btn.onclick = () => startMinigame(g.id, g.name); container = menu.appendChild(btn);
+            btn.innerHTML = `<b style="color:#0b7285;">${g.name}</b><br><small>${g.desc}</small>`;
+            btn.onclick = () => startMinigame(g.id, g.name); menu.appendChild(btn);
         });
         document.getElementById('minigame-modal').style.display = 'flex';
     };
-    document.getElementById('close-minigame').onclick = () => closeModal('minigame-modal');
-    document.getElementById('btn-abort-game').onclick = () => { document.getElementById('minigame-menu-view').style.display = 'grid'; document.getElementById('minigame-play-view').style.display = 'none'; };
+    document.getElementById('close-minigame').onclick = () => { playSE('click'); closeModal('minigame-modal'); };
+    
+    let activeGameTimer = null;
+    document.getElementById('btn-abort-game').onclick = () => {
+        playSE('click');
+        if(activeGameTimer) { clearInterval(activeGameTimer); activeGameTimer = null; }
+        document.getElementById('minigame-menu-view').style.display = 'grid'; document.getElementById('minigame-play-view').style.display = 'none'; document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場";
+    };
 
-    // --- 各種イベントリスナー登録 ---
+    function startMinigame(id, name) {
+        playSE('click');
+        document.getElementById('minigame-header-title').innerText = name; document.getElementById('minigame-menu-view').style.display = 'none'; document.getElementById('minigame-play-view').style.display = 'block';
+        updateMissionProgress('game');
+        if(!gameState.totalMinigames) gameState.totalMinigames = 0; gameState.totalMinigames++;
+        if(!gameState.minigameStats[id]) gameState.minigameStats[id] = { plays: 0, highscore: 0 };
+        gameState.minigameStats[id].plays++;
+        
+        const arena = document.getElementById('minigame-arena'); arena.innerHTML = '';
+
+        if(id === "mole") {
+            let score = 0, time = 15;
+            arena.innerHTML = `<h3>残り: <span id="m-time">15</span>秒</h3><div style="height:200px; position:relative; background:#f1f3f5; border-radius:10px; overflow:hidden;" id="mole-field"></div><p>Score: <span id="m-score">0</span></p>`;
+            const field = document.getElementById('mole-field');
+            const spawnMole = () => {
+                const mole = document.createElement('div'); mole.innerText = "🐙"; mole.style.fontSize = "2.5rem"; mole.style.position = "absolute";
+                mole.style.left = Math.random() * 80 + "%"; mole.style.top = Math.random() * 80 + "%"; mole.style.cursor = "pointer";
+                mole.onmousedown = () => { playSE('click'); score++; document.getElementById('m-score').innerText = score; mole.remove(); };
+                field.appendChild(mole); setTimeout(() => mole.remove(), 800);
+            };
+            activeGameTimer = setInterval(() => { time--; document.getElementById('m-time').innerText = time; spawnMole(); if(time<=0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}</p>`; endGamePayout(id, score, score*5, 10); } }, 1000);
+        }
+        else if(id === "memory") {
+            const icons = ["🍎","🍎","🍌","🍌","🍇","🍇","🍉","🍉"]; icons.sort(() => Math.random() - 0.5);
+            let first = null, lock = false, matched = 0, score = 100;
+            arena.innerHTML = `<h3 style="margin-bottom:10px;">神経衰弱</h3><div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:10px;" id="memory-field"></div><p style="margin-top:10px;">Score: <span id="mem-score">100</span></p>`;
+            const field = document.getElementById('memory-field');
+            icons.forEach((icon, i) => {
+                const card = document.createElement('div');
+                card.style = "background:#ced4da; height:60px; display:flex; justify-content:center; align-items:center; font-size:2rem; border-radius:8px; cursor:pointer;";
+                card.dataset.val = icon; card.dataset.idx = i;
+                card.onclick = () => {
+                    if (lock || card.innerText !== "" || card.dataset.matched === "1") return;
+                    playSE('click'); card.innerText = icon; card.style.background = "#fff3bf";
+                    if (!first) { first = card; }
+                    else {
+                        lock = true;
+                        if (first.dataset.val === icon) {
+                            first.dataset.matched = "1"; card.dataset.matched = "1";
+                            first.style.background = "#d3f9d8"; card.style.background = "#d3f9d8";
+                            matched++; first = null; lock = false;
+                            if (matched === icons.length / 2) {
+                                setTimeout(() => { arena.innerHTML = `<h3>クリア！</h3><p>記録: ${score}</p>`; endGamePayout(id, score, score, 15); }, 500);
+                            }
+                        } else {
+                            score = Math.max(0, score - 10); document.getElementById('mem-score').innerText = score;
+                            setTimeout(() => { first.innerText = ""; card.innerText = ""; first.style.background = "#ced4da"; card.style.background = "#ced4da"; first = null; lock = false; }, 800);
+                        }
+                    }
+                };
+                field.appendChild(card);
+            });
+        }
+        else if(id === "stop") {
+            let pos = 0, dir = 1;
+            arena.innerHTML = `<h3>ジャストストップ</h3><p>赤いラインで止めろ！</p><div style="width:100%; height:30px; background:#e9ecef; position:relative; margin:20px 0; border-radius:15px; overflow:hidden;"><div style="position:absolute; left:48%; width:4%; height:100%; background:#fa5252; opacity:0.5; z-index:1;"></div><div id="stop-bar" style="width:20px; height:100%; background:#15aabf; position:absolute; left:0; z-index:2; border-radius:10px;"></div></div><button class="start-btn" id="stop-btn">ストップ！</button>`;
+            activeGameTimer = setInterval(() => {
+                pos += dir * 3; if (pos > 95 || pos < 0) dir *= -1;
+                document.getElementById('stop-bar').style.left = pos + "%";
+            }, 20);
+            document.getElementById('stop-btn').onclick = () => {
+                playSE('click'); clearInterval(activeGameTimer);
+                const diff = Math.abs(pos - 48); let score = 0;
+                if (diff < 2) score = 100; else if (diff < 10) score = 50; else if (diff < 20) score = 20; else score = 5;
+                arena.innerHTML = `<h3>結果: ${score}点！</h3><p>ズレ: ${Math.floor(diff)}</p>`;
+                endGamePayout(id, score, score, 10);
+            };
+        }
+        else if(id === "slot") {
+            const sym = ["🍎", "🍖", "⭐", "💰"];
+            arena.innerHTML = `<h3>スロット</h3><div style="font-size:3rem; margin:20px 0; display:flex; justify-content:center; gap:10px;"><div id="s1">❓</div><div id="s2">❓</div><div id="s3">❓</div></div><button class="start-btn" id="slot-btn">回す！</button>`;
+            document.getElementById('slot-btn').onclick = () => {
+                playSE('click'); document.getElementById('slot-btn').style.display = 'none';
+                let t = 0;
+                activeGameTimer = setInterval(() => {
+                    document.getElementById('s1').innerText = sym[Math.floor(Math.random()*sym.length)];
+                    document.getElementById('s2').innerText = sym[Math.floor(Math.random()*sym.length)];
+                    document.getElementById('s3').innerText = sym[Math.floor(Math.random()*sym.length)];
+                    t++;
+                    if (t > 15) {
+                        clearInterval(activeGameTimer);
+                        const r1 = sym[Math.floor(Math.random()*sym.length)];
+                        const r2 = sym[Math.floor(Math.random()*sym.length)];
+                        const r3 = sym[Math.floor(Math.random()*sym.length)];
+                        document.getElementById('s1').innerText = r1; document.getElementById('s2').innerText = r2; document.getElementById('s3').innerText = r3;
+                        let score = 0;
+                        if (r1 === r2 && r2 === r3) score = 150; else if (r1 === r2 || r2 === r3 || r1 === r3) score = 30; else score = 5;
+                        arena.innerHTML += `<h3 style="margin-top:15px;">結果: ${score}点</h3>`;
+                        endGamePayout(id, score, score, 5);
+                    }
+                }, 50);
+            };
+        }
+        else if(id === "math") {
+            let score = 0, time = 5; let ans = 0;
+            arena.innerHTML = `<h3>限界計算サバイバル</h3><p>残り: <span id="math-time">5</span>秒</p><div style="font-size:2rem; font-weight:bold; margin:20px 0;" id="math-q"></div><div style="display:flex; gap:10px;" id="math-opts"></div><p>Score: <span id="math-score">0</span></p>`;
+            const genQ = () => {
+                const a = Math.floor(Math.random()*20)+1; const b = Math.floor(Math.random()*20)+1;
+                const op = Math.random() > 0.5 ? "+" : "-";
+                ans = op === "+" ? a + b : a - b;
+                document.getElementById('math-q').innerText = `${a} ${op} ${b} = ?`;
+                const opts = [ans, ans+Math.floor(Math.random()*5)+1, ans-Math.floor(Math.random()*5)-1]; opts.sort(() => Math.random() - 0.5);
+                const optsDiv = document.getElementById('math-opts'); optsDiv.innerHTML = '';
+                opts.forEach(o => {
+                    const btn = document.createElement('button'); btn.className = 'option-btn'; btn.innerText = o;
+                    btn.onclick = () => {
+                        if (o === ans) { playSE('click'); score += 10; time += 2; document.getElementById('math-score').innerText = score; genQ(); }
+                        else { playSE('error'); time -= 3; document.getElementById('math-time').innerText = time; }
+                    };
+                    optsDiv.appendChild(btn);
+                });
+            };
+            genQ();
+            activeGameTimer = setInterval(() => {
+                time--; document.getElementById('math-time').innerText = time;
+                if (time <= 0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}</p>`; endGamePayout(id, score, score, score/2); }
+            }, 1000);
+        }
+        else if(id === "clicker") {
+            let score = 0, time = 10;
+            arena.innerHTML = `<h3>10秒連打ラッシュ</h3><p>残り: <span id="clk-time">10</span>秒</p><button id="clk-btn" style="width:150px; height:150px; border-radius:50%; background:#ff922b; color:white; font-size:3rem; border:none; margin:20px auto; display:block; box-shadow:0 10px 0 #d9480f; cursor:pointer;">TAP</button><p>Score: <span id="clk-score">0</span></p>`;
+            document.getElementById('clk-btn').onclick = () => { playSE('click'); score++; document.getElementById('clk-score').innerText = score; };
+            activeGameTimer = setInterval(() => {
+                time--; document.getElementById('clk-time').innerText = time;
+                if(time <= 0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}回</p>`; endGamePayout(id, score, score*2, 20); }
+            }, 1000);
+        }
+        else if(id === "catch") {
+            let score = 0, time = 15; let playerX = 40;
+            arena.innerHTML = `<h3>リンゴキャッチ🍎</h3><p>残り: <span id="catch-time">15</span>秒</p><div id="catch-field" style="width:100%; height:200px; background:#e3fafc; position:relative; overflow:hidden; border-radius:12px; border:2px solid #15aabf;">
+                <div id="catch-player" style="position:absolute; bottom:5px; left:${playerX}%; font-size:2rem; transition:left 0.1s;">🧺</div>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:10px;">
+                <button class="option-btn" id="btn-left" style="width:45%; margin-bottom:0;">◀ 左</button>
+                <button class="option-btn" id="btn-right" style="width:45%; margin-bottom:0;">右 ▶</button>
+            </div>
+            <p style="margin-top:10px;">Score: <span id="catch-score">0</span></p>`;
+            
+            const field = document.getElementById('catch-field');
+            const player = document.getElementById('catch-player');
+            
+            const movePlayer = (dir) => { playerX += dir * 15; if(playerX < 0) playerX = 0; if(playerX > 85) playerX = 85; player.style.left = playerX + "%"; };
+            document.getElementById('btn-left').onclick = () => movePlayer(-1);
+            document.getElementById('btn-right').onclick = () => movePlayer(1);
+            
+            let items = [];
+            const spawnItem = () => {
+                const isBomb = Math.random() > 0.8;
+                const item = document.createElement('div');
+                item.innerText = isBomb ? "💣" : "🍎";
+                item.style.position = "absolute"; item.style.top = "0px"; item.style.left = Math.floor(Math.random() * 85) + "%"; item.style.fontSize = "1.5rem";
+                field.appendChild(item); items.push({el: item, y: 0, isBomb: isBomb});
+            };
+            
+            activeGameTimer = setInterval(() => {
+                time -= 0.1; 
+                if(Math.floor(time * 10) % 10 === 0) document.getElementById('catch-time').innerText = Math.ceil(time);
+                if(Math.random() < 0.15) spawnItem();
+                
+                for(let i=items.length-1; i>=0; i--) {
+                    let it = items[i]; it.y += 10; it.el.style.top = it.y + "px";
+                    if(it.y > 160 && it.y < 190) {
+                        let itemX = parseFloat(it.el.style.left);
+                        if(Math.abs(itemX - playerX) < 15) {
+                            if(it.isBomb) { playSE('error'); score = Math.max(0, score - 5); } else { playSE('coin'); score += 1; }
+                            document.getElementById('catch-score').innerText = score;
+                            it.el.remove(); items.splice(i, 1); continue;
+                        }
+                    }
+                    if(it.y > 200) { it.el.remove(); items.splice(i, 1); }
+                }
+
+                if(time <= 0) { clearInterval(activeGameTimer); arena.innerHTML = `<h3>終了！</h3><p>記録: ${score}個</p>`; endGamePayout(id, score, score*3, 15); }
+            }, 100);
+        }
+    }
+
+    function endGamePayout(id, score, coinReward, expReward) {
+        if(score > gameState.minigameStats[id].highscore) gameState.minigameStats[id].highscore = score;
+        gameState.coins += Math.floor(coinReward); gainExp(Math.floor(expReward));
+        document.getElementById('minigame-arena').innerHTML += `<p style="color:#d9480f; font-weight:bold; margin-top:10px;">報酬: 💰${Math.floor(coinReward)} / ✨${Math.floor(expReward)}EXP</p>`;
+        saveActiveGame();
+    }
+
+    // ボタン類の初期化
+    document.getElementById('btn-shop').onclick = () => { playSE('click'); openShopModal(); };
+    document.getElementById('btn-bag').onclick = () => { playSE('click'); openBagModal(); };
+    document.getElementById('close-shop').onclick = () => { playSE('click'); closeModal('shop-modal'); };
+    document.getElementById('close-bag').onclick = () => { playSE('click'); closeModal('bag-modal'); };
+    document.getElementById('close-bg-modal').onclick = () => { playSE('click'); closeModal('bg-modal'); };
+    document.getElementById('close-make').onclick = () => { playSE('click'); closeModal('make-modal'); updateUI(); saveActiveGame(); };
+
+    // スタート
+    document.getElementById('btn-start-game').onclick = () => {
+        playSE('click'); const ownerInput = document.getElementById('init-owner-name-input').value.trim(); const nameInput = document.getElementById('init-name-input').value.trim();
+        gameState.ownerName = ownerInput || "あなた"; gameState.name = nameInput || "ウパのココロ";
+        gameState.appearance.type = document.querySelector('#init-char-types .type-btn.active').getAttribute('data-type');
+        gameState.appearance.bodyColor = document.getElementById('init-body-color-picker').value; gameState.appearance.gillColor = document.getElementById('init-gill-color-picker').value;
+        document.getElementById('welcome-screen').style.display = 'none';
+        document.getElementById('game-slot-indicator').innerText = `Slot ${currentSlotIndex+1}`;
+        checkLoginStreakAndMissions(); updateUI(); saveActiveGame(true);
+    };
+
+    document.querySelectorAll('#init-char-types .type-btn').forEach(btn => {
+        btn.onclick = (e) => {
+            document.querySelectorAll('#init-char-types .type-btn').forEach(b => b.classList.remove('active')); e.target.classList.add('active');
+            const type = e.target.getAttribute('data-type');
+            const preview = document.getElementById('preview-char');
+            preview.setAttribute('data-char-type', type);
+        };
+    });
+
+    document.getElementById('init-body-color-picker').oninput = (e) => { document.querySelectorAll('#preview-char .body-part').forEach(p => p.setAttribute('fill', e.target.value)); };
+    document.getElementById('init-gill-color-picker').oninput = (e) => { document.querySelectorAll('#preview-char .gill-part').forEach(p => p.setAttribute('fill', e.target.value)); };
+
+    // ロード時に実行
     document.getElementById('upa-char').innerHTML = SVG_TEMPLATE;
     document.getElementById('preview-char').innerHTML = SVG_TEMPLATE;
-    document.getElementById('btn-shop').onclick = openShopModal;
-    document.getElementById('btn-bag').onclick = openBagModal;
-    document.getElementById('btn-start-game').onclick = () => {
-        const v = document.getElementById('init-name-input').value.trim(); if(!v) return;
-        gameState.name = v.substring(0,12); document.getElementById('welcome-screen').style.display = 'none';
-        checkLoginStreakAndMissions(); saveActiveGame(); updateUI();
-        setTimeout(() => { moveCharacter(120, 180, 0); }, 100);
-    };
-    document.getElementById('game-title').onclick = () => { const n = prompt("なまえの変更:", gameState.name); if(n && n.trim()!=="") { gameState.name = n.trim().substring(0,12); updateUI(); saveActiveGame(); } };
-    document.getElementById('char-wrapper').onclick = (e) => { if(e.target.id !== 'worry-lamp') openMakeModal(); };
-    document.getElementById('close-make').onclick = () => { closeModal('make-modal'); saveActiveGame(); };
-    document.getElementById('close-shop').onclick = () => closeModal('shop-modal');
-    document.getElementById('close-bag').onclick = () => closeModal('bag-modal');
-    document.getElementById('close-worry').onclick = () => closeModal('worry-modal');
-    document.getElementById('close-bg-modal').onclick = () => closeModal('bg-modal');
-    document.getElementById('close-furniture-inv').onclick = () => closeModal('furniture-inventory-modal');
-    document.getElementById('close-drawer').onclick = () => closeModal('side-drawer');
-
-    document.querySelectorAll('.type-btn').forEach(b => {
-        b.onclick = () => { const t = b.getAttribute('data-type'); if(t) { gameState.appearance.type = t; applyAppearance(); } };
-    });
-    document.getElementById('init-body-color-picker').oninput = (e) => { gameState.appearance.bodyColor = e.target.value; applyAppearance(); };
-    document.getElementById('init-gill-color-picker').oninput = (e) => { gameState.appearance.gillColor = e.target.value; applyAppearance(); };
-    document.getElementById('body-color-picker').oninput = (e) => { gameState.appearance.bodyColor = e.target.value; applyAppearance(); };
-    document.getElementById('gill-color-picker').oninput = (e) => { gameState.appearance.gillColor = e.target.value; applyAppearance(); };
-
-    setInterval(() => {
-        if (document.getElementById('title-screen').style.display === 'flex' || document.getElementById('welcome-screen').style.display === 'flex') return;
-        gameState.fullness = Math.max(gameState.fullness - 1, 0); updateUI();
-        if (!hasWorry && Math.random() < 0.35) triggerNewWorry();
-        saveActiveGame();
-    }, 15000);
-
-    // アプリ起動
     initTitleScreen();
-</script>
 
+</script>
 </body>
 </html>
