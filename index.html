@@ -520,20 +520,25 @@
     // 空文字のままなら、今までと同じ「この端末の中だけで完結する」動作になります（壊れません）。
     const FIREBASE_DB_URL = "https://daikichi-67e67-default-rtdb.firebaseio.com";
 
+    // ▼ ここから下の3つの関数のみ修正しました（player階層を作って送受信するようにしています） ▼
     async function cloudGetPlayer(friendId) {
         if (!FIREBASE_DB_URL) return null;
         try {
             const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}.json`);
             if (!res.ok) return null;
-            return (await res.json()) || null;
-        } catch (e) { return null; } // オフライン・未設定時はnullを返し、呼び出し側がローカルにフォールバックする
+            const data = await res.json();
+            if (!data) return null;
+            // Firebaseから取得した時、中に player 欄があればそれを取り出して返す（ゲームにそのまま渡すため）
+            return data.player ? data.player : data;
+        } catch (e) { return null; }
     }
 
     async function cloudSavePlayer(state) {
         if (!FIREBASE_DB_URL) return;
         try {
+            // Firebaseに送る時に { player: state } という形で「player」欄の中に包んで送ります
             await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(state.friendId)}.json`, {
-                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(state)
+                method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ player: state })
             });
         } catch (e) { /* オフライン時は無視（ローカル保存は既に完了している） */ }
     }
@@ -541,12 +546,14 @@
     async function cloudUpdatePlayerField(friendId, partialObj) {
         if (!FIREBASE_DB_URL) return false;
         try {
-            const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}.json`, {
+            // 一部更新する時も「player」欄の中身を更新するようにURLの末尾に /player.json を追加しました
+            const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}/player.json`, {
                 method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(partialObj)
             });
             return res.ok;
         } catch (e) { return false; }
     }
+    // ▲ 修正箇所はここまで ▲
     // ==========================================
 
     let logTimer = null; let isMoving = false; let bgmMode = 'title';
@@ -573,7 +580,7 @@
     };
     const bgList = [ { id: "bg-aquarium", name: "🫧 アクアリウム", cost: 0 }, { id: "bg-garden", name: "🏡 ひろいお庭", cost: 100 }, { id: "bg-deepsea", name: "⚓ 深海", cost: 150 }, { id: "bg-space", name: "🌌 宇宙", cost: 200 }, { id: "bg-sunset", name: "🌇 夕焼け空", cost: 120 }, { id: "bg-candy", name: "🍬 お菓子の国", cost: 180 }, { id: "bg-room", name: "🛋️ マイルーム", cost: 80 } ];
     const furnitureData = { f_table: { name: "木製テーブル", emoji: "🟫", cost: 30 }, f_bed: { name: "お布団", emoji: "🛏️", cost: 100 }, f_tv: { name: "テレビ", emoji: "📺", cost: 120 }, f_bear: { name: "クマ", emoji: "🧸", cost: 50 }, f_game: { name: "ゲーム", emoji: "🕹️", cost: 90 }, f_sofa: { name: "ソファ", emoji: "🛋️", cost: 150 }, f_tent: { name: "テント", emoji: "⛺", cost: 220 }, f_crystal: { name: "水晶", emoji: "🔮", cost: 250 }, f_gold_chest: { name: "宝箱", emoji: "🪙", cost: 400 } };
-    const costumeData = { "なし": { emoji: "" }, "🎀 リボン": { emoji: "🎀" }, "👑 王冠": { emoji: "👑" }, "🎩 ハット": { emoji: "🎩" }, "👓 メガネ": { emoji: "👓" }, "🐱 猫耳": { emoji: "🐱" }, "👼 天使": { emoji: "👼" }, "🌸 お花": { emoji: "🌸" } };
+    const costumeData = { "なし": { emoji: "" }, "🎀 リボン": { emoji: "👑 王冠": { emoji: "👑" }, "🎩 ハット": { emoji: "🎩" }, "👓 メガネ": { emoji: "👓" }, "🐱 猫耳": { emoji: "🐱" }, "👼 天使": { emoji: "👼" }, "🌸 お花": { emoji: "🌸" } };
     const worryData = [ { text: "角に頭をぶつけちゃう…", options: [ { text: "クッションを貼る", correct: true, rewardCoin: 30, rewardExp: 10, reply: "いたくなくなった！" }, { text: "ヘルメットを渡す", correct: false, rewardCoin: 10, rewardExp: 2, reply: "重いよぉ…" } ] }, { text: "なんだかツヤがない…", options: [ { text: "お水を綺麗にする", correct: true, rewardCoin: 50, rewardExp: 20, reply: "ピカピカ元気！" }, { text: "ペンで塗る", correct: false, rewardCoin: 0, rewardExp: 0, reply: "汚れちゃう！" } ] } ];
 
     const TITLE_DICT = [
