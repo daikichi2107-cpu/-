@@ -115,7 +115,7 @@
 
         footer { background-color: #f8f9fa; padding: 10px; border-top: 1px solid #e9ecef; z-index: 10; }
         .action-menu { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
-        .menu-btn { background-color: #15aabf; color: white; border: none; border-radius: 14px; padding: 12px 4px; font-size: 0.9rem; font-weight: 800; text-align: center; box-shadow: 0 4px 8px rgba(21, 170, 191, 0.2); cursor: pointer; }
+        .menu-btn { background-color: #15aabf; color: white; border: none; border-radius: 14px; padding: 12px 4px; font-size: 0.9rem; font-weight: 800; text-align: center; box-shadow: 0 4px 8px rgba(21, 170, 191, 0.2); cursor: pointer; transition: opacity 0.2s; }
         .menu-btn.orange { background-color: #ff922b; }
         .menu-btn.green { background-color: #40c057; }
         .game-log { background-color: #f1f3f5; border-radius: 10px; padding: 10px; margin-top: 8px; font-size: 0.85rem; color: #495057; min-height: 42px; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; }
@@ -152,9 +152,9 @@
         .login-cell.stamped::after { content: '💮'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-15deg); font-size: 1.8rem; color: #fa5252; opacity: 0.8; }
 
         /* フレンドリスト (専用画面) */
-        .f-list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid #dee2e6; }
-        .f-fav-btn { font-size: 1.5rem; background: none; border: none; cursor: pointer; outline: none; padding: 0 10px; color: #ccc; transition: color 0.2s; }
-        .f-fav-btn.active { color: #fcc419; }
+        .f-list-item { background: white; border-radius: 12px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 2px solid #dee2e6; }
+        .f-fav-btn { font-size: 1.5rem; background: none; border: none; cursor: pointer; outline: none; padding: 0 10px; color: #ccc; transition: all 0.2s; }
+        .f-fav-btn.active { color: #fcc419; text-shadow: 0 0 5px orange; }
         
         .setting-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: bold; font-size: 0.9rem; }
         .setting-slider { width: 60%; }
@@ -276,6 +276,7 @@
     <div class="side-drawer" id="side-drawer">
         <div class="drawer-content">
             <div class="drawer-header">メニュー</div>
+            <button class="drawer-btn" id="drawer-notice-btn" style="color: #d6336c; font-weight: bold;">🔔 お知らせ <span id="notice-badge" style="display:none; background:red; color:white; border-radius:50%; padding:2px 6px; font-size:0.7rem; margin-left:5px;">!</span></button>
             <button class="drawer-btn" id="drawer-profile-btn">👤 プロフィール</button>
             <button class="drawer-btn" id="drawer-title-dict-btn">📖 称号辞典</button>
             <button class="drawer-btn" id="drawer-mg-record-btn">🏆 ミニゲーム記録</button>
@@ -291,6 +292,15 @@
             <button class="drawer-btn" id="drawer-save-btn" style="background:#f8f9fa; border: 1px solid #ced4da;">💾 データを保存</button>
             <button class="drawer-btn" id="drawer-title-btn" style="margin-top:10px; background:#f1f3f5;">🚪 タイトルへ戻る</button>
             <button class="close-btn" id="close-drawer" style="margin-top:20px;">閉じる</button>
+        </div>
+    </div>
+
+    <!-- お知らせモーダル -->
+    <div class="modal" id="notice-modal" style="z-index: 260;">
+        <div class="modal-content">
+            <div class="modal-header">🔔 お知らせ</div>
+            <div id="notice-list-container" style="max-height: 300px; overflow-y: auto;"></div>
+            <button class="close-btn" id="close-notice">閉じる</button>
         </div>
     </div>
 
@@ -373,15 +383,16 @@
         </div>
         
         <p style="font-size:0.85rem; font-weight:bold; color:#495057; margin-bottom:5px;">お互いに⭐(お気に入り)にすると<br>💖ベストフレンドになってお小遣いが送れます。</p>
-        <div id="friend-list-container" style="flex-grow:1; overflow-y:auto; background:#f8f9fa; padding:10px; border-radius:12px; border:2px solid #dee2e6;"></div>
+        <div id="friend-list-container" style="flex-grow:1; overflow-y:auto; background:#f8f9fa; padding:10px; border-radius:12px; border:2px solid #dee2e6; max-height: 350px;"></div>
         
         <button class="close-btn" id="close-friend" style="margin-top:20px; font-size:1.1rem; padding:14px;">広場を出る</button>
     </div>
 
-    <div class="modal" id="friend-visit-modal" style="z-index: 170;">
+    <div class="modal" id="friend-visit-modal" style="z-index: 250;">
         <div class="modal-content" style="text-align: center;">
             <div class="modal-header">訪問メニュー</div>
-            <p id="visit-f-name" style="font-weight:bold; font-size:1.1rem; margin-bottom:15px;"></p>
+            <p id="visit-f-name" style="font-weight:bold; font-size:1.1rem; margin-bottom:10px;"></p>
+            <div id="visit-f-profile" style="background:#f1f3f5; padding:10px; border-radius:8px; font-size:0.85rem; margin-bottom:15px; text-align:left; line-height:1.4;"></div>
             <button class="start-btn" id="btn-do-visit" style="background:#40c057; margin-bottom:10px;">🏠 お家に行く</button>
             <button class="start-btn" id="btn-send-money" style="background:#fcc419; color:#d9480f; display:none; margin-bottom:10px;">💰 お小遣いを100送る</button>
             <button class="close-btn" id="close-visit-modal">もどる</button>
@@ -462,7 +473,7 @@
         return {
             name: "ウパのココロ", ownerName: "あなた", level: 1, exp: 0, maxExp: 30, coins: 150, fullness: 80,
             friendId: "FC-" + Math.floor(100000 + Math.random() * 900000), password: "1234",
-            friends: [], favorites: [], minigameStats: {}, unlockedHiddenTitles: [], loginBonusDay: 1,
+            friends: [], favorites: [], notices: [], minigameStats: {}, unlockedHiddenTitles: [], loginBonusDay: 1,
             inventory: {}, unlockedBgs: ["bg-aquarium"], customBgData: "",
             furnitureInventory: {}, placedFurniture: [],
             appearance: { type: "upa", bodyColor: "#fff0f3", gillColor: "#ff85a2", bgClass: "bg-aquarium" },
@@ -489,6 +500,7 @@
             minigameStats: { ...defaultState.minigameStats, ...(savedData.minigameStats || {}) },
             unlockedHiddenTitles: savedData.unlockedHiddenTitles || [],
             favorites: savedData.favorites || [],
+            notices: savedData.notices || [],
             loginBonusDay: savedData.loginBonusDay || 1
         };
     }
@@ -496,6 +508,10 @@
     let gameState = createInitialState();
     let currentSlotIndex = 0;
     
+    // 訪問フラグ
+    let isVisiting = false;
+    let visitTargetSave = null;
+
     function getGlobalSaves() { const saves = localStorage.getItem(SAVE_KEY); return saves ? JSON.parse(saves) : [null, null]; }
     function saveAllSlots(arr) { localStorage.setItem(SAVE_KEY, JSON.stringify(arr)); }
     function getAccountPool() { const pool = localStorage.getItem(ACCOUNT_POOL_KEY); return pool ? JSON.parse(pool) : []; }
@@ -507,20 +523,16 @@
     function saveActiveGame(showFlash = false) {
         let slots = getGlobalSaves(); slots[currentSlotIndex] = gameState;
         saveAllSlots(slots); registerToAccountPool(gameState);
-        cloudSavePlayer(gameState); // 🌐 オンライン同期（下で設定していない場合は何もしない／既存のローカル保存は無条件で実行される）
+        cloudSavePlayer(gameState); // 🌐 オンライン同期
         if (showFlash) logMessage("💾 セーブデータを保存しました！", true);
     }
     // ==========================================
 
     // ==========================================
-    // --- 🌐 オンライン同期設定（フレンド・引き継ぎ機能専用／上のセーブ機構とは無関係・触れていません） ---
+    // --- 🌐 オンライン同期設定 ---
     // ==========================================
-    // 下のFIREBASE_DB_URLに、自分のFirebase Realtime DatabaseのURLを貼ってください。
-    // 例: const FIREBASE_DB_URL = "https://my-project-12345-default-rtdb.asia-southeast1.firebasedatabase.app";
-    // 空文字のままなら、今までと同じ「この端末の中だけで完結する」動作になります（壊れません）。
     const FIREBASE_DB_URL = "https://daikichi-67e67-default-rtdb.firebaseio.com";
 
-    // ▼ ここから下の3つの関数のみ修正しました（player階層を作って送受信するようにしています） ▼
     async function cloudGetPlayer(friendId) {
         if (!FIREBASE_DB_URL) return null;
         try {
@@ -528,7 +540,6 @@
             if (!res.ok) return null;
             const data = await res.json();
             if (!data) return null;
-            // Firebaseから取得した時、中に player 欄があればそれを取り出して返す（ゲームにそのまま渡すため）
             return data.player ? data.player : data;
         } catch (e) { return null; }
     }
@@ -536,24 +547,21 @@
     async function cloudSavePlayer(state) {
         if (!FIREBASE_DB_URL) return;
         try {
-            // Firebaseに送る時に { player: state } という形で「player」欄の中に包んで送ります
             await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(state.friendId)}.json`, {
                 method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ player: state })
             });
-        } catch (e) { /* オフライン時は無視（ローカル保存は既に完了している） */ }
+        } catch (e) { }
     }
 
     async function cloudUpdatePlayerField(friendId, partialObj) {
         if (!FIREBASE_DB_URL) return false;
         try {
-            // 一部更新する時も「player」欄の中身を更新するようにURLの末尾に /player.json を追加しました
             const res = await fetch(`${FIREBASE_DB_URL}/players/${encodeURIComponent(friendId)}/player.json`, {
                 method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(partialObj)
             });
             return res.ok;
         } catch (e) { return false; }
     }
-    // ▲ 修正箇所はここまで ▲
     // ==========================================
 
     let logTimer = null; let isMoving = false; let bgmMode = 'title';
@@ -649,7 +657,7 @@
                     currentSlotIndex = idx; gameState = migrateData(slot); 
                     document.getElementById('title-screen').style.display = 'none'; 
                     document.getElementById('game-slot-indicator').innerText = `Slot ${idx+1}`; 
-                    checkLoginStreakAndMissions(); updateUI(); playBGM('main'); 
+                    checkLoginStreakAndMissions(); updateUI(); checkNotices(); playBGM('main'); 
                 };
                 document.getElementById(`slot-del-btn-${idx}`).onclick = () => { if(confirm(`スロット ${idx+1} を完全に消去しますか？`)) { let fresh = getGlobalSaves(); fresh[idx] = null; saveAllSlots(fresh); renderSaveSlots(); } };
             } else {
@@ -660,7 +668,7 @@
         });
     }
 
-    function startNewGameFlow() { playBGM('main'); document.getElementById('title-screen').style.display = 'none'; document.getElementById('welcome-screen').style.display = 'flex'; gameState = createInitialState(); applyAppearance(); }
+    function startNewGameFlow() { playBGM('main'); document.getElementById('title-screen').style.display = 'none'; document.getElementById('welcome-screen').style.display = 'flex'; gameState = createInitialState(); applyAppearanceForState(gameState); }
     document.getElementById('title-start-new-btn').onclick = () => { const slots = getGlobalSaves(); if(slots[0] && slots[1]){ if(!confirm("スロット1を上書きして始めますか？")) return; currentSlotIndex = 0; } else { currentSlotIndex = slots[0] ? 1 : 0; } startNewGameFlow(); };
     document.getElementById('title-load-menu-btn').onclick = () => { document.getElementById('title-start-new-btn').style.display = 'none'; document.getElementById('title-load-menu-btn').style.display = 'none'; document.getElementById('title-load-pane').style.display = 'block'; renderSaveSlots(); };
     document.getElementById('btn-back-to-title').onclick = initTitleScreen;
@@ -671,8 +679,8 @@
 
         const transferBtn = document.getElementById('btn-title-execute-transfer');
         transferBtn.disabled = true; transferBtn.innerText = "確認中…";
-        let targetAcc = await cloudGetPlayer(idInput); // 🌐 まずオンラインを確認（他の端末のデータもここで見つかる）
-        if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === idInput); } // 見つからなければ同一端末内を確認
+        let targetAcc = await cloudGetPlayer(idInput);
+        if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === idInput); }
         transferBtn.disabled = false; transferBtn.innerText = "この端末に同期する";
 
         if(!targetAcc) { playSE('error'); return alert("❌ 指定されたIDは見つかりません。\n（オンライン同期を設定していない場合、別の端末のデータは引き継げません）"); }
@@ -737,34 +745,115 @@
         if (m && !m.completed) { m.current++; if (m.current >= m.target) { m.completed = true; gameState.coins += 20; logMessage(`🎯 ミッション達成！ 💰+20`); } saveActiveGame(); }
     }
 
-    function updateUI() {
-        document.getElementById('level-display').innerText = `Lv.${gameState.level}`; document.getElementById('coin-display').innerText = `💰 ${gameState.coins}`;
-        document.getElementById('exp-bar').style.width = `${Math.min((gameState.exp / gameState.maxExp) * 100, 100)}%`; document.getElementById('next-exp-display').innerText = `あと ${gameState.maxExp - gameState.exp} EXP`;
-        document.getElementById('fullness-bar').style.width = `${Math.min(Math.max(gameState.fullness, 0), 100)}%`; document.getElementById('fullness-text').innerText = `${Math.floor(Math.max(gameState.fullness, 0))}%`;
-        document.getElementById('personality-display').innerText = `称号: ${gameState.currentTitle}`; document.getElementById('love-display').innerText = `💖 なつき度: Lv.${gameState.loveLevel || 0}`;
-        document.getElementById('main-name-label').innerText = gameState.name;
-        document.getElementById('preview-name-label') && (document.getElementById('preview-name-label').innerText = gameState.name);
-        const cos = costumeData[gameState.currentCostume || "なし"]; document.getElementById('costume-layer').innerText = cos ? cos.emoji : "";
-        const aq = document.getElementById('aquarium');
-        if (gameState.appearance.bgClass === "custom-bg" && gameState.customBgData) { bgList.forEach(bg => aq.classList.remove(bg.id)); aq.style.background = `url(${gameState.customBgData})`; }
-        else { aq.style.background = ""; bgList.forEach(bg => aq.classList.remove(bg.id)); aq.classList.add(gameState.appearance.bgClass); }
-
-        const lamp = document.getElementById('worry-lamp');
-        if (hasWorry && currentWorry) lamp.style.display = 'block'; else lamp.style.display = 'none';
-
-        renderPlacedFurniture(); applyAppearance();
+    function checkNotices() {
+        if(gameState.notices && gameState.notices.length > 0) {
+            document.getElementById('notice-badge').style.display = 'inline-block';
+        } else {
+            document.getElementById('notice-badge').style.display = 'none';
+        }
     }
 
-    function applyAppearance() {
-        const targets = [document.getElementById('upa-char'), document.getElementById('preview-char')];
+    // 定期的に通知を確認
+    setInterval(async () => {
+        if(document.getElementById('title-screen').style.display === 'flex' || !gameState.friendId) return;
+        if(FIREBASE_DB_URL) {
+            const me = await cloudGetPlayer(gameState.friendId);
+            if(me && me.notices) {
+                let updated = false;
+                me.notices.forEach(n => {
+                    if(!gameState.notices) gameState.notices = [];
+                    if(!gameState.notices.some(localN => localN.id === n.id)) {
+                        gameState.notices.push(n);
+                        updated = true;
+                    }
+                });
+                if(updated) {
+                    checkNotices();
+                    saveActiveGame();
+                }
+            }
+        }
+    }, 15000);
+
+    function renderPlacedFurnitureForState(s) {
+        const layer = document.getElementById('furniture-placement-layer'); 
+        layer.innerHTML = ''; 
+        const furnitures = s.placedFurniture || [];
+        furnitures.forEach(f => { 
+            const div = document.createElement('div'); div.className = 'placed-furniture'; div.innerText = f.emoji; 
+            div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; 
+            
+            if(isVisiting) {
+                div.style.pointerEvents = 'none';
+            } else {
+                div.style.pointerEvents = 'auto'; 
+                let drag = false; let sx, sy; 
+                const start = (cx, cy) => { drag = true; div.classList.add('editing'); sx = cx - div.offsetLeft; sy = cy - div.offsetTop; }; 
+                const move = (cx, cy) => { if(!drag) return; f.x = cx - sx; f.y = cy - sy; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; }; 
+                const end = () => { if(drag) { drag = false; div.classList.remove('editing'); saveActiveGame(); } }; 
+                div.onmousedown = (e) => { start(e.clientX, e.clientY); e.stopPropagation(); }; window.onmousemove = (e) => move(e.clientX, e.clientY); window.onmouseup = end; 
+                div.ontouchstart = (e) => { start(e.touches[0].clientX, e.touches[0].clientY); e.stopPropagation(); }; window.ontouchmove = (e) => { if(drag) move(e.touches[0].clientX, e.touches[0].clientY); }; window.ontouchend = end; 
+                let lt = 0; 
+                div.onclick = (e) => { let now = Date.now(); if(now - lt < 300) { playSE('click'); gameState.furnitureInventory[f.key] = (gameState.furnitureInventory[f.key] || 0) + 1; gameState.placedFurniture = gameState.placedFurniture.filter(x => x.id !== f.id); updateUI(); saveActiveGame(); } lt = now; e.stopPropagation(); }; 
+            }
+            layer.appendChild(div); 
+        });
+    }
+
+    function applyAppearanceForState(s) {
+        const targets = [document.getElementById('upa-char')];
+        if(!isVisiting) targets.push(document.getElementById('preview-char'));
+        
         targets.forEach(charEl => {
             if (!charEl) return;
-            charEl.setAttribute('data-char-type', gameState.appearance.type);
-            charEl.querySelectorAll('.body-part').forEach(part => part.setAttribute('fill', gameState.appearance.bodyColor));
-            charEl.querySelectorAll('.gill-part').forEach(part => part.setAttribute('fill', gameState.appearance.gillColor));
+            charEl.setAttribute('data-char-type', s.appearance.type);
+            charEl.querySelectorAll('.body-part').forEach(part => part.setAttribute('fill', s.appearance.bodyColor));
+            charEl.querySelectorAll('.gill-part').forEach(part => part.setAttribute('fill', s.appearance.gillColor));
         });
-        document.getElementById('body-color-picker').value = gameState.appearance.bodyColor; document.getElementById('gill-color-picker').value = gameState.appearance.gillColor;
-        document.querySelectorAll('#char-types .type-btn').forEach(el => { if(el.getAttribute('data-type') === gameState.appearance.type) el.classList.add('active'); else el.classList.remove('active'); });
+        if(!isVisiting) {
+            document.getElementById('body-color-picker').value = s.appearance.bodyColor; 
+            document.getElementById('gill-color-picker').value = s.appearance.gillColor;
+            document.querySelectorAll('#char-types .type-btn').forEach(el => { if(el.getAttribute('data-type') === s.appearance.type) el.classList.add('active'); else el.classList.remove('active'); });
+        }
+    }
+
+    function updateUI() {
+        const s = isVisiting ? visitTargetSave : gameState;
+        if(!s) return;
+
+        document.getElementById('level-display').innerText = `Lv.${s.level}`; 
+        document.getElementById('coin-display').innerText = `💰 ${s.coins}`;
+        document.getElementById('exp-bar').style.width = `${Math.min((s.exp / s.maxExp) * 100, 100)}%`; 
+        document.getElementById('next-exp-display').innerText = isVisiting ? '---' : `あと ${s.maxExp - s.exp} EXP`;
+        document.getElementById('fullness-bar').style.width = `${Math.min(Math.max(s.fullness, 0), 100)}%`; 
+        document.getElementById('fullness-text').innerText = `${Math.floor(Math.max(s.fullness, 0))}%`;
+        document.getElementById('personality-display').innerText = `称号: ${s.currentTitle}`; 
+        document.getElementById('love-display').innerText = `💖 なつき度: Lv.${s.loveLevel || 0}`;
+        document.getElementById('main-name-label').innerText = s.name;
+        document.getElementById('preview-name-label') && (document.getElementById('preview-name-label').innerText = s.name);
+        
+        const cos = costumeData[s.currentCostume || "なし"]; 
+        document.getElementById('costume-layer').innerText = cos ? cos.emoji : "";
+        
+        const aq = document.getElementById('aquarium');
+        if (s.appearance.bgClass === "custom-bg" && s.customBgData) { 
+            bgList.forEach(bg => aq.classList.remove(bg.id)); 
+            aq.style.background = `url(${s.customBgData})`; 
+        } else { 
+            aq.style.background = ""; 
+            bgList.forEach(bg => aq.classList.remove(bg.id)); 
+            aq.classList.add(s.appearance.bgClass || 'bg-aquarium'); 
+        }
+
+        const lamp = document.getElementById('worry-lamp');
+        if (!isVisiting && hasWorry && currentWorry) lamp.style.display = 'block'; else lamp.style.display = 'none';
+
+        renderPlacedFurnitureForState(s);
+        applyAppearanceForState(s);
+
+        const actionBtns = document.querySelectorAll('.action-menu .menu-btn');
+        if(isVisiting) { actionBtns.forEach(btn => btn.style.opacity = '0.5'); } 
+        else { actionBtns.forEach(btn => btn.style.opacity = '1'); }
     }
 
     function moveCharacter(targetX, targetY, duration = 800) {
@@ -789,11 +878,13 @@
         charImg.classList.add('jump');
         setTimeout(() => charImg.classList.remove('jump'), 300);
         
-        sessionTouchCount++;
-        if(sessionTouchCount === 100 && !gameState.unlockedHiddenTitles.includes('愛情たっぷり')) {
-            gameState.unlockedHiddenTitles.push('愛情たっぷり');
-            alert('🏆 隠し称号「愛情たっぷり」を解放しました！');
-            saveActiveGame();
+        if(!isVisiting) {
+            sessionTouchCount++;
+            if(sessionTouchCount === 100 && !gameState.unlockedHiddenTitles.includes('愛情たっぷり')) {
+                gameState.unlockedHiddenTitles.push('愛情たっぷり');
+                alert('🏆 隠し称号「愛情たっぷり」を解放しました！');
+                saveActiveGame();
+            }
         }
     };
     
@@ -805,9 +896,89 @@
     };
 
     const sideDrawer = document.getElementById('side-drawer');
-    document.getElementById('menu-trigger').onclick = () => { playSE('click'); sideDrawer.style.display = 'flex'; };
+    document.getElementById('menu-trigger').onclick = () => { playSE('click'); sideDrawer.style.display = 'flex'; checkNotices(); };
     document.getElementById('close-drawer').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; };
 
+    // --- お知らせ関連 ---
+    document.getElementById('drawer-notice-btn').onclick = () => {
+        playSE('click'); sideDrawer.style.display = 'none';
+        renderNotices();
+        document.getElementById('notice-modal').style.display = 'flex';
+        document.getElementById('notice-badge').style.display = 'none';
+    };
+    document.getElementById('close-notice').onclick = () => { playSE('click'); closeModal('notice-modal'); };
+
+    function renderNotices() {
+        const container = document.getElementById('notice-list-container');
+        container.innerHTML = '';
+        if(!gameState.notices || gameState.notices.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:20px; color:#adb5bd;">お知らせはありません</div>';
+            return;
+        }
+        
+        const sorted = [...gameState.notices].sort((a,b) => b.timestamp - a.timestamp);
+        sorted.forEach(n => {
+            const div = document.createElement('div');
+            div.className = 'mission-item';
+            div.style.flexDirection = 'column'; div.style.alignItems = 'flex-start';
+            
+            if(n.type === 'friend_request') {
+                div.innerHTML = `<div style="margin-bottom:8px;">🤝 <b>${n.fromOwner}</b> さん (${n.fromName}) からフレンド申請が届きました！</div>
+                <div style="display:flex; gap:10px; width:100%;">
+                    <button class="start-btn" style="margin:0; background:#40c057; padding:8px; font-size:0.85rem;" onclick="acceptFriend('${n.id}', '${n.fromId}', '${n.fromName}', '${n.fromOwner}', ${n.fromLevel}, '${n.fromBg}', '${JSON.stringify(n.fromApp).replace(/"/g, '&quot;')}')">許可</button>
+                    <button class="close-btn" style="margin:0; padding:8px; font-size:0.85rem;" onclick="deleteNotice('${n.id}')">拒否</button>
+                </div>`;
+            } else if (n.type === 'request_accepted') {
+                div.innerHTML = `<div style="margin-bottom:8px;">✅ <b>${n.fromOwner}</b> さんとフレンドになりました！</div>
+                <button class="close-btn" style="margin:0; padding:8px; width:100%; font-size:0.85rem;" onclick="deleteNotice('${n.id}')">確認</button>`;
+            } else {
+                div.innerHTML = `<div>${n.message}</div><button class="close-btn" style="margin-top:5px; padding:4px;" onclick="deleteNotice('${n.id}')">削除</button>`;
+            }
+            container.appendChild(div);
+        });
+    }
+
+    window.deleteNotice = function(nid) {
+        playSE('click');
+        gameState.notices = gameState.notices.filter(n => n.id !== nid);
+        saveActiveGame(); renderNotices(); checkNotices();
+    };
+
+    window.acceptFriend = async function(nid, fromId, fromName, fromOwner, fromLevel, fromBg, fromAppStr) {
+        playSE('click');
+        const fromApp = JSON.parse(fromAppStr);
+        if(!gameState.friends) gameState.friends = [];
+        if(!gameState.friends.some(f => f.id === fromId)) {
+            gameState.friends.push({ id: fromId, name: fromName, ownerName: fromOwner, level: fromLevel, bg: fromBg, app: fromApp });
+        }
+        
+        gameState.notices = gameState.notices.filter(n => n.id !== nid);
+        
+        let targetAcc = await cloudGetPlayer(fromId);
+        if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === fromId); }
+        
+        if(targetAcc) {
+            targetAcc.notices = targetAcc.notices || [];
+            targetAcc.notices.push({
+                id: Date.now().toString(), type: 'request_accepted', fromId: gameState.friendId, fromOwner: gameState.ownerName, timestamp: Date.now()
+            });
+            if(!targetAcc.friends) targetAcc.friends = [];
+            if(!targetAcc.friends.some(f => f.id === gameState.friendId)) {
+                targetAcc.friends.push({
+                    id: gameState.friendId, name: gameState.name, ownerName: gameState.ownerName, level: gameState.level, bg: gameState.appearance.bgClass, app: gameState.appearance
+                });
+            }
+            if(FIREBASE_DB_URL) {
+                await cloudUpdatePlayerField(fromId, { notices: targetAcc.notices, friends: targetAcc.friends });
+            } else {
+                let pool = getAccountPool(); let idx = pool.findIndex(a => a.friendId === fromId);
+                if(idx !== -1) { pool[idx].notices = targetAcc.notices; pool[idx].friends = targetAcc.friends; localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); }
+            }
+        }
+        saveActiveGame(); renderNotices(); alert(`${fromOwner} さんとフレンドになりました！`);
+    };
+
+    // --- メニュー機能群 ---
     document.getElementById('drawer-profile-btn').onclick = () => {
         playSE('click'); sideDrawer.style.display = 'none';
         document.getElementById('prof-owner-pet').innerText = `${gameState.ownerName} の ${gameState.name}`;
@@ -871,43 +1042,54 @@
     document.getElementById('cheat-furni').onclick = () => { playSE('click'); for (const k in furnitureData) { gameState.furnitureInventory[k] = (gameState.furnitureInventory[k]||0)+1; } saveActiveGame(true); alert("全家具+1"); };
     document.getElementById('cheat-ceo').onclick = () => { playSE('click'); if(!gameState.unlockedHiddenTitles.includes('代表取締役')) { gameState.unlockedHiddenTitles.push('代表取締役'); alert("称号「代表取締役」を解放しました！"); saveActiveGame(true); } };
 
+    // --- フレンド機能 ---
     document.getElementById('drawer-friend-btn').onclick = () => { playSE('click'); sideDrawer.style.display = 'none'; document.getElementById('my-friend-id').innerText = gameState.friendId; renderFriendList(); document.getElementById('friend-modal').style.display = 'flex'; };
     document.getElementById('close-friend').onclick = () => { playSE('click'); closeModal('friend-modal'); };
     
     document.getElementById('btn-add-friend').onclick = async () => {
         playSE('click'); const fid = document.getElementById('friend-id-input').value.trim();
-        if(!fid || fid === gameState.friendId || gameState.friends.some(f => f.id === fid)) { playSE('error'); return alert("エラー：不正なID、または追加済みです。"); }
+        if(!fid || fid === gameState.friendId || (gameState.friends && gameState.friends.some(f => f.id === fid))) { playSE('error'); return alert("エラー：不正なID、または追加済みです。"); }
 
         const addFriendBtn = document.getElementById('btn-add-friend');
         addFriendBtn.disabled = true; addFriendBtn.innerText = "検索中…";
-        let targetAcc = await cloudGetPlayer(fid); // 🌐 まずオンラインを確認（他の端末の友達もここで見つかる）
-        if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === fid); } // 見つからなければ同一端末内を確認
+        let targetAcc = await cloudGetPlayer(fid);
+        if(!targetAcc) { const pool = getAccountPool(); targetAcc = pool.find(acc => acc.friendId === fid); }
         addFriendBtn.disabled = false; addFriendBtn.innerText = "検索追加";
 
         if(!targetAcc) { playSE('error'); return alert("見つかりません。IDが正しいか、相手が一度セーブ済みか確認してください。"); }
 
-        if(confirm(`「${targetAcc.ownerName} の ${targetAcc.name}」さんにフレンド申請しますか？`)) {
-            gameState.friends.push({ id: targetAcc.friendId, name: targetAcc.name, ownerName: targetAcc.ownerName, level: targetAcc.level, bg: targetAcc.appearance?.bgClass, app: targetAcc.appearance });
-            renderFriendList();
-            if(gameState.friends.length % 3 === 0) {
-                const rank = gameState.friends.length === 3 ? "ブロンズ" : gameState.friends.length === 6 ? "シルバー" : "ゴールド";
-                const tName = `友情の証・${rank} (${gameState.friends.length}人)`;
-                if(!gameState.trophies.includes(tName)) { gameState.trophies.push(tName); alert(`🏆 新しいトロフィーを獲得しました！\n「${tName}」`); }
+        if(confirm(`「${targetAcc.ownerName} の ${targetAcc.name}」さんにフレンド申請を送りますか？`)) {
+            const req = {
+                id: Date.now().toString(), type: 'friend_request', fromId: gameState.friendId, fromOwner: gameState.ownerName, fromName: gameState.name, fromLevel: gameState.level, fromBg: gameState.appearance.bgClass, fromApp: gameState.appearance, timestamp: Date.now()
+            };
+            targetAcc.notices = targetAcc.notices || [];
+            targetAcc.notices.push(req);
+            
+            if(FIREBASE_DB_URL) {
+                await cloudUpdatePlayerField(fid, { notices: targetAcc.notices });
+            } else {
+                let pool = getAccountPool(); let idx = pool.findIndex(a => a.friendId === fid);
+                if(idx !== -1) { pool[idx].notices = targetAcc.notices; localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); }
             }
-            saveActiveGame(); alert("フレンドになりました！");
+            alert("フレンド申請を送信しました！相手が許可するまでお待ちください。");
+            document.getElementById('friend-id-input').value = "";
         }
     };
 
     function renderFriendList() {
         const container = document.getElementById('friend-list-container');
         if(!gameState.favorites) gameState.favorites = [];
+        if(!gameState.friends || gameState.friends.length === 0) { container.innerHTML = "<div style='text-align:center; padding:20px;'>まだフレンドがいません</div>"; return; }
+        
         container.innerHTML = gameState.friends.map((f, i) => {
             const isFav = gameState.favorites.includes(f.id);
-            return `<div class="f-list-item">
+            const bgCol = isFav ? '#fff9db' : 'white';
+            const borderCol = isFav ? '#fcc419' : '#dee2e6';
+            return `<div class="f-list-item" style="background:${bgCol}; border-color:${borderCol};">
                 <div style="flex-grow:1; cursor:pointer;" onclick="openFriendVisit('${f.id}')">
-                    <b style="color:#0b7285; font-size:1rem;">${f.ownerName}の ${f.name}</b><br><small>Lv.${f.level} | 🏠 訪問する</small>
+                    <b style="color:#0b7285; font-size:1rem;">${f.ownerName}の ${f.name}</b><br><small>Lv.${f.level} | 🏠 訪問・プロフ</small>
                 </div>
-                <button class="f-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${f.id}')">⭐</button>
+                <button class="f-fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav('${f.id}')" style="font-size:1.8rem;">${isFav ? '⭐' : '☆'}</button>
             </div>`;
         }).join("");
     }
@@ -926,17 +1108,36 @@
         targetVisitFriendData = gameState.friends.find(f => f.id === fid);
         if(!targetVisitFriendData) return;
         
-        targetVisitFriendSave = await cloudGetPlayer(fid); // 🌐 まずオンラインの最新データを確認
-        if(!targetVisitFriendSave) { const pool = getAccountPool(); targetVisitFriendSave = pool.find(acc => acc.friendId === fid); } // なければ同一端末内
-        document.getElementById('visit-f-name').innerText = `${targetVisitFriendData.ownerName} さんのお家`;
+        const btnDoVisit = document.getElementById('btn-do-visit');
+        btnDoVisit.innerText = "通信中..."; btnDoVisit.disabled = true;
         
-        const amIFavorited = targetVisitFriendSave && targetVisitFriendSave.favorites && targetVisitFriendSave.favorites.includes(gameState.friendId);
+        targetVisitFriendSave = await cloudGetPlayer(fid);
+        if(!targetVisitFriendSave) { const pool = getAccountPool(); targetVisitFriendSave = pool.find(acc => acc.friendId === fid); }
+        
+        btnDoVisit.innerText = "🏠 お家に行く"; btnDoVisit.disabled = false;
+        
+        if(!targetVisitFriendSave) { return alert("相手のデータが見つかりませんでした。"); }
+
+        const amIFavorited = targetVisitFriendSave.favorites && targetVisitFriendSave.favorites.includes(gameState.friendId);
         const didIFavorite = gameState.favorites && gameState.favorites.includes(fid);
-        const btnSend = document.getElementById('btn-send-money');
-        if(amIFavorited && didIFavorite) {
-            document.getElementById('visit-f-name').innerHTML += `<br><span style="color:#e64980; font-size:0.9rem;">💖 ベストフレンド</span>`;
-            btnSend.style.display = 'block';
-        } else { btnSend.style.display = 'none'; }
+        const isBestFriend = amIFavorited && didIFavorite;
+        
+        const nameEl = document.getElementById('visit-f-name');
+        nameEl.innerHTML = `${targetVisitFriendData.ownerName} さんのお家`;
+        if(isBestFriend) {
+            nameEl.innerHTML += `<br><span style="color:#e64980; font-size:0.9rem;">💖 ベストフレンド</span>`;
+            document.getElementById('btn-send-money').style.display = 'block';
+        } else { 
+            document.getElementById('btn-send-money').style.display = 'none'; 
+        }
+
+        document.getElementById('visit-f-profile').innerHTML = `
+            <b>ペット:</b> ${targetVisitFriendSave.name}<br>
+            <b>レベル:</b> Lv.${targetVisitFriendSave.level}<br>
+            <b>称号:</b> ${targetVisitFriendSave.currentTitle || '見習い'}<br>
+            <b>ステータス:</b> 総エサ ${targetVisitFriendSave.totalFeeds||0}回 / 総ゲーム ${targetVisitFriendSave.totalMinigames||0}回<br>
+            <b>ログイン:</b> 連続${targetVisitFriendSave.currentLoginStreak||1}日 (最高${targetVisitFriendSave.maxLoginStreak||1}日)
+        `;
         
         document.getElementById('friend-visit-modal').style.display = 'flex';
     };
@@ -952,29 +1153,33 @@
             pool[targetIndex].coins += 100;
             localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool)); 
         }
-        const cloudFriend = await cloudGetPlayer(targetVisitFriendData.id); // 🌐 相手が別の端末にいてもここで反映される
+        const cloudFriend = await cloudGetPlayer(targetVisitFriendData.id);
         if(cloudFriend) { await cloudUpdatePlayerField(targetVisitFriendData.id, { coins: (cloudFriend.coins || 0) + 100 }); }
 
         playSE('coin'); updateUI(); saveActiveGame(); alert("ベストフレンドにお小遣いを100コイン送りました！");
     };
 
     document.getElementById('btn-do-visit').onclick = () => {
-        playSE('click'); closeModal('friend-visit-modal'); closeModal('friend-modal');
-        const aq = document.getElementById('aquarium'); const originalBg = gameState.appearance.bgClass;
-        bgList.forEach(bg => aq.classList.remove(bg.id)); aq.classList.add(targetVisitFriendData.bg || 'bg-room');
+        playSE('click'); 
+        closeModal('friend-visit-modal'); closeModal('friend-modal');
         
-        const charEl = document.getElementById('upa-char');
-        charEl.setAttribute('data-char-type', targetVisitFriendData.app?.type || 'cat');
-        charEl.querySelectorAll('.body-part').forEach(part => part.setAttribute('fill', targetVisitFriendData.app?.bodyColor || '#ffffff'));
-        charEl.querySelectorAll('.gill-part').forEach(part => part.setAttribute('fill', targetVisitFriendData.app?.gillColor || '#ff85a2'));
+        isVisiting = true;
+        visitTargetSave = targetVisitFriendSave;
         
-        document.getElementById('main-name-label').innerText = targetVisitFriendData.name;
-        document.getElementById('game-title').innerText = `【訪問中】${targetVisitFriendData.ownerName}のお家`;
-        
+        document.getElementById('game-title').innerText = `【訪問中】${visitTargetSave.ownerName}のお家`;
+        updateUI();
+
         const backBtn = document.createElement('button'); backBtn.id = 'visit-return-btn'; backBtn.innerText = '🏠 自分の家に帰る';
         backBtn.style.position = 'absolute'; backBtn.style.top = '60px'; backBtn.style.left = '50%'; backBtn.style.transform = 'translateX(-50%)'; backBtn.style.zIndex = '50'; backBtn.style.padding = '12px 24px'; backBtn.style.background = '#fa5252'; backBtn.style.color = 'white'; backBtn.style.border = 'none'; backBtn.style.borderRadius = '24px'; backBtn.style.fontWeight = 'bold'; backBtn.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)'; backBtn.style.cursor = 'pointer';
         
-        backBtn.onclick = () => { playSE('click'); backBtn.remove(); document.getElementById('game-title').innerText = "悩み解決！育成ゲーム"; updateUI(); };
+        backBtn.onclick = () => { 
+            playSE('click'); 
+            isVisiting = false;
+            visitTargetSave = null;
+            backBtn.remove(); 
+            document.getElementById('game-title').innerText = "悩み解決！育成ゲーム"; 
+            updateUI(); 
+        };
         document.getElementById('aquarium').appendChild(backBtn);
     };
 
@@ -995,7 +1200,7 @@
     function triggerNewWorry() { if (hasWorry) return; currentWorry = worryData[Math.floor(Math.random() * worryData.length)]; hasWorry = true; updateUI(); }
     document.getElementById('worry-lamp').onclick = (e) => {
         e.stopPropagation(); playSE('click');
-        if (!hasWorry || !currentWorry) return;
+        if (!hasWorry || !currentWorry || isVisiting) return;
         document.getElementById('modal-worry-title').innerText = `${gameState.name}の相談`; document.getElementById('worry-modal-text').innerText = currentWorry.text;
         const container = document.getElementById('worry-options-container'); container.innerHTML = '';
         currentWorry.options.forEach((opt) => {
@@ -1023,8 +1228,7 @@
     function askPurchaseCount(key, type) { playSE('click'); const item = type === 'food' ? foodData[key] : furnitureData[key]; const count = parseInt(prompt(`「${item.name}」をいくつ購入しますか？`, "1")); if(isNaN(count) || count <= 0) return; const total = item.cost * count; if(gameState.coins >= total) { playSE('coin'); gameState.coins -= total; if(type === 'food') gameState.inventory[key] = (gameState.inventory[key] || 0) + count; else gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + count; updateUI(); saveActiveGame(); openShopModal(); } else { playSE('error'); alert("コインが足りません"); } }
 
     function openFurnitureInventoryModal() { const container = document.getElementById('furniture-inv-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.furnitureInventory)) { if(qty > 0) { const f = furnitureData[key]; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerHTML = `${f.emoji}<br>${f.name}(${qty})`; btn.onclick = () => { playSE('click'); gameState.furnitureInventory[key]--; gameState.placedFurniture.push({ id: "f-"+Date.now(), key: key, emoji: f.emoji, x: 100, y: 150 }); closeModal('furniture-inventory-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); } } document.getElementById('furniture-inventory-modal').style.display = 'flex'; }
-    function renderPlacedFurniture() { const layer = document.getElementById('furniture-placement-layer'); layer.innerHTML = ''; if(!gameState.placedFurniture) gameState.placedFurniture = []; gameState.placedFurniture.forEach(f => { const div = document.createElement('div'); div.className = 'placed-furniture'; div.innerText = f.emoji; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; div.style.pointerEvents = 'auto'; let drag = false; let sx, sy; const start = (cx, cy) => { drag = true; div.classList.add('editing'); sx = cx - div.offsetLeft; sy = cy - div.offsetTop; }; const move = (cx, cy) => { if(!drag) return; f.x = cx - sx; f.y = cy - sy; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; }; const end = () => { if(drag) { drag = false; div.classList.remove('editing'); saveActiveGame(); } }; div.onmousedown = (e) => { start(e.clientX, e.clientY); e.stopPropagation(); }; window.onmousemove = (e) => move(e.clientX, e.clientY); window.onmouseup = end; div.ontouchstart = (e) => { start(e.touches[0].clientX, e.touches[0].clientY); e.stopPropagation(); }; window.ontouchmove = (e) => { if(drag) move(e.touches[0].clientX, e.touches[0].clientY); }; window.ontouchend = end; let lt = 0; div.onclick = (e) => { let now = Date.now(); if(now - lt < 300) { playSE('click'); gameState.furnitureInventory[f.key] = (gameState.furnitureInventory[f.key] || 0) + 1; gameState.placedFurniture = gameState.placedFurniture.filter(x => x.id !== f.id); updateUI(); saveActiveGame(); } lt = now; e.stopPropagation(); }; layer.appendChild(div); }); }
-
+    
     function openBagModal() { const container = document.getElementById('bag-container'); container.innerHTML = ''; for (const [key, qty] of Object.entries(gameState.inventory)) { if(qty > 0) { const item = foodData[key]; const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.innerHTML = `<div class="shop-item-info"><span>${item.name} (${qty}個)</span><span class="item-owned">あげる</span></div>`; btn.onclick = () => { playSE('click'); if(gameState.fullness >= 100) { playSE('error'); return alert("お腹いっぱいです"); } gameState.inventory[key]--; gameState.fullness = Math.min(gameState.fullness + item.full, 100); if(!gameState.totalFeeds) gameState.totalFeeds = 0; gameState.totalFeeds++; logMessage(`🍖 ${item.name} をあげました！`); gainExp(item.exp); updateMissionProgress('feed'); closeModal('bag-modal'); updateUI(); }; container.appendChild(btn); } } document.getElementById('bag-modal').style.display = 'flex'; }
     function openBgModal() { const container = document.getElementById('bg-container'); container.innerHTML = ''; bgList.forEach(bg => { if(!gameState.unlockedBgs.includes(bg.id)) return; const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = bg.name; btn.onclick = () => { playSE('click'); gameState.appearance.bgClass = bg.id; closeModal('bg-modal'); updateUI(); saveActiveGame(); }; container.appendChild(btn); }); document.getElementById('bg-modal').style.display = 'flex'; }
 
@@ -1048,6 +1252,7 @@
 
     // --- ミニゲーム ---
     document.getElementById('btn-minigame').onclick = () => {
+        if(isVisiting) { playSE('error'); return alert("訪問中はミニゲームで遊べません！"); }
         playSE('click');
         document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場"; document.getElementById('minigame-menu-view').style.display = 'grid'; document.getElementById('minigame-play-view').style.display = 'none';
         const menu = document.getElementById('minigame-menu-view'); menu.innerHTML = '';
@@ -1252,8 +1457,8 @@
     }
 
     // ボタン類の初期化
-    document.getElementById('btn-shop').onclick = () => { playSE('click'); openShopModal(); };
-    document.getElementById('btn-bag').onclick = () => { playSE('click'); openBagModal(); };
+    document.getElementById('btn-shop').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中はショップを使えません！'); } playSE('click'); openShopModal(); };
+    document.getElementById('btn-bag').onclick = () => { if(isVisiting) { playSE('error'); return alert('訪問中はごはんをあげられません！'); } playSE('click'); openBagModal(); };
     document.getElementById('close-shop').onclick = () => { playSE('click'); closeModal('shop-modal'); };
     document.getElementById('close-bag').onclick = () => { playSE('click'); closeModal('bag-modal'); };
     document.getElementById('close-bg-modal').onclick = () => { playSE('click'); closeModal('bg-modal'); };
@@ -1267,7 +1472,7 @@
         gameState.appearance.bodyColor = document.getElementById('init-body-color-picker').value; gameState.appearance.gillColor = document.getElementById('init-gill-color-picker').value;
         document.getElementById('welcome-screen').style.display = 'none';
         document.getElementById('game-slot-indicator').innerText = `Slot ${currentSlotIndex+1}`;
-        checkLoginStreakAndMissions(); updateUI(); saveActiveGame(true);
+        checkLoginStreakAndMissions(); updateUI(); checkNotices(); saveActiveGame(true);
     };
 
     document.querySelectorAll('#init-char-types .type-btn').forEach(btn => {
