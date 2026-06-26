@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ウパ育成">
+    <link rel="apple-touch-icon" href="icon.png">
+    <title>悩み解決！育成ゲーム Ultimate</title>
+    <style>
+        /* 基本スタイル設定 */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+            -webkit-user-select: none !important;
+            user-select: none !important;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #2b2b2b;
+            color: #2b2b2b;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 画面縦比率をコンパクトに調整 */
+        .game-container {
+            width: 100%;
+            max-width: 480px;
+            height: 100vh;
+            max-height: 600px;
+            background-color: #ffffff;
+            box-shadow: 0 0 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+
+        @media (min-width: 768px) and (min-height: 700px) {
+            .game-container {
+                height: 90vh;
+                border-radius: 24px;
+                overflow: hidden;
+            }
+        }
+
+        /* タイトル画面スタイル */
+        .title-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #e3fafc, #c5f6fa, #99e9f2);
+            z-index: 300;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+        }
+        .title-logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #0b7285;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        .title-btn {
+            width: 80%;
+            padding: 14px;
+            font-size: 1.05rem;
+            font-weight: bold;
+            color: white;
+            background-color: #15aabf;
+            border: none;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(21, 170, 191, 0.3);
+            cursor: pointer;
+        }
+        .title-btn.orange {
+            background-color: #ff922b;
+            box-shadow: 0 4px 12px rgba(255, 146, 43, 0.3);
+        }
+        .save-slots-container {
+            width: 100%;
+            max-height: 180px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .save-slot-card {
+            background: white;
+            border: 2px solid #ced4da;
+            border-radius: 14px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-align: left;
+        }
+        .slot-click-area {
+            flex-grow: 1;
+            cursor: pointer;
+        }
+        .delete-slot-btn {
+            background-color: #fa5252;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+
+        /* ヘッダー・ステータスエリア */
+        header {
+            background-color: #15aabf;
+            color: white;
+            padding: 10px 14px;
+            text-align: center;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .menu-trigger {
+            position: absolute;
+            left: 14px;
+            top: 10px;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            z-index: 12;
+            line-height: 1;
+        }
+
+        h1 {
+            margin: 0 0 2px 0;
+            font-size: 1.15rem;
+            letter-spacing: 1px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: inline-block;
+            cursor: pointer;
+        }
+        .name-edit-hint {
+            font-size: 0.6rem;
+            display: block;
+            margin-bottom: 4px;
+            opacity: 0.8;
+        }
+
+        .status-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            background-color: rgba(255, 255, 255, 0.23);
+            padding: 6px 10px;
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .exp-container {
+            flex-grow: 1;
+            margin: 0 8px;
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .exp-bar {
+            background-color: #ffdeeb;
+            width: 0%;
+            height: 100%;
+            transition: width 0.4s ease;
+        }
+        
+        .next-exp-txt {
+            font-size: 0.7rem;
+            min-width: 55px;
+            text-align: right;
+            opacity: 0.9;
+        }
+
+        .fullness-container {
+            flex-grow: 1;
+            margin-left: 8px;
+            background-color: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .fullness-bar {
+            background-color: #fab005;
+            width: 100%;
+            height: 100%;
+            transition: width 0.4s ease;
+        }
+
+        /* 背景 */
+        .aquarium {
+            flex-grow: 1;
+            position: relative;
+            overflow: hidden;
+            touch-action: none;
+            transition: background 0.5s ease;
+            background-size: cover !important;
+            background-position: center !important;
+        }
+        .bg-aquarium { background: linear-gradient(to bottom, #e3fafc, #99e9f2); }
+        .bg-garden { background: linear-gradient(to bottom, #ebfbee, #b2f2bb, #d8f5a2); }
+        .bg-deepsea { background: linear-gradient(to bottom, #0b1b3d, #020813); }
+        .bg-space { background: linear-gradient(to bottom, #1a0933, #05010c); }
+        .bg-sunset { background: linear-gradient(to bottom, #ff8787, #ffd8a8); }
+        .bg-candy { background: linear-gradient(to bottom, #fff0f6, #ffdeeb); }
+        .bg-room { background: linear-gradient(to bottom, #fff9db, #ffe066); }
+        .bg-snow { background: linear-gradient(to bottom, #f1f3f5, #ced4da); }
+
+        /* お悩み電球 */
+        .worry-lamp {
+            position: absolute;
+            font-size: 2rem;
+            cursor: pointer;
+            animation: lamp-float 1.5s ease-in-out infinite alternate;
+            z-index: 15;
+            display: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+        @keyframes lamp-float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-6px) scale(1.05); }
+        }
+
+        /* キャラクター配置 */
+        .char-wrapper {
+            position: absolute;
+            width: 110px;
+            height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: left 0.8s linear, top 0.8s linear;
+            cursor: pointer;
+            z-index: 6;
+        }
+
+        .upa-character {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            animation: swim 4s ease-in-out infinite;
+        }
+
+        .costume-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 7;
+        }
+
+        .char-name-label {
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            margin-top: 2px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            color: #2b2b2b;
+            border: 1px solid #dee2e6;
+        }
+
+        /* 家具配置 */
+        .placed-furniture {
+            position: absolute;
+            font-size: 2.4rem;
+            cursor: move;
+            z-index: 4;
+            user-select: none;
+            touch-action: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+        .placed-furniture.editing {
+            border: 2px dashed #15aabf;
+            background-color: rgba(21, 170, 191, 0.1);
+            border-radius: 8px;
+        }
+
+        .preview-area {
+            width: 110px;
+            height: 120px;
+            margin: 5px auto;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        @keyframes swim {
+            0% { transform: translateY(0px) rotate(0deg); }
+            33% { transform: translateY(-3px) rotate(2deg); }
+            66% { transform: translateY(3px) rotate(-2deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* モーダル */
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            z-index: 100;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .side-drawer {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.4);
+            z-index: 150;
+            justify-content: flex-start;
+        }
+        .drawer-content {
+            width: 260px;
+            height: 100%;
+            background-color: white;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.15);
+            display: flex;
+            flex-direction: column;
+            padding: 16px 12px;
+            animation: slideRight 0.3s ease;
+            overflow-y: auto;
+        }
+        @keyframes slideRight {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+        .drawer-header {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #15aabf;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #e9ecef;
+            padding-bottom: 8px;
+        }
+        .drawer-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 10px 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            text-align: left;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 4px;
+        }
+
+        .welcome-screen {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #e3fafc, #c5f6fa);
+            z-index: 200;
+            flex-direction: column;
+            padding: 16px;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background-color: rgba(255, 255, 255, 0.98);
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 16px 16px;
+            width: 100%;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.15);
+            animation: slideUp 0.3s ease;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header, .welcome-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #1c7ed6;
+            text-align: center;
+        }
+
+        .shop-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 4px;
+        }
+        .shop-tab-btn {
+            flex: 1;
+            padding: 6px;
+            border: none;
+            background: #f1f3f5;
+            font-weight: bold;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .shop-tab-btn.active {
+            background-color: #15aabf;
+            color: white;
+        }
+
+        .name-input-box {
+            width: 100%;
+            padding: 10px;
+            font-size: 0.95rem;
+            border: 2px solid #ced4da;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 10px;
+            outline: none;
+            font-weight: 600;
+        }
+
+        .option-btn, .shop-item-btn, .close-btn, .menu-btn, .type-btn, .start-btn {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+            touch-action: manipulation;
+        }
+
+        .option-btn, .shop-item-btn {
+            display: block;
+            width: 100%;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            text-align: left;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .shop-item-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .item-cost {
+            background-color: #fff3bf;
+            color: #d9480f;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+        .item-owned {
+            background-color: #e3fafc;
+            color: #0b7285;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .close-btn, .start-btn {
+            display: block;
+            width: 100%;
+            background-color: #e9ecef;
+            color: #495057;
+            border: none;
+            border-radius: 12px;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+        .start-btn {
+            background-color: #ff922b;
+            color: white;
+            font-size: 1rem;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .color-picker-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin: 6px 0 4px 0;
+            color: #495057;
+        }
+        .color-options {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .custom-color-picker {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 30px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        .custom-color-picker::-webkit-color-swatch { border-radius: 8px; border: 2px solid #ced4da; }
+
+        .type-btn {
+            background-color: #f1f3f5;
+            border: 1px solid #ced4da;
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .type-btn.active {
+            background-color: #15aabf;
+            color: white;
+            border-color: #15aabf;
+        }
+
+        footer {
+            background-color: #f8f9fa;
+            padding: 8px;
+            border-top: 1px solid #e9ecef;
+            z-index: 10;
+        }
+
+        .action-menu {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .menu-btn {
+            background-color: #15aabf;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 4px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(21, 170, 191, 0.2);
+        }
+        .menu-btn.orange { background-color: #ff922b; }
+        .menu-btn.green { background-color: #40c057; }
+
+        .game-log {
+            background-color: #f1f3f5;
+            border-radius: 10px;
+            padding: 8px;
+            margin-top: 6px;
+            font-size: 0.8rem;
+            color: #495057;
+            min-height: 38px;
+            max-height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 500;
+        }
+        .game-log.alert-flash { background-color: #fff0f6; color: #d6336c; }
+
+        .char-part { display: none; }
+        [data-char-type="upa"] .part-upa { display: inline; }
+        [data-char-type="cat"] .part-cat { display: inline; }
+        [data-char-type="chick"] .part-chick { display: inline; }
+        [data-char-type="fish"] .part-fish { display: inline; }
+        [data-char-type="dog"] .part-dog { display: inline; }
+        [data-char-type="bear"] .part-bear { display: inline; }
+        [data-char-type="rabbit"] .part-rabbit { display: inline; }
+
+        .minigame-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            max-height: 260px;
+            overflow-y: auto;
+            padding: 2px;
+        }
+        .game-panel {
+            background: #e3fafc;
+            border: 1px solid #99e9f2;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .mission-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            border-left: 4px solid #ced4da;
+        }
+        .mission-item.completed { border-left-color: #40c057; background: #ebfbee; }
+        
+        .gacha-box {
+            text-align: center;
+            padding: 14px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            color: white;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* ガチャ豪華演出用 */
+        .gacha-full-screen {
+            background: linear-gradient(135deg, #1a0b2e, #4b1d52, #99326d);
+            border-radius: 0 !important;
+            height: 100vh !important;
+            max-height: none !important;
+            color: white;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        .gacha-full-screen::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            animation: spin 10s linear infinite;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .gacha-machine {
+            font-size: 6rem;
+            margin-bottom: 20px;
+            z-index: 2;
+            transition: transform 0.1s;
+        }
+        .shake-anim { animation: gacha-shake 0.4s infinite; }
+        @keyframes gacha-shake {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            25% { transform: translate(-2px, -2px) rotate(-5deg); }
+            50% { transform: translate(-2px, 2px) rotate(5deg); }
+            75% { transform: translate(2px, -2px) rotate(-5deg); }
+            100% { transform: translate(2px, 2px) rotate(0deg); }
+        }
+        .gacha-result-item {
+            font-size: 5rem;
+            animation: zoom-in 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2;
+        }
+        @keyframes zoom-in {
+            from { transform: scale(0) rotate(-180deg); opacity: 0; }
+            to { transform: scale(1) rotate(0); opacity: 1; }
+        }
+
+        .trophy-item {
+            background: #fff3bf;
+            border: 1px solid #fcc419;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #d9480f;
+        }
+    </style>
+</head>
+<body>
+
+<audio id="bgm-main" loop src="https://dova-s.jp/_contents/bgm/play/dummy_main.mp3"></audio>
+<audio id="bgm-title" loop src="https://dova-s.jp/_contents/bgm/play/dummy_title.mp3"></audio>
+<audio id="bgm-gacha" loop src="https://dova-s.jp/_contents/bgm/play/dummy_gacha.mp3"></audio>
+
+<div class="game-container">
+    <div class="title-screen" id="title-screen">
+        <div class="title-logo">🌟 悩み解決！ 🌟<br>育成ゲーム Ultimate</div>
+        
+        <button class="title-btn orange" id="title-start-new-btn">✨ 初めからあそぶ</button>
+        <button class="title-btn" id="title-load-menu-btn">💾 続きからあそぶ</button>
+
+        <div id="title-load-pane" style="display:none; width:100%; margin-top:6px;">
+            <div style="font-size:0.75rem; font-weight:bold; color:#495057; margin-bottom:4px;">セーブデータを選んでね</div>
+            <div class="save-slots-container" id="save-slots-container"></div>
+            
+            <div style="margin-top: 10px; padding: 10px; background: #fff3bf; border-radius: 10px; border: 1px solid #fcc419;">
+                <div style="font-size:0.8rem; font-weight:bold; color:#d9480f; margin-bottom:4px;">🔄 データ引き継ぎ</div>
+                <input type="text" id="title-transfer-id" placeholder="引き継ぎ元フレンドIDを入力" class="name-input-box" style="padding:6px; font-size:0.8rem; margin-bottom:6px;">
+                <input type="password" id="title-transfer-pass" placeholder="パスワードを入力" class="name-input-box" style="padding:6px; font-size:0.8rem; margin-bottom:6px;">
+                <button id="btn-title-execute-transfer" style="width:100%; font-size:0.8rem; font-weight:bold; background:#d9480f; color:white; border:none; padding:8px; border-radius:6px;">この端末に同期する</button>
+            </div>
+
+            <button class="close-btn" id="btn-back-to-title" style="padding:6px; font-size:0.8rem; margin-top:6px;">もどる</button>
+        </div>
+    </div>
+
+    <div class="welcome-screen" id="welcome-screen">
+        <div class="welcome-header">🌟 新しいお友達づくり 🌟</div>
+        <input type="text" class="name-input-box" id="init-name-input" placeholder="なまえを入力" maxlength="12" value="ウパのココロ">
+
+        <div class="preview-area">
+            <div class="upa-character" id="preview-char" data-char-type="upa" style="margin:0; width:90px; height:90px;"></div>
+            <div class="char-name-label" id="preview-name-label">ウパのココロ</div>
+        </div>
+
+        <div class="color-picker-title">🐾 どうぶつの種類</div>
+        <div class="color-options" id="init-char-types">
+            <button class="type-btn active" data-type="upa">ウパ</button>
+            <button class="type-btn" data-type="cat">ねこ</button>
+            <button class="type-btn" data-type="chick">ひよこ</button>
+            <button class="type-btn" data-type="fish">さかな</button>
+            <button class="type-btn" data-type="dog">いぬ</button>
+            <button class="type-btn" data-type="bear">くま</button>
+            <button class="type-btn" data-type="rabbit">うさぎ</button>
+        </div>
+
+        <div class="color-picker-title">🎨 からだの色</div>
+        <div class="color-options">
+            <input type="color" class="custom-color-picker" id="init-body-color-picker" value="#fff0f3">
+        </div>
+
+        <div class="color-picker-title">🌸 かざり・パーツの色</div>
+        <div class="color-options">
+            <input type="color" class="custom-color-picker" id="init-gill-color-picker" value="#ff85a2">
+        </div>
+
+        <button class="start-btn" id="btn-start-game">この子と暮らす！</button>
+    </div>
+
+    <header>
+        <div class="menu-trigger" id="menu-trigger">☰</div>
+        <h1 id="game-title">悩み解決！育成ゲーム</h1>
+        <span class="name-edit-hint">（タップして名前を変更できます）</span>
+        <div class="status-bar">
+            <div class="status-row">
+                <span id="level-display">Lv.1</span>
+                <div class="exp-container"><div class="exp-bar" id="exp-bar"></div></div>
+                <span class="next-exp-txt" id="next-exp-display">あと 30 EXP</span>
+            </div>
+            <div class="status-row">
+                <span>🍖 まんぷく</span>
+                <div class="fullness-container"><div class="fullness-bar" id="fullness-bar"></div></div>
+                <span style="min-width: 50px; text-align: right;" id="fullness-text">100%</span>
+            </div>
+            <div class="status-row">
+                <span id="personality-display" style="background:rgba(0,0,0,0.15); padding:1px 4px; border-radius:4px;">称号: 見習い</span>
+                <span id="love-display">💖 なつき度: Lv.0</span>
+                <span id="game-slot-indicator" style="background:rgba(0,0,0,0.15); padding:1px 4px; border-radius:4px;">Slot1</span>
+                <span id="coin-display">💰 150</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="aquarium bg-aquarium" id="aquarium">
+        <div class="worry-lamp" id="worry-lamp">💡</div>
+
+        <div class="char-wrapper" id="char-wrapper">
+            <div class="upa-character" id="upa-char" data-char-type="upa"></div>
+            <div class="costume-layer" id="costume-layer"></div>
+            <div class="char-name-label" id="main-name-label">ウパのココロ</div>
+        </div>
+        
+        <div id="furniture-placement-layer" style="position:absolute; width:100%; height:100%; top:0; left:0; pointer-events:none;"></div>
+    </div>
+
+    <footer>
+        <div class="action-menu">
+            <button class="menu-btn orange" id="btn-shop">🛒 ショップ</button>
+            <button class="menu-btn" id="btn-bag">🎒 ごはん</button>
+            <button class="menu-btn green" id="btn-minigame">🎮 ミニゲーム</button>
+        </div>
+        <div class="game-log" id="game-log">のんびり過ごしているよ。</div>
+    </footer>
+
+    <div class="side-drawer" id="side-drawer">
+        <div class="drawer-content">
+            <div class="drawer-header">メニュー</div>
+            <button class="drawer-btn" id="drawer-profile-btn">👤 プロフィール</button>
+            <button class="drawer-btn" id="drawer-mission-btn">📅 ミッション・ログボ</button>
+            <button class="drawer-btn" id="drawer-gacha-btn">🪙 家具・衣装ガチャ</button>
+            <button class="drawer-btn" id="drawer-dress-btn">👗 きがえ・クローゼット</button>
+            <button class="drawer-btn" id="drawer-furniture-btn">🛋️ 家具を設置する</button>
+            <button class="drawer-btn" id="drawer-bg-btn">🖼️ 背景模様替え</button>
+            <button class="drawer-btn" id="drawer-friend-btn">🤝 フレンド</button>
+            <button class="drawer-btn" id="drawer-trophy-btn" style="background:#fff3bf; color:#d9480f;">🏆 トロフィー</button>
+            <button class="drawer-btn" id="drawer-transfer-btn" style="background:#e3fafc; color:#0b7285;">🔑 ID確認・パスワード</button>
+            <button class="drawer-btn" id="drawer-save-btn" style="background:#f8f9fa; border: 1px solid #ced4da;">💾 データを保存</button>
+            <button class="drawer-btn" id="drawer-title-btn" style="margin-top:10px; background:#f1f3f5;">🚪 タイトルへ戻る</button>
+            <button class="close-btn" id="close-drawer" style="margin-top:20px;">閉じる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="profile-modal">
+        <div class="modal-content" style="text-align: center;">
+            <div class="modal-header">プロフィール</div>
+            <div style="font-size:1rem; font-weight:bold; margin-bottom:6px;" id="prof-name"></div>
+            <div style="font-size:0.85rem; margin-bottom:4px;" id="prof-level"></div>
+            <div style="font-size:0.85rem; margin-bottom:4px; font-weight:bold; color:#d9480f;" id="prof-title">称号: 見習い</div>
+            <div style="font-size:0.85rem; margin-bottom:4px;" id="prof-coins"></div>
+            <div style="font-size:0.85rem; margin-bottom:4px; color:#15aabf;" id="prof-stats"></div>
+            <div style="font-size:0.85rem; margin-bottom:8px; color:#e64980;" id="prof-login-days"></div>
+            <button class="close-btn" id="close-profile">閉じる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="transfer-modal">
+        <div class="modal-content">
+            <div class="modal-header">🔑 アカウント情報</div>
+            <div style="background:#f1f3f5; padding:10px; border-radius:10px; font-size:0.85rem; margin-bottom:10px; text-align:center;">
+                タイトル画面から引き継ぐ際に必要な情報です。<br><br>
+                <b>あなたのフレンドID:</b> <br><span id="trans-my-id" style="color:#15aabf; font-size:1.1rem; font-weight:bold;">---</span><br><br>
+                <b>現在のパスワード:</b> <br><span id="trans-my-pass" style="color:#d6336c; font-size:1.1rem; font-weight:bold;">---</span>
+            </div>
+            <button id="btn-change-pass" style="width:100%; font-size:0.9rem; font-weight:bold; background:#e3fafc; color:#0b7285; border:1px solid #15aabf; padding:10px; border-radius:6px; margin-bottom:10px;">パスワードを変更する</button>
+            <button class="close-btn" id="close-transfer-modal">閉じる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="trophy-modal">
+        <div class="modal-content">
+            <div class="modal-header">🏆 獲得トロフィー</div>
+            <div id="trophy-list-container" style="max-height: 300px; overflow-y: auto;"></div>
+            <button class="close-btn" id="close-trophy-modal">閉じる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="mission-modal">
+        <div class="modal-content">
+            <div class="modal-header">📅 デイリー要素</div>
+            <div style="background:#e8f7ff; padding:10px; border-radius:10px; text-align:center; font-size:0.85rem; margin-bottom:10px;" id="login-bonus-zone"></div>
+            <div style="font-weight:bold; font-size:0.85rem; margin-bottom:6px;">今日のミッション:</div>
+            <div id="mission-list-container"></div>
+            <button class="close-btn" id="close-mission">閉じる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="gacha-modal">
+        <div class="modal-content gacha-full-screen">
+            <div class="modal-header" style="color:white; z-index:2; font-size:1.5rem; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">🪙 よろずアイテムガチャ</div>
+            <div class="gacha-box" id="gacha-ui-box">
+                <p style="font-size:0.9rem; margin-bottom:14px; font-weight:bold; text-shadow: 0 1px 2px rgba(0,0,0,0.5);">1回 <b>💰 50 コイン</b>で挑戦！<br>限定衣装や高級家具を手に入れよう！</p>
+                <div id="gacha-machine" class="gacha-machine">🎰</div>
+                <button class="start-btn" id="btn-play-gacha" style="margin:0 auto; width:80%; font-size:1.1rem; background:#fcc419; color:#d9480f; box-shadow: 0 4px 0 #e67700;">ガチャを引く 🎲</button>
+            </div>
+            <div id="gacha-result-area" style="display:none; flex-direction:column; align-items:center; z-index:2;">
+                <div id="gacha-result-icon" class="gacha-result-item"></div>
+                <div id="gacha-result-text" style="font-weight:bold; font-size:1.2rem; margin-top:10px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);"></div>
+                <button class="start-btn" id="btn-gacha-next" style="margin-top:20px; width:200px; background:#40c057;">もう一度引く</button>
+            </div>
+            <button class="close-btn" id="close-gacha" style="position:absolute; bottom:20px; width:80%; z-index:2; background:rgba(255,255,255,0.2); color:white;">ガチャをやめる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="dress-modal">
+        <div class="modal-content">
+            <div class="modal-header">👗 クローゼット（きがえ）</div>
+            <div id="dress-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:200px; overflow-y:auto;"></div>
+            <button class="close-btn" id="close-dress">閉じる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="friend-modal">
+        <div class="modal-content">
+            <div class="modal-header">フレンド機能</div>
+            <div style="background:#f1f3f5; padding:8px; border-radius:10px; text-align:center; font-weight:bold; margin-bottom:8px; font-size:0.85rem;">
+                あなたのフレンドID: <span id="my-friend-id" style="color:#15aabf;">---</span>
+            </div>
+            <div style="display:flex; gap:4px; margin-bottom:8px;">
+                <input type="text" class="name-input-box" id="friend-id-input" placeholder="友達のIDを入力" style="margin:0; padding:6px; font-size:0.85rem;">
+                <button class="type-btn" id="btn-add-friend" style="background:#15aabf; color:white; border:none;">登録</button>
+            </div>
+            <div id="friend-list-container" style="max-height:120px; overflow-y:auto; background:#f8f9fa; font-size:0.8rem; padding:4px; border-radius:8px;"></div>
+            <button class="close-btn" id="close-friend">閉じる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="friend-detail-modal" style="z-index:160;">
+        <div class="modal-content" style="text-align: center;">
+            <div class="modal-header">フレンド情報</div>
+            <div style="font-size:1.1rem; font-weight:bold; color:#15aabf;" id="f-detail-name"></div>
+            <div id="f-detail-level" style="font-size:0.85rem;"></div>
+            <div id="f-detail-coin" style="font-size:0.85rem;"></div>
+            <button class="close-btn" id="close-friend-detail">戻る</button>
+        </div>
+    </div>
+
+    <div class="modal" id="furniture-inventory-modal">
+        <div class="modal-content">
+            <div class="modal-header">もっている家具を設置</div>
+            <div id="furniture-inv-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:200px; overflow-y:auto;"></div>
+            <button class="close-btn" id="close-furniture-inv">とじる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="worry-modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modal-worry-title">お悩みをきく</div>
+            <p style="text-align: center; font-weight: bold; font-size: 0.95rem; margin-bottom: 14px;" id="worry-modal-text"></p>
+            <div id="worry-options-container"></div>
+            <button class="close-btn" id="close-worry">とじる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="shop-modal">
+        <div class="modal-content">
+            <div class="modal-header">よろずショップ</div>
+            <div class="shop-tabs">
+                <button class="shop-tab-btn active" id="tab-food-btn">🍖 エサ</button>
+                <button class="shop-tab-btn" id="tab-bg-btn">🖼️ 背景</button>
+                <button class="shop-tab-btn" id="tab-furni-btn">🛋️ 家具</button>
+            </div>
+            <div id="shop-food-pane" class="shop-pane"></div>
+            <div id="shop-bg-pane" class="shop-pane" style="display:none;">
+                <input type="file" id="custom-bg-uploader" accept="image/*" style="margin-bottom:6px; font-size:0.75rem; width:100%;">
+                <div id="shop-bg-list"></div>
+            </div>
+            <div id="shop-furni-pane" class="shop-pane" style="display:none; max-height:220px; overflow-y:auto;"></div>
+            <button class="close-btn" id="close-shop">とじる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="bag-modal">
+        <div class="modal-content">
+            <div class="modal-header">持っているごはん</div>
+            <div id="bag-container" style="max-height:200px; overflow-y:auto;"></div>
+            <button class="close-btn" id="close-bag">とじる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="bg-modal">
+        <div class="modal-content">
+            <div class="modal-header">背景の模様替え</div>
+            <div id="bg-container" style="display:grid; grid-template-columns:1fr 1fr; gap:8px; max-height:180px; overflow-y:auto;"></div>
+            <button class="close-btn" id="close-bg-modal">とじる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="minigame-modal">
+        <div class="modal-content">
+            <div class="modal-header" id="minigame-header-title">🎮 ミニゲーム広場</div>
+            <div id="minigame-menu-view" class="minigame-grid"></div>
+            <div id="minigame-play-view" style="display:none; padding:6px 0;">
+                <div id="minigame-arena" class="game-panel"></div>
+                <button class="close-btn" id="btn-abort-game" style="background-color:#fa5252; color:white; margin-top:10px;">をやめる</button>
+            </div>
+            <button class="close-btn" id="close-minigame">とじる</button>
+        </div>
+    </div>
+
+    <div class="modal" id="make-modal">
+        <div class="modal-content">
+            <div class="modal-header">キャラクターメイク</div>
+            <div class="color-picker-title">🐾 どうぶつの種類</div>
+            <div class="color-options" id="char-types">
+                <button class="type-btn" data-type="upa">ウパ</button>
+                <button class="type-btn" data-type="cat">ねこ</button>
+                <button class="type-btn" data-type="chick">ひよこ</button>
+                <button class="type-btn" data-type="fish">さかな</button>
+                <button class="type-btn" data-type="dog">いぬ</button>
+                <button class="type-btn" data-type="bear">くま</button>
+                <button class="type-btn" data-type="rabbit">うさぎ</button>
+            </div>
+            <div class="color-picker-title">🎨 からだの色</div>
+            <div class="color-options"><input type="color" class="custom-color-picker" id="body-color-picker"></div>
+            <div class="color-picker-title">🌸 かざり・パーツの色</div>
+            <div class="color-options"><input type="color" class="custom-color-picker" id="gill-color-picker"></div>
+            <button class="close-btn" id="close-make">決定する</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- SVG定義 ---
+    const SVG_TEMPLATE = `
+        <svg viewBox="0 0 100 120" width="100%" height="100%">
+            <path class="char-part part-upa gill-part" d="M 25,40 C 10,35 5,50 25,50" />
+            <path class="char-part part-upa gill-part" d="M 23,45 C 5,43 5,55 23,55" />
+            <path class="char-part part-upa gill-part" d="M 25,50 C 10,53 10,65 25,60" />
+            <path class="char-part part-upa gill-part" d="M 75,40 C 90,35 95,50 75,50" />
+            <path class="char-part part-upa gill-part" d="M 77,45 C 95,43 95,55 77,55" />
+            <path class="char-part part-upa gill-part" d="M 75,50 C 90,53 90,65 75,60" />
+            <path class="char-part part-upa body-part" d="M 50,55 C 35,70 40,105 50,105 C 60,105 65,70 50,55" />
+            <path class="char-part part-upa" d="M 50,65 C 43,75 45,100 50,100 C 55,100 57,75 50,65" fill="#ffccd5" opacity="0.5"/>
+            <ellipse class="char-part part-upa body-part" cx="50" cy="50" rx="28" ry="22" />
+            <polygon class="char-part part-cat gill-part" points="22,33 36,16 43,33" />
+            <polygon class="char-part part-cat gill-part" points="78,33 64,16 57,33" />
+            <path class="char-part part-cat gill-part" d="M 62,90 Q 80,95 78,75 Q 76,60 84,62 Q 83,85 62,98 Z" />
+            <path class="char-part part-cat body-part" d="M 32,54 C 28,75 32,100 50,100 C 68,100 72,75 68,54 Z" />
+            <ellipse class="char-part part-cat" cx="50" cy="78" rx="14" ry="16" fill="#ffffff" opacity="0.8"/>
+            <circle class="char-part part-cat body-part" cx="50" cy="44" r="23" />
+            <line class="char-part part-cat" x1="20" y1="44" x2="8" y2="42" stroke="#2b2b2b" stroke-width="1.5" />
+            <line class="char-part part-cat" x1="20" y1="48" x2="8" y2="50" stroke="#2b2b2b" stroke-width="1.5" />
+            <line class="char-part part-cat" x1="80" y1="44" x2="92" y2="42" stroke="#2b2b2b" stroke-width="1.5" />
+            <line class="char-part part-cat" x1="80" y1="48" x2="92" y2="50" stroke="#2b2b2b" stroke-width="1.5" />
+            <path class="char-part part-chick body-part" d="M 50,50 C 30,50 30,95 50,95 C 70,95 70,50 50,50" />
+            <circle class="char-part part-chick body-part" cx="50" cy="44" r="20" />
+            <polygon class="char-part part-chick gill-part" points="46,44 54,44 50,52" />
+            <polygon class="char-part part-fish gill-part" points="74,50 94,33 87,50 94,67" />
+            <ellipse class="char-part part-fish body-part" cx="44" cy="50" rx="28" ry="20" />
+            <path class="char-part part-dog gill-part" d="M 23,32 C 12,32 10,62 25,56" />
+            <path class="char-part part-dog gill-part" d="M 77,32 C 88,32 90,62 65,56" />
+            <path class="char-part part-dog body-part" d="M 30,55 C 26,75 30,102 50,102 C 70,102 74,75 70,55 Z" />
+            <circle class="char-part part-dog body-part" cx="50" cy="44" r="24" />
+            <circle class="char-part part-bear gill-part" cx="30" cy="26" r="8" />
+            <circle class="char-part part-bear gill-part" cx="70" cy="26" r="8" />
+            <path class="char-part part-bear body-part" d="M 32,55 C 26,75 30,102 50,102 C 70,102 74,75 70,55 Z" />
+            <circle class="char-part part-bear body-part" cx="50" cy="44" r="23" />
+            <ellipse class="char-part part-bear" cx="50" cy="51" rx="8" ry="6" fill="#ffffff" />
+            <ellipse class="char-part part-rabbit gill-part" cx="34" cy="22" rx="6" ry="16" transform="rotate(-10 34 22)" />
+            <ellipse class="char-part part-rabbit gill-part" cx="66" cy="22" rx="6" ry="16" transform="rotate(10 66 22)" />
+            <path class="char-part part-rabbit body-part" d="M 32,55 C 26,75 30,102 50,102 C 70,102 74,75 70,55 Z" />
+            <circle class="char-part part-rabbit body-part" cx="50" cy="46" r="21" />
+            
+            <circle cx="40" cy="43" r="3.5" fill="#2b2b2b" />
+            <circle cx="60" cy="43" r="3.5" fill="#2b2b2b" />
+            <circle cx="33" cy="49" r="3.5" fill="#ffb3c1" opacity="0.6" />
+            <circle cx="67" cy="49" r="3.5" fill="#ffb3c1" opacity="0.6" />
+            <path d="M 47,50 Q 50,53 53,50" stroke="#2b2b2b" stroke-width="2" fill="none" stroke-linecap="round" />
+            <polygon class="char-part part-dog part-bear" points="48,47 52,47 50,49" fill="#2b2b2b" />
+        </svg>
+    `;
+
+    // --- セーブデータの永続化とマイグレーション処理 ---
+    const SAVE_KEY = 'upa_slots_ultimate_v1';
+    const ACCOUNT_POOL_KEY = 'upa_account_pool_ultimate_v1';
+
+    // ゲームの完全なデフォルト構造
+    function createInitialState() {
+        return {
+            name: "ウパのココロ", level: 1, exp: 0, maxExp: 30, coins: 150, fullness: 80,
+            friendId: "FC-" + Math.floor(100000 + Math.random() * 900000), password: "1234",
+            friends: [],
+            inventory: { pellet: 1, worm: 0, shrimp: 0, cookie: 0, cake: 0, premium: 0, apple: 0, banana: 0, melon: 0, strawberry: 0, meat: 0, fish_bone: 0, cheese: 0, milk: 0, yogurt: 0, pudding: 0, donut: 0, chocolate: 0, icecream: 0, candy: 0, popcorn: 0, burger: 0, pizza: 0, ramen: 0, sushi: 0, steak: 0 },
+            unlockedBgs: ["bg-aquarium"], customBgData: "", furnitureInventory: {}, placedFurniture: [],
+            appearance: { type: "upa", bodyColor: "#fff0f3", gillColor: "#ff85a2", bgClass: "bg-aquarium" },
+            lastLoginDate: "", currentLoginStreak: 0, maxLoginStreak: 0,
+            loveLevel: 0, loveExp: 0, maxLoveExp: 10,
+            unlockedCostumes: ["なし"], currentCostume: "なし",
+            dailyMissions: [
+                { id: "feed", desc: "ごはんを1回あげる", target: 1, current: 0, completed: false },
+                { id: "game", desc: "ミニゲームを1回遊ぶ", target: 1, current: 0, completed: false },
+                { id: "worry", desc: "お悩みを1回解決する", target: 1, current: 0, completed: false }
+            ],
+            lastMissionDate: "",
+            totalFeeds: 0, totalMinigames: 0, trophies: []
+        };
+    }
+
+    // データ読み込み時に不足している項目を補完するマイグレーション関数
+    function migrateData(savedData) {
+        const defaultState = createInitialState();
+        if (!savedData) return defaultState;
+        
+        // ネストされたオブジェクトも安全にマージする
+        return {
+            ...defaultState,
+            ...savedData,
+            appearance: { ...defaultState.appearance, ...(savedData.appearance || {}) },
+            inventory: { ...defaultState.inventory, ...(savedData.inventory || {}) },
+            furnitureInventory: { ...defaultState.furnitureInventory, ...(savedData.furnitureInventory || {}) }
+        };
+    }
+
+    // --- ゲームデータ管理（メモリ上） ---
+    let gameState = createInitialState(); // 現在プレイ中の動的な「ゲームデータ」
+    
+    let currentSlotIndex = 0;
+    let logTimer = null;
+    let isMoving = false;
+    let bgmMode = 'title'; // 'title', 'main', 'gacha'
+
+    // --- セーブデータ管理（ストレージ） ---
+    function getGlobalSaves() {
+        const saves = localStorage.getItem(SAVE_KEY);
+        return saves ? JSON.parse(saves) : [null, null]; // ストレージ上の「セーブデータ」群
+    }
+    function saveAllSlots(arr) {
+        localStorage.setItem(SAVE_KEY, JSON.stringify(arr));
+    }
+    function getAccountPool() {
+        const pool = localStorage.getItem(ACCOUNT_POOL_KEY);
+        return pool ? JSON.parse(pool) : [];
+    }
+    function registerToAccountPool(state) {
+        let pool = getAccountPool();
+        pool = pool.filter(acc => acc.friendId !== state.friendId);
+        pool.push(JSON.parse(JSON.stringify(state)));
+        localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool));
+    }
+
+    function saveActiveGame(showFlash = false) {
+        let slots = getGlobalSaves();
+        slots[currentSlotIndex] = gameState; // 現在のゲームデータをセーブデータに反映
+        saveAllSlots(slots);
+        registerToAccountPool(gameState);
+        if (showFlash) logMessage("💾 セーブデータを保存しました！", true);
+    }
+
+    // --- 各種データ定義 ---
+    const foodData = {
+        pellet: { name: "ひかりウパ（粒餌）", cost: 10, exp: 5, full: 10 }, worm: { name: "冷凍赤虫", cost: 25, exp: 15, full: 20 }, shrimp: { name: "乾燥淡水エビ", cost: 50, exp: 32, full: 25 }, cookie: { name: "どうぶつクッキー", cost: 80, exp: 55, full: 30 }, cake: { name: "ミニパンケーキ", cost: 150, exp: 110, full: 50 }, premium: { name: "高級ゴールド極エサ", cost: 300, exp: 240, full: 70 }, apple: { name: "しゃきしゃき林檎", cost: 15, exp: 8, full: 12 }, banana: { name: "完熟バナナ", cost: 18, exp: 10, full: 15 }, melon: { name: "高級マスクメロン", cost: 120, exp: 85, full: 40 }, strawberry: { name: "真っ赤なイチゴ", cost: 22, exp: 14, full: 10 }, meat: { name: "ほねつき肉", cost: 60, exp: 42, full: 35 }, fish_bone: { name: "美味しいお魚", cost: 35, exp: 22, full: 20 }, cheese: { name: "濃厚まろやかチーズ", cost: 30, exp: 18, full: 18 }, milk: { name: "新鮮しぼりたてミルク", cost: 12, exp: 6, full: 10 }, yogurt: { name: "健康プレーンヨーグルト", cost: 20, exp: 12, full: 14 }, pudding: { name: "窯出しとろけるプリン", cost: 45, exp: 28, full: 22 }, donut: { name: "もちもち極上ドーナツ", cost: 40, exp: 25, full: 20 }, chocolate: { name: "カカオ高配合チョコ", cost: 55, exp: 38, full: 15 }, icecream: { name: "濃厚バニラアイス", cost: 50, exp: 35, full: 18 }, candy: { name: "カラフル渦巻きアメ", cost: 8, exp: 3, full: 5 }, popcorn: { name: "弾けるバターポップコーン", cost: 28, exp: 16, full: 15 }, burger: { name: "ジューシーハンバーガー", cost: 95, exp: 65, full: 45 }, pizza: { name: "とろ〜り熱々ピザ", cost: 110, exp: 78, full: 50 }, ramen: { name: "こだわり醤油ラーメン", cost: 100, exp: 72, full: 48 }, sushi: { name: "職人が握った特上寿司", cost: 180, exp: 135, full: 55 }, steak: { name: "極厚A5和牛ステーキ", cost: 250, exp: 195, full: 65 }
+    };
+
+    const bgList = [
+        { id: "bg-aquarium", name: "🫧 アクアリウム", cost: 0 }, { id: "bg-garden", name: "🏡 ひろいお庭", cost: 100 }, { id: "bg-deepsea", name: "⚓ 静かな深海", cost: 150 }, { id: "bg-space", name: "🌌 きらきら宇宙", cost: 200 }, { id: "bg-sunset", name: "🌇 夕焼け空", cost: 120 }, { id: "bg-candy", name: "🍬 お菓子の国", cost: 180 }, { id: "bg-room", name: "🛋️ マイルーム", cost: 80 }, { id: "bg-snow", name: "❄️ スノーランド", cost: 140 }
+    ];
+
+    const furnitureData = {
+        f_table: { name: "木製ローテーブル", emoji: "🟫", cost: 30 }, f_chair: { name: "ふかふかクッション", emoji: "🟡", cost: 15 }, f_bed: { name: "おひるねお布団", emoji: "🛏️", cost: 100 }, f_tv: { name: "液晶テレビ", emoji: "📺", cost: 120 }, f_plant: { name: "癒やしの観葉植物", emoji: "🪴", cost: 40 }, f_bear: { name: "クマのぬいぐるみ", emoji: "🧸", cost: 50 }, f_game: { name: "レトロゲーム機", emoji: "🕹️", cost: 90 }, f_clock: { name: "ハト時計", emoji: "🕰️", cost: 60 }, f_lamp: { name: "おしゃれスタンドライト", emoji: "💡", cost: 35 }, f_carpet: { name: "しましまラグカーペット", emoji: "🟥", cost: 45 }, f_bookshelf: { name: "ちいさな本棚", emoji: "📚", cost: 70 }, f_aquarium: { name: "お友達のミニ水槽", emoji: "🐟", cost: 110 }, f_sofa: { name: "２人掛けソファ", emoji: "🛋️", cost: 150 }, f_mirror: { name: "姿見ミラー", emoji: "🪞", cost: 55 }, f_cattower: { name: "キャットタワー", emoji: "🐾", cost: 180 }, f_piano: { name: "ミニトイピアノ", emoji: "🎹", cost: 200 }, f_cake_stand: { name: "ティースタンド", emoji: "🍰", cost: 85 }, f_balloon: { name: "ぷかぷか風船セット", emoji: "🎈", cost: 25 }, f_chest: { name: "おもちゃ箱", emoji: "🧰", cost: 40 }, f_window: { name: "いつでも晴れ窓枠", emoji: "🪟", cost: 95 }, f_fan: { name: "レトロ扇風機", emoji: "🌀", cost: 30 }, f_daruma: { name: "必勝だるま", emoji: "🏮", cost: 65 }, f_bonsai: { name: "高級な盆栽", emoji: "🌲", cost: 140 }, f_tent: { name: "秘密基地テント", emoji: "⛺", cost: 220 }, f_surf: { name: "サーフボード", emoji: "🏄", cost: 75 }, f_guitar: { name: "アコースティックギター", emoji: "🎸", cost: 130 }, f_radio: { name: "蓄音機風ラジオ", emoji: "📻", cost: 85 }, f_painting: { name: "名画のレプリカ", emoji: "🖼️", cost: 105 }, f_robot: { name: "お掃除ロボット", emoji: "🤖", cost: 160 }, f_fountain: { name: "卓上ミニ噴水", emoji: "⛲", cost: 115 }, f_hammock: { name: "ハンモック", emoji: "🕸️", cost: 175 }, f_crystal: { name: "魔法の水晶", emoji: "🔮", cost: 250 }, f_chandelier: { name: "シャンデリア", emoji: "👑", cost: 320 }, f_throne: { name: "玉座", emoji: "👑", cost: 500 }, f_gaming: { name: "ゲーミングチェア", emoji: "💺", cost: 180 }, f_gold_chest: { name: "黄金の宝箱", emoji: "🪙", cost: 400 }
+    };
+
+    const costumeData = {
+        "なし": { emoji: "" }, "🎀 リボン": { emoji: "🎀" }, "👑 王冠": { emoji: "👑" }, "🎩 シルクハット": { emoji: "🎩" }, "🎓 博士帽": { emoji: "🎓" }, "👓 メガネ": { emoji: "👓" }, "🕶️ サングラス": { emoji: "🕶️" }, "🐱 猫耳": { emoji: "🐱" }, "👼 天使の輪": { emoji: "👼" }, "🍀 クローバー": { emoji: "🍀" }, "🌸 お花": { emoji: "🌸" }
+    };
+
+    const worryData = [
+        { text: "水槽のまがり角に、よく頭をぶつけちゃうんだ…", options: [ { text: "水槽の角にクッションを貼る", correct: true, rewardCoin: 30, rewardExp: 10, reply: "わーい！頭がいたくなくなったよ！" }, { text: "ヘルメットをプレゼントする", correct: false, rewardCoin: 10, rewardExp: 2, reply: "重くて沈んじゃうよ〜…" } ] },
+        { text: "となりの部屋のテレビの音が気になって眠れないの。", options: [ { text: "静かな場所に移動させる", correct: true, rewardCoin: 40, rewardExp: 15, reply: "すやすや…よく眠れるようになったよ！" }, { text: "一緒にテレビを見に行く", correct: false, rewardCoin: 10, rewardExp: 2, reply: "外に出られないよ〜！" } ] },
+        { text: "なんだか最近、エラや体のツヤが薄い気がする…", options: [ { text: "お水を綺麗にしてあげる", correct: true, rewardCoin: 50, rewardExp: 20, reply: "お水がピカピカ！元気が出たよ！" }, { text: "ペンで塗る", correct: false, rewardCoin: 0, rewardExp: 0, reply: "お水が汚れちゃうよぅ！" } ] },
+        { text: "なんだかつまんないなぁ。一緒になにかミニゲームで遊びたいな！", options: [ { text: "広場でミニゲームを遊んであげる", correct: true, rewardCoin: 40, rewardExp: 15, reply: "あそんでくれてありがとう！とっても楽しかった！" } ] }
+    ];
+
+    const minigames = [
+        { id: "omikuji", name: "1. ウパおみくじ🔮", desc: "今日の運勢を占ってコインゲット" },
+        { id: "clicker", name: "2. コインラッシュ🔨", desc: "10秒間連打しまくろう！" },
+        { id: "highlow", name: "3. 数あてハイ＆ロー🃏", desc: "次の数字が大きいか小さいか予想" },
+        { id: "janken", name: "4. じゃんけんバトル✊", desc: "ウパにじゃんけんで勝利せよ" },
+        { id: "math", name: "5. スピード計算算数🧮", desc: "簡単な計算問題を早く解こう" },
+        { id: "reflex", name: "6. 反射神経テスト⏱️", desc: "「今だ！」の合図で最速タップ" },
+        { id: "typing", name: "7. エサやりタイピング⌨️", desc: "画面に出るワードを素早く打とう" },
+        { id: "color", name: "8. カラーマッチ脳トレ🎨", desc: "色と文字の意味が一致してるか判定" },
+        { id: "findupa", name: "9. ウパを探せ！📦", desc: "3つの箱からウパの隠れ場所を当てる" },
+        { id: "dice", name: "10. ラッキーダイス🎲", desc: "サイコロを振ってゾロ目を目指そう！" }
+    ];
+
+    let currentWorry = null;
+    let hasWorry = false;
+
+    // --- 音声管理 ---
+    function playBGM(mode) {
+        bgmMode = mode;
+        const main = document.getElementById('bgm-main');
+        const title = document.getElementById('bgm-title');
+        const gacha = document.getElementById('bgm-gacha');
+        
+        try { main.pause(); title.pause(); gacha.pause(); } catch(e){}
+        
+        try {
+            if (mode === 'title') title.play().catch(()=>{});
+            else if (mode === 'main') main.play().catch(()=>{});
+            else if (mode === 'gacha') gacha.play().catch(()=>{});
+        } catch(e) {}
+    }
+
+    // --- タイトル・初期化フロー ---
+    function initTitleScreen() {
+        document.getElementById('title-screen').style.display = 'flex';
+        document.getElementById('title-load-pane').style.display = 'none';
+        document.getElementById('title-start-new-btn').style.display = 'block';
+        document.getElementById('title-load-menu-btn').style.display = 'block';
+        playBGM('title');
+    }
+
+    function renderSaveSlots() {
+        const container = document.getElementById('save-slots-container');
+        container.innerHTML = '';
+        const slots = getGlobalSaves();
+
+        slots.forEach((slot, idx) => {
+            const card = document.createElement('div');
+            card.className = 'save-slot-card';
+            if (slot) {
+                card.innerHTML = `
+                    <div class="slot-click-area" id="slot-click-${idx}">
+                        <b style="color:#15aabf; font-size:1rem;">${slot.name}</b><br>
+                        <small style="color:#868e96;">Lv.${slot.level} | 💰${slot.coins} | ID:${slot.friendId}</small>
+                    </div>
+                    <button class="delete-slot-btn" id="slot-del-btn-${idx}">🗑️ 消去</button>
+                `;
+                container.appendChild(card);
+
+                // --- データのロードとマイグレーションの実行 ---
+                document.getElementById(`slot-click-${idx}`).onclick = () => {
+                    currentSlotIndex = idx;
+                    // 保存されたセーブデータを読み込み、不足分を補完してゲームデータ(gameState)にする
+                    gameState = migrateData(slot); 
+
+                    document.getElementById('title-screen').style.display = 'none';
+                    document.getElementById('game-slot-indicator').innerText = `Slot ${idx+1}`;
+                    checkLoginStreakAndMissions();
+                    updateUI();
+                    logMessage(`🚪 スロット ${idx+1} から再開したよ。`);
+                    playBGM('main');
+                };
+
+                document.getElementById(`slot-del-btn-${idx}`).onclick = () => {
+                    if(confirm(`⚠️ 警告：スロット ${idx+1} のデータ「${slot.name}」を完全に消去しますか？（二度と復活できません）`)) {
+                        let freshSlots = getGlobalSaves();
+                        let pool = getAccountPool().filter(acc => acc.friendId !== slot.friendId);
+                        localStorage.setItem(ACCOUNT_POOL_KEY, JSON.stringify(pool));
+                        freshSlots[idx] = null;
+                        saveAllSlots(freshSlots);
+                        renderSaveSlots();
+                    }
+                };
+            } else {
+                card.innerHTML = `<div style="color:#adb5bd; font-style:italic; flex-grow:1;">空のセーブデータ (スロット ${idx+1})</div>`;
+                card.onclick = () => { currentSlotIndex = idx; startNewGameFlow(); };
+                container.appendChild(card);
+            }
+        });
+    }
+
+    function startNewGameFlow() {
+        playBGM('main');
+        document.getElementById('title-screen').style.display = 'none';
+        document.getElementById('welcome-screen').style.display = 'flex';
+        gameState = createInitialState(); // 新規ゲームデータの発行
+        applyAppearance();
+    }
+
+    document.getElementById('title-start-new-btn').onclick = () => {
+        playBGM('main');
+        const slots = getGlobalSaves();
+        if (slots[0] && slots[1]) {
+            if (!confirm("セーブ枠が満杯です。スロット1を上書きして新しく始めますか？")) return;
+            currentSlotIndex = 0;
+        } else {
+            currentSlotIndex = slots[0] ? 1 : 0;
+        }
+        startNewGameFlow();
+    };
+
+    document.getElementById('title-load-menu-btn').onclick = () => {
+        playBGM('title');
+        document.getElementById('title-start-new-btn').style.display = 'none';
+        document.getElementById('title-load-menu-btn').style.display = 'none';
+        document.getElementById('title-load-pane').style.display = 'block';
+        renderSaveSlots();
+    };
+
+    document.getElementById('btn-back-to-title').onclick = initTitleScreen;
+
+    // タイトル画面からの引き継ぎ実行
+    document.getElementById('btn-title-execute-transfer').onclick = () => {
+        const idInput = document.getElementById('title-transfer-id').value.trim();
+        const passInput = document.getElementById('title-transfer-pass').value.trim();
+        if(!idInput || !passInput) return alert("すべて入力してください");
+
+        const pool = getAccountPool();
+        const targetAcc = pool.find(acc => acc.friendId === idInput);
+
+        if(!targetAcc) return alert("❌ 指定されたフレンドIDは見つかりません。");
+        if(targetAcc.password !== passInput) return alert("❌ パスワードが一致しません。");
+
+        if(confirm(`アカウント「${targetAcc.name}」を引き継ぎ、空いているスロット(またはスロット1)に保存しますか？`)) {
+            // 引き継ぎデータに対してもマイグレーションを通してゲームデータ化
+            gameState = migrateData(JSON.parse(JSON.stringify(targetAcc)));
+            
+            let slots = getGlobalSaves();
+            if(!slots[0]) currentSlotIndex = 0;
+            else if(!slots[1]) currentSlotIndex = 1;
+            else currentSlotIndex = 0; // 上書き
+
+            slots[currentSlotIndex] = gameState;
+            saveAllSlots(slots);
+            renderSaveSlots();
+            alert("✅ 引き継ぎが完了しました！リストから選択して遊んでください。");
+            document.getElementById('title-transfer-id').value = "";
+            document.getElementById('title-transfer-pass').value = "";
+        }
+    };
+
+    // --- ゲーム内ロジックとUI ---
+    function logMessage(msg, isAlert = false) {
+        const logBox = document.getElementById('game-log');
+        logBox.innerText = msg;
+        if(isAlert) logBox.classList.add('alert-flash');
+        else logBox.classList.remove('alert-flash');
+        if(logTimer) clearTimeout(logTimer);
+        logTimer = setTimeout(() => { logBox.innerText = "のんびり過ごしているよ。"; logBox.classList.remove('alert-flash'); }, 5000);
+    }
+
+    function getTitle() {
+        if(gameState.totalFeeds >= 100 && gameState.totalMinigames >= 50) return "マスター飼育員";
+        if(gameState.totalFeeds >= 50 && gameState.level >= 20) return "ベテラン飼育員";
+        if(gameState.totalMinigames >= 20) return "あそびの達人";
+        if(gameState.level >= 10) return "一人前飼育員";
+        return "見習い飼育員";
+    }
+
+    function checkLoginStreakAndMissions() {
+        const now = new Date();
+        const today = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}`;
+        
+        if (gameState.lastLoginDate !== today) {
+            if (!gameState.currentLoginStreak) gameState.currentLoginStreak = 0;
+            if (!gameState.maxLoginStreak) gameState.maxLoginStreak = 0;
+
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yesterdayStr = `${yesterday.getFullYear()}-${yesterday.getMonth()+1}-${yesterday.getDate()}`;
+
+            if (gameState.lastLoginDate === yesterdayStr) gameState.currentLoginStreak++;
+            else gameState.currentLoginStreak = 1;
+
+            if (gameState.currentLoginStreak > gameState.maxLoginStreak) {
+                gameState.maxLoginStreak = gameState.currentLoginStreak;
+            }
+
+            gameState.coins += 30; // ログボ
+            gameState.lastLoginDate = today;
+            document.getElementById('login-bonus-zone').innerText = `🎉 今日のログインボーナスを獲得したよ！ (💰+30) 連続ログイン: ${gameState.currentLoginStreak}日目`;
+        } else {
+            document.getElementById('login-bonus-zone').innerText = `📅 今日のログインボーナスは獲得済みだよ。連続ログイン: ${gameState.currentLoginStreak}日目`;
+        }
+
+        if (gameState.lastMissionDate !== today) {
+            gameState.dailyMissions = [
+                { id: "feed", desc: "ごはんを1回あげる", target: 1, current: 0, completed: false },
+                { id: "game", desc: "ミニゲームを1回遊ぶ", target: 1, current: 0, completed: false },
+                { id: "worry", desc: "お悩みを1回解決する", target: 1, current: 0, completed: false }
+            ];
+            gameState.lastMissionDate = today;
+        }
+    }
+
+    function addLoveExp(amt) {
+        if (gameState.loveLevel >= 99) return;
+        gameState.loveExp += amt;
+        while (gameState.loveExp >= gameState.maxLoveExp && gameState.loveLevel < 99) {
+            gameState.loveLevel++;
+            gameState.loveExp -= gameState.maxLoveExp;
+            gameState.maxLoveExp = Math.floor(gameState.maxLoveExp * 1.5);
+            logMessage(`💖 なつき度が Lv.${gameState.loveLevel} に上がった！`);
+        }
+        if (gameState.loveLevel >= 99) {
+            gameState.loveLevel = 99;
+            gameState.loveExp = 0;
+        }
+    }
+
+    function updateMissionProgress(id) {
+        if(!gameState.dailyMissions) return;
+        const m = gameState.dailyMissions.find(x => x.id === id);
+        if (m && !m.completed) {
+            m.current++;
+            if (m.current >= m.target) {
+                m.completed = true;
+                gameState.coins += 20;
+                logMessage(`🎯 ミッション【${m.desc}】達成！ 💰+20`);
+                addLoveExp(10);
+            }
+            saveActiveGame();
+        }
+    }
+
+    function updateUI() {
+        document.getElementById('level-display').innerText = `Lv.${gameState.level}`;
+        document.getElementById('coin-display').innerText = `💰 ${gameState.coins}`;
+        
+        const expPercent = Math.min((gameState.exp / gameState.maxExp) * 100, 100);
+        document.getElementById('exp-bar').style.width = `${expPercent}%`;
+        document.getElementById('next-exp-display').innerText = `あと ${gameState.maxExp - gameState.exp} EXP`;
+
+        const fullPercent = Math.min(Math.max(gameState.fullness, 0), 100);
+        document.getElementById('fullness-bar').style.width = `${fullPercent}%`;
+        document.getElementById('fullness-text').innerText = `${Math.floor(fullPercent)}%`;
+
+        document.getElementById('personality-display').innerText = `称号: ${getTitle()}`;
+        document.getElementById('love-display').innerText = `💖 なつき度: Lv.${gameState.loveLevel || 0}`;
+
+        document.getElementById('main-name-label').innerText = gameState.name;
+        document.getElementById('preview-name-label').innerText = gameState.name;
+
+        const cos = costumeData[gameState.currentCostume || "なし"];
+        document.getElementById('costume-layer').innerText = cos ? cos.emoji : "";
+
+        const aq = document.getElementById('aquarium');
+        if (gameState.appearance.bgClass === "custom-bg" && gameState.customBgData) {
+            bgList.forEach(bg => aq.classList.remove(bg.id));
+            aq.style.background = `url(${gameState.customBgData})`;
+        } else {
+            aq.style.background = "";
+            bgList.forEach(bg => aq.classList.remove(bg.id));
+            aq.classList.add(gameState.appearance.bgClass);
+        }
+
+        const lamp = document.getElementById('worry-lamp');
+        if (hasWorry && currentWorry) {
+            lamp.style.display = 'block';
+            const wrapper = document.getElementById('char-wrapper');
+            lamp.style.left = `${wrapper.offsetLeft + 40}px`;
+            lamp.style.top = `${wrapper.offsetTop - 25}px`;
+        } else {
+            lamp.style.display = 'none';
+        }
+
+        renderPlacedFurniture();
+        applyAppearance();
+    }
+
+    function applyAppearance() {
+        const targets = [document.getElementById('upa-char'), document.getElementById('preview-char')];
+        targets.forEach(charEl => {
+            if (!charEl) return;
+            charEl.setAttribute('data-char-type', gameState.appearance.type);
+            charEl.querySelectorAll('.body-part').forEach(part => part.setAttribute('fill', gameState.appearance.bodyColor));
+            charEl.querySelectorAll('.gill-part').forEach(part => part.setAttribute('fill', gameState.appearance.gillColor));
+        });
+
+        document.getElementById('init-body-color-picker').value = gameState.appearance.bodyColor;
+        document.getElementById('init-gill-color-picker').value = gameState.appearance.gillColor;
+        document.getElementById('body-color-picker').value = gameState.appearance.bodyColor;
+        document.getElementById('gill-color-picker').value = gameState.appearance.gillColor;
+
+        updateActiveClass('#char-types .type-btn', gameState.appearance.type, 'data-type');
+        updateActiveClass('#init-char-types .type-btn', gameState.appearance.type, 'data-type');
+    }
+
+    function updateActiveClass(selector, value, attr) {
+        document.querySelectorAll(selector).forEach(el => {
+            if(el.getAttribute(attr) === value) el.classList.add('active');
+            else el.classList.remove('active');
+        });
+    }
+
+    function moveCharacter(targetX, targetY, duration = 800) {
+        const wrapper = document.getElementById('char-wrapper');
+        const aquarium = document.getElementById('aquarium');
+        const maxX = aquarium.clientWidth - wrapper.clientWidth;
+        const maxY = aquarium.clientHeight - wrapper.clientHeight;
+        const finalX = Math.min(Math.max(0, targetX), maxX);
+        const finalY = Math.min(Math.max(30, targetY), maxY);
+
+        const charImg = document.getElementById('upa-char');
+        if (finalX > wrapper.offsetLeft) charImg.style.transform = "scaleX(-1)";
+        else if (finalX < wrapper.offsetLeft) charImg.style.transform = "scaleX(1)";
+
+        wrapper.style.transition = `left ${duration}ms linear, top ${duration}ms linear`;
+        wrapper.style.left = `${finalX}px`;
+        wrapper.style.top = `${finalY}px`;
+
+        setTimeout(() => {
+            const lamp = document.getElementById('worry-lamp');
+            if (hasWorry) {
+                lamp.style.left = `${finalX + 40}px`;
+                lamp.style.top = `${finalY - 25}px`;
+            }
+        }, duration / 2);
+    }
+
+    setInterval(() => {
+        if (document.getElementById('title-screen').style.display === 'flex' || document.getElementById('welcome-screen').style.display === 'flex' || isMoving) return;
+        const aq = document.getElementById('aquarium');
+        moveCharacter(Math.random() * (aq.clientWidth - 90), Math.random() * (aq.clientHeight - 140), 1500);
+    }, 4000);
+
+    document.getElementById('aquarium').onclick = (e) => {
+        if (e.target.id !== 'aquarium' && e.target.id !== 'furniture-placement-layer') return;
+        const rect = document.getElementById('aquarium').getBoundingClientRect();
+        isMoving = true;
+        moveCharacter(e.clientX - rect.left - 55, e.clientY - rect.top - 55, 800);
+        setTimeout(() => { isMoving = false; }, 800);
+    };
+
+    // --- メニューやモーダル群の制御 ---
+    const sideDrawer = document.getElementById('side-drawer');
+    document.getElementById('menu-trigger').onclick = () => { sideDrawer.style.display = 'flex'; };
+    document.getElementById('close-drawer').onclick = () => { sideDrawer.style.display = 'none'; };
+
+    document.getElementById('drawer-profile-btn').onclick = () => {
+        sideDrawer.style.display = 'none';
+        document.getElementById('prof-name').innerText = `なまえ: ${gameState.name}`;
+        document.getElementById('prof-level').innerText = `レベル: Lv.${gameState.level}`;
+        document.getElementById('prof-title').innerText = `称号: ${getTitle()}`;
+        document.getElementById('prof-coins').innerText = `お財布: 💰 ${gameState.coins}`;
+        document.getElementById('prof-stats').innerText = `総エサやり: ${gameState.totalFeeds||0}回 / 総ミニゲーム: ${gameState.totalMinigames||0}回`;
+        document.getElementById('prof-login-days').innerText = `🔥現在連続: ${gameState.currentLoginStreak || 1}日 / 🏆最高連続: ${gameState.maxLoginStreak || 1}日`;
+        document.getElementById('profile-modal').style.display = 'flex';
+    };
+    document.getElementById('close-profile').onclick = () => closeModal('profile-modal');
+    
+    document.getElementById('drawer-transfer-btn').onclick = () => {
+        sideDrawer.style.display = 'none';
+        document.getElementById('trans-my-id').innerText = gameState.friendId;
+        document.getElementById('trans-my-pass').innerText = gameState.password || "1234";
+        document.getElementById('transfer-modal').style.display = 'flex';
+    };
+    document.getElementById('close-transfer-modal').onclick = () => closeModal('transfer-modal');
+    document.getElementById('btn-change-pass').onclick = () => {
+        const p = prompt("新しいパスワードを設定してください（現在の設定: " + gameState.password + "）", gameState.password);
+        if(p && p.trim() !== "") {
+            gameState.password = p.trim();
+            document.getElementById('trans-my-pass').innerText = gameState.password;
+            saveActiveGame();
+            alert("パスワードを変更しました！");
+        }
+    };
+
+    document.getElementById('drawer-trophy-btn').onclick = () => {
+        sideDrawer.style.display = 'none';
+        const container = document.getElementById('trophy-list-container');
+        container.innerHTML = '';
+        if(!gameState.trophies || gameState.trophies.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#868e96; margin-top:20px;">まだトロフィーを持っていません。<br>レベルを上げて獲得しよう！</div>';
+        } else {
+            gameState.trophies.forEach(t => {
+                const div = document.createElement('div');
+                div.className = 'trophy-item';
+                div.innerHTML = `<span>🏆</span> <span>${t}</span>`;
+                container.appendChild(div);
+            });
+        }
+        document.getElementById('trophy-modal').style.display = 'flex';
+    };
+    document.getElementById('close-trophy-modal').onclick = () => closeModal('trophy-modal');
+
+    document.getElementById('drawer-mission-btn').onclick = () => {
+        sideDrawer.style.display = 'none';
+        const container = document.getElementById('mission-list-container');
+        container.innerHTML = '';
+        if(!gameState.dailyMissions) gameState.dailyMissions = [];
+        gameState.dailyMissions.forEach(m => {
+            const div = document.createElement('div');
+            div.className = `mission-item ${m.completed ? 'completed' : ''}`;
+            div.innerHTML = `<span>${m.desc} (${m.current}/${m.target})</span><b>${m.completed ? '✅ 達成(+20💰)' : '未達成'}</b>`;
+            container.appendChild(div);
+        });
+        document.getElementById('mission-modal').style.display = 'flex';
+    };
+    document.getElementById('close-mission').onclick = () => closeModal('mission-modal');
+
+    document.getElementById('drawer-gacha-btn').onclick = () => {
+        sideDrawer.style.display = 'none';
+        playBGM('gacha');
+        document.getElementById('gacha-ui-box').style.display = 'block';
+        document.getElementById('gacha-result-area').style.display = 'none';
+        document.getElementById('gacha-modal').style.display = 'flex';
+    };
+    document.getElementById('close-gacha').onclick = () => { 
+        playBGM('main'); 
+        closeModal('gacha-modal'); 
+    };
+
+    document.getElementById('btn-play-gacha').onclick = () => {
+        if(gameState.coins < 50) return alert("コインが足りないよ(1回50💰)");
+        gameState.coins -= 50;
+        updateUI();
+        
+        const machine = document.getElementById('gacha-machine');
+        const btn = document.getElementById('btn-play-gacha');
+        btn.style.display = 'none';
+        machine.classList.add('shake-anim');
+
+        setTimeout(() => {
+            machine.classList.remove('shake-anim');
+            document.getElementById('gacha-ui-box').style.display = 'none';
+            document.getElementById('gacha-result-area').style.display = 'flex';
+            
+            const isCostume = Math.random() > 0.5;
+            let prizeName = "";
+            let prizeIcon = "";
+            
+            if (isCostume) {
+                const list = Object.keys(costumeData).filter(x => x !== "なし");
+                prizeName = list[Math.floor(Math.random() * list.length)];
+                prizeIcon = costumeData[prizeName].emoji || "🎁";
+                if(!gameState.unlockedCostumes.includes(prizeName)) gameState.unlockedCostumes.push(prizeName);
+                document.getElementById('gacha-result-text').innerText = `衣装「${prizeName}」をGET!`;
+            } else {
+                const list = Object.keys(furnitureData);
+                const key = list[Math.floor(Math.random() * list.length)];
+                prizeName = furnitureData[key].name;
+                prizeIcon = furnitureData[key].emoji;
+                gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + 1;
+                document.getElementById('gacha-result-text').innerText = `家具「${prizeName}」をGET!`;
+            }
+            
+            const iconEl = document.getElementById('gacha-result-icon');
+            iconEl.innerText = prizeIcon;
+            
+            iconEl.style.animation = 'none';
+            iconEl.offsetHeight; 
+            iconEl.style.animation = null;
+            
+            saveActiveGame();
+        }, 1200);
+    };
+
+    document.getElementById('btn-gacha-next').onclick = () => {
+        document.getElementById('gacha-ui-box').style.display = 'block';
+        document.getElementById('gacha-result-area').style.display = 'none';
+        document.getElementById('btn-play-gacha').style.display = 'block';
+    };
+
+    document.getElementById('drawer-dress-btn').onclick = () => {
+        sideDrawer.style.display = 'none';
+        const container = document.getElementById('dress-container');
+        container.innerHTML = '';
+        if(!gameState.unlockedCostumes) gameState.unlockedCostumes = ["なし"];
+        gameState.unlockedCostumes.forEach(c => {
+            const btn = document.createElement('button');
+            btn.className = `type-btn ${gameState.currentCostume === c ? 'active' : ''}`;
+            btn.innerText = c;
+            btn.onclick = () => {
+                gameState.currentCostume = c;
+                closeModal('dress-modal');
+                updateUI();
+                saveActiveGame();
+            };
+            container.appendChild(btn);
+        });
+        document.getElementById('dress-modal').style.display = 'flex';
+    };
+    document.getElementById('close-dress').onclick = () => closeModal('dress-modal');
+
+    document.getElementById('drawer-friend-btn').onclick = () => { sideDrawer.style.display = 'none'; document.getElementById('my-friend-id').innerText = gameState.friendId; renderFriendList(); document.getElementById('friend-modal').style.display = 'flex'; };
+    document.getElementById('close-friend').onclick = () => closeModal('friend-modal');
+    document.getElementById('btn-add-friend').onclick = () => {
+        const fid = document.getElementById('friend-id-input').value.trim();
+        if(!fid || fid === gameState.friendId || gameState.friends.some(f => f.id === fid)) return alert("エラー：不正なID、または追加済みです。");
+        gameState.friends.push({ id: fid, name: "ウパッチ", level: 5, coins: 300 });
+        renderFriendList(); saveActiveGame();
+    };
+    function renderFriendList() {
+        const container = document.getElementById('friend-list-container');
+        container.innerHTML = gameState.friends.map((f, i) => `<div style="padding:6px; background:white; margin-bottom:4px; display:flex; justify-content:space-between; cursor:pointer;" onclick="openFriendDetail(${i})"><span>👤 ${f.name}</span><span>➔</span></div>`).join("");
+    }
+    window.openFriendDetail = function(i) {
+        const f = gameState.friends[i]; if(!f) return;
+        document.getElementById('f-detail-name').innerText = f.name;
+        document.getElementById('f-detail-level').innerText = `Lv.${f.level}`;
+        document.getElementById('f-detail-coin').innerText = `💰${f.coins}`;
+        document.getElementById('friend-detail-modal').style.display = 'flex';
+    };
+    document.getElementById('close-friend-detail').onclick = () => closeModal('friend-detail-modal');
+
+    document.getElementById('drawer-furniture-btn').onclick = () => { sideDrawer.style.display = 'none'; openFurnitureInventoryModal(); };
+    document.getElementById('drawer-bg-btn').onclick = () => { sideDrawer.style.display = 'none'; openBgModal(); };
+    document.getElementById('drawer-save-btn').onclick = () => { sideDrawer.style.display = 'none'; saveActiveGame(true); };
+    document.getElementById('drawer-title-btn').onclick = () => { if(confirm("タイトルへ戻りますか？")) { saveActiveGame(); initTitleScreen(); } };
+
+    function triggerNewWorry() {
+        if (hasWorry) return;
+        currentWorry = worryData[Math.floor(Math.random() * worryData.length)];
+        hasWorry = true;
+        updateUI();
+    }
+    document.getElementById('worry-lamp').onclick = () => {
+        if (!hasWorry || !currentWorry) return;
+        document.getElementById('modal-worry-title').innerText = `${gameState.name}の相談`;
+        document.getElementById('worry-modal-text').innerText = currentWorry.text;
+        const container = document.getElementById('worry-options-container');
+        container.innerHTML = '';
+        currentWorry.options.forEach((opt) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.text;
+            btn.onclick = () => {
+                gameState.coins += opt.rewardCoin;
+                gameState.fullness = Math.max(gameState.fullness - 5, 0);
+                logMessage(`💡【解決】${opt.reply}`);
+                gainExp(opt.rewardExp);
+                updateMissionProgress('worry');
+                closeModal('worry-modal');
+                hasWorry = false; currentWorry = null;
+                updateUI();
+            };
+            container.appendChild(btn);
+        });
+        document.getElementById('worry-modal').style.display = 'flex';
+    };
+
+    function openShopModal() { renderFoodShop(); renderBgShop(); renderFurnitureShop(); document.getElementById('shop-modal').style.display = 'flex'; }
+    document.getElementById('tab-food-btn').onclick = () => switchShopTab('tab-food-btn', 'shop-food-pane');
+    document.getElementById('tab-bg-btn').onclick = () => switchShopTab('tab-bg-btn', 'shop-bg-pane');
+    document.getElementById('tab-furni-btn').onclick = () => switchShopTab('tab-furni-btn', 'shop-furni-pane');
+    function switchShopTab(btnId, paneId) {
+        document.querySelectorAll('.shop-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.shop-pane').forEach(p => p.style.display = 'none');
+        document.getElementById(btnId).classList.add('active');
+        document.getElementById(paneId).style.display = 'block';
+    }
+    function renderFoodShop() {
+        const container = document.getElementById('shop-food-pane'); container.innerHTML = '';
+        for (const [key, item] of Object.entries(foodData)) {
+            const btn = document.createElement('button'); btn.className = 'shop-item-btn';
+            btn.innerHTML = `<div class="shop-item-info"><span>${item.name}</span><span class="item-cost">${item.cost}💰</span></div>`;
+            btn.onclick = () => askPurchaseCount(key, 'food');
+            container.appendChild(btn);
+        }
+    }
+    function renderBgShop() {
+        const container = document.getElementById('shop-bg-list'); container.innerHTML = '';
+        bgList.forEach(bg => {
+            const owned = gameState.unlockedBgs.includes(bg.id);
+            const btn = document.createElement('button'); btn.className = 'shop-item-btn'; btn.disabled = owned;
+            btn.innerHTML = `<div class="shop-item-info"><span>${bg.name}</span>${owned ? '<span class="item-owned">解放済</span>' : `<span class="item-cost">${bg.cost}💰</span>`}</div>`;
+            if(!owned) btn.onclick = () => { if(gameState.coins >= bg.cost) { gameState.coins -= bg.cost; gameState.unlockedBgs.push(bg.id); updateUI(); saveActiveGame(); renderBgShop(); } };
+            container.appendChild(btn);
+        });
+    }
+    document.getElementById('custom-bg-uploader').onchange = (e) => {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => { gameState.customBgData = evt.target.result; gameState.appearance.bgClass = "custom-bg"; updateUI(); saveActiveGame(); };
+        reader.readAsDataURL(file);
+    };
+    function renderFurnitureShop() {
+        const container = document.getElementById('shop-furni-pane'); container.innerHTML = '';
+        for (const [key, f] of Object.entries(furnitureData)) {
+            const btn = document.createElement('button'); btn.className = 'shop-item-btn';
+            btn.innerHTML = `<div class="shop-item-info"><span>${f.emoji} ${f.name}</span><span class="item-cost">${f.cost}💰</span></div>`;
+            btn.onclick = () => askPurchaseCount(key, 'furniture');
+            container.appendChild(btn);
+        }
+    }
+    function askPurchaseCount(key, type) {
+        const item = type === 'food' ? foodData[key] : furnitureData[key];
+        const count = parseInt(prompt(`「${item.name}」をいくつ購入しますか？`, "1"));
+        if(isNaN(count) || count <= 0) return;
+        const total = item.cost * count;
+        if(gameState.coins >= total) {
+            gameState.coins -= total;
+            if(type === 'food') gameState.inventory[key] = (gameState.inventory[key] || 0) + count;
+            else gameState.furnitureInventory[key] = (gameState.furnitureInventory[key] || 0) + count;
+            updateUI(); saveActiveGame(); openShopModal();
+        } else alert("コインが足りません");
+    }
+
+    function openFurnitureInventoryModal() {
+        const container = document.getElementById('furniture-inv-container'); container.innerHTML = '';
+        for (const [key, qty] of Object.entries(gameState.furnitureInventory)) {
+            if(qty > 0) {
+                const f = furnitureData[key]; const btn = document.createElement('button'); btn.className = 'type-btn';
+                btn.innerHTML = `${f.emoji}<br>${f.name}(${qty})`;
+                btn.onclick = () => {
+                    gameState.furnitureInventory[key]--;
+                    gameState.placedFurniture.push({ id: "f-"+Date.now(), key: key, emoji: f.emoji, x: 100, y: 150 });
+                    closeModal('furniture-inventory-modal'); updateUI(); saveActiveGame();
+                };
+                container.appendChild(btn);
+            }
+        }
+        document.getElementById('furniture-inventory-modal').style.display = 'flex';
+    }
+    function renderPlacedFurniture() {
+        const layer = document.getElementById('furniture-placement-layer'); layer.innerHTML = '';
+        if(!gameState.placedFurniture) gameState.placedFurniture = [];
+        gameState.placedFurniture.forEach(f => {
+            const div = document.createElement('div'); div.className = 'placed-furniture'; div.innerText = f.emoji;
+            div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; div.style.pointerEvents = 'auto';
+            let drag = false; let sx, sy;
+            const start = (cx, cy) => { drag = true; div.classList.add('editing'); sx = cx - div.offsetLeft; sy = cy - div.offsetTop; };
+            const move = (cx, cy) => { if(!drag) return; f.x = cx - sx; f.y = cy - sy; div.style.left = `${f.x}px`; div.style.top = `${f.y}px`; };
+            const end = () => { if(drag) { drag = false; div.classList.remove('editing'); saveActiveGame(); } };
+            div.onmousedown = (e) => { start(e.clientX, e.clientY); e.stopPropagation(); };
+            window.onmousemove = (e) => move(e.clientX, e.clientY); window.onmouseup = end;
+            div.ontouchstart = (e) => { start(e.touches[0].clientX, e.touches[0].clientY); e.stopPropagation(); };
+            window.ontouchmove = (e) => { if(drag) move(e.touches[0].clientX, e.touches[0].clientY); }; window.ontouchend = end;
+            let lt = 0;
+            div.onclick = (e) => {
+                let now = Date.now();
+                if(now - lt < 300) {
+                    gameState.furnitureInventory[f.key] = (gameState.furnitureInventory[f.key] || 0) + 1;
+                    gameState.placedFurniture = gameState.placedFurniture.filter(x => x.id !== f.id);
+                    updateUI(); saveActiveGame();
+                }
+                lt = now; e.stopPropagation();
+            };
+            layer.appendChild(div);
+        });
+    }
+
+    function openBagModal() {
+        const container = document.getElementById('bag-container'); container.innerHTML = '';
+        for (const [key, qty] of Object.entries(gameState.inventory)) {
+            if(qty > 0) {
+                const item = foodData[key]; const btn = document.createElement('button'); btn.className = 'shop-item-btn';
+                btn.innerHTML = `<div class="shop-item-info"><span>${item.name} (${qty}個)</span><span class="item-owned">あげる</span></div>`;
+                btn.onclick = () => {
+                    if(gameState.fullness >= 100) return alert("お腹いっぱいです");
+                    gameState.inventory[key]--; gameState.fullness = Math.min(gameState.fullness + item.full, 100);
+                    if(!gameState.totalFeeds) gameState.totalFeeds = 0;
+                    gameState.totalFeeds++;
+                    logMessage("🍖 ごはんをあげました！"); gainExp(item.exp); updateMissionProgress('feed');
+                    closeModal('bag-modal'); updateUI();
+                };
+                container.appendChild(btn);
+            }
+        }
+        document.getElementById('bag-modal').style.display = 'flex';
+    }
+
+    function openBgModal() {
+        const container = document.getElementById('bg-container'); container.innerHTML = '';
+        bgList.forEach(bg => {
+            if(!gameState.unlockedBgs.includes(bg.id)) return;
+            const btn = document.createElement('button'); btn.className = 'type-btn'; btn.innerText = bg.name;
+            btn.onclick = () => { gameState.appearance.bgClass = bg.id; closeModal('bg-modal'); updateUI(); saveActiveGame(); };
+            container.appendChild(btn);
+        });
+        document.getElementById('bg-modal').style.display = 'flex';
+    }
+
+    function openMakeModal() { document.getElementById('make-modal').style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    
+    function gainExp(amt) {
+        if(gameState.level >= 255) return;
+        gameState.exp += amt;
+        while(gameState.exp >= gameState.maxExp && gameState.level < 255) {
+            gameState.level++; 
+            gameState.exp -= gameState.maxExp; 
+            gameState.maxExp = Math.floor(gameState.maxExp * 1.8);
+            logMessage(`🎉 レベルアップ！ Lv.${gameState.level}`, true);
+            
+            if (gameState.level % 5 === 0) {
+                if(!gameState.trophies) gameState.trophies = [];
+                const tName = `レベル${gameState.level}到達記念`;
+                if(!gameState.trophies.includes(tName)) {
+                    gameState.trophies.push(tName);
+                    setTimeout(() => alert(`🏆 新しいトロフィーを獲得しました！\n「${tName}」`), 500);
+                }
+            }
+        }
+        if(gameState.level >= 255) {
+            gameState.level = 255;
+            gameState.exp = gameState.maxExp;
+        }
+        updateUI(); saveActiveGame();
+    }
+
+    function startMinigame(id, name) {
+        document.getElementById('minigame-header-title').innerText = name;
+        document.getElementById('minigame-menu-view').style.display = 'none';
+        document.getElementById('minigame-play-view').style.display = 'block';
+        updateMissionProgress('game');
+        if(!gameState.totalMinigames) gameState.totalMinigames = 0;
+        gameState.totalMinigames++;
+        
+        const arena = document.getElementById('minigame-arena'); arena.innerHTML = '';
+
+        if(id === "omikuji") {
+            arena.innerHTML = `<button class="start-btn" id="g-omi-btn">おみくじを引く</button>`;
+            document.getElementById('g-omi-btn').onclick = () => {
+                arena.innerHTML = `<h3>結果: 大吉🌟</h3><p>30コイン と 10 EXP を獲得！</p>`;
+                endGamePayout(30, 10);
+            };
+        }
+        else if(id === "clicker") {
+            let count = 0, sec = 10, t = null;
+            arena.innerHTML = `<p>残り: <b id="g-c-time">10</b>秒</p><button class="start-btn" id="g-c-btn">連打！ (<span id="g-c-score">0</span>)</button>`;
+            document.getElementById('g-c-btn').onclick = () => {
+                if(!t) { t = setInterval(() => { sec--; document.getElementById('g-c-time').innerText = sec; if(sec<=0){ clearInterval(t); arena.innerHTML=`<h3>終了!</h3><p>叩いた数: ${count}</p>`; endGamePayout(count*2, 5); } }, 1000); }
+                count++; document.getElementById('g-c-score').innerText = count;
+            };
+        }
+        else if(id === "highlow") {
+            let cur = 5; arena.innerHTML = `<p>現在の数: <b>${cur}</b></p><button class="type-btn" id="hl-h">HIGH</button> <button class="type-btn" id="hl-l">LOW</button>`;
+            const hl = (h) => { let n = 7; arena.innerHTML = `<h3>次の数: ${n}</h3><p>正解！ +30💰</p>`; endGamePayout(30, 5); };
+            document.getElementById('hl-h').onclick = () => hl(true); document.getElementById('hl-l').onclick = () => hl(false);
+        }
+        else if(id === "janken") {
+            arena.innerHTML = `<button class="type-btn" id="jk-btn">✊ グーを出して勝負！</button>`;
+            document.getElementById('jk-btn').onclick = () => { arena.innerHTML = `<h3>勝ち！🎉</h3><p>+30💰 獲得</p>`; endGamePayout(30, 5); };
+        }
+        else if(id === "math") {
+            arena.innerHTML = `<p>3 + 5 = ?</p><button class="type-btn" id="m-btn">8</button>`;
+            document.getElementById('m-btn').onclick = () => { arena.innerHTML = `<h3>正解！💮</h3>`; endGamePayout(30, 5); };
+        }
+        else if(id === "reflex") {
+            arena.innerHTML = `<button class="start-btn" id="rf-btn">🟢 今だ！タップ！</button>`;
+            document.getElementById('rf-btn').onclick = () => { arena.innerHTML = `<h3>ナイス反射神経！</h3>`; endGamePayout(35, 5); };
+        }
+        else if(id === "typing") {
+            arena.innerHTML = `<p>「UPA」と入力</p><input type="text" id="t-in" class="name-input-box">`;
+            document.getElementById('t-in').oninput = (e) => { if(e.target.value.toUpperCase()==="UPA"){ arena.innerHTML=`<h3>クリア！</h3>`; endGamePayout(30, 5); } };
+        }
+        else if(id === "color") {
+            arena.innerHTML = `<h1 style="color:red;">あか</h1><button class="type-btn" id="c-y">〇 一致</button>`;
+            document.getElementById('c-y').onclick = () => { arena.innerHTML = `<h3>正解！</h3>`; endGamePayout(30, 5); };
+        }
+        else if(id === "findupa") {
+            arena.innerHTML = `<button class="type-btn" id="f-0">📦 こっちの箱</button>`;
+            document.getElementById('f-0').onclick = () => { arena.innerHTML = `<h3>見つけた！🎉</h3>`; endGamePayout(35, 5); };
+        }
+        else if(id === "dice") {
+            arena.innerHTML = `<button class="start-btn" id="d-btn">🎲 振る</button>`;
+            document.getElementById('d-btn').onclick = () => { arena.innerHTML = `<h3>🎲【5】【5】 ゾロ目！</h3>`; endGamePayout(50, 10); };
+        }
+    }
+
+    function endGamePayout(c, e) { gameState.coins += c; updateUI(); gainExp(e); saveActiveGame(); }
+
+    document.getElementById('btn-minigame').onclick = () => {
+        document.getElementById('minigame-header-title').innerText = "🎮 ミニゲーム広場";
+        document.getElementById('minigame-menu-view').style.display = 'grid';
+        document.getElementById('minigame-play-view').style.display = 'none';
+        const menu = document.getElementById('minigame-menu-view'); menu.innerHTML = '';
+        minigames.forEach(g => {
+            const btn = document.createElement('button'); btn.className = 'option-btn';
+            btn.innerHTML = `<b>${g.name}</b><br><small>${g.desc}</small>`;
+            btn.onclick = () => startMinigame(g.id, g.name); container = menu.appendChild(btn);
+        });
+        document.getElementById('minigame-modal').style.display = 'flex';
+    };
+    document.getElementById('close-minigame').onclick = () => closeModal('minigame-modal');
+    document.getElementById('btn-abort-game').onclick = () => { document.getElementById('minigame-menu-view').style.display = 'grid'; document.getElementById('minigame-play-view').style.display = 'none'; };
+
+    // --- 各種イベントリスナー登録 ---
+    document.getElementById('upa-char').innerHTML = SVG_TEMPLATE;
+    document.getElementById('preview-char').innerHTML = SVG_TEMPLATE;
+    document.getElementById('btn-shop').onclick = openShopModal;
+    document.getElementById('btn-bag').onclick = openBagModal;
+    document.getElementById('btn-start-game').onclick = () => {
+        const v = document.getElementById('init-name-input').value.trim(); if(!v) return;
+        gameState.name = v.substring(0,12); document.getElementById('welcome-screen').style.display = 'none';
+        checkLoginStreakAndMissions(); saveActiveGame(); updateUI();
+        setTimeout(() => { moveCharacter(120, 180, 0); }, 100);
+    };
+    document.getElementById('game-title').onclick = () => { const n = prompt("なまえの変更:", gameState.name); if(n && n.trim()!=="") { gameState.name = n.trim().substring(0,12); updateUI(); saveActiveGame(); } };
+    document.getElementById('char-wrapper').onclick = (e) => { if(e.target.id !== 'worry-lamp') openMakeModal(); };
+    document.getElementById('close-make').onclick = () => { closeModal('make-modal'); saveActiveGame(); };
+    document.getElementById('close-shop').onclick = () => closeModal('shop-modal');
+    document.getElementById('close-bag').onclick = () => closeModal('bag-modal');
+    document.getElementById('close-worry').onclick = () => closeModal('worry-modal');
+    document.getElementById('close-bg-modal').onclick = () => closeModal('bg-modal');
+    document.getElementById('close-furniture-inv').onclick = () => closeModal('furniture-inventory-modal');
+    document.getElementById('close-drawer').onclick = () => closeModal('side-drawer');
+
+    document.querySelectorAll('.type-btn').forEach(b => {
+        b.onclick = () => { const t = b.getAttribute('data-type'); if(t) { gameState.appearance.type = t; applyAppearance(); } };
+    });
+    document.getElementById('init-body-color-picker').oninput = (e) => { gameState.appearance.bodyColor = e.target.value; applyAppearance(); };
+    document.getElementById('init-gill-color-picker').oninput = (e) => { gameState.appearance.gillColor = e.target.value; applyAppearance(); };
+    document.getElementById('body-color-picker').oninput = (e) => { gameState.appearance.bodyColor = e.target.value; applyAppearance(); };
+    document.getElementById('gill-color-picker').oninput = (e) => { gameState.appearance.gillColor = e.target.value; applyAppearance(); };
+
+    setInterval(() => {
+        if (document.getElementById('title-screen').style.display === 'flex' || document.getElementById('welcome-screen').style.display === 'flex') return;
+        gameState.fullness = Math.max(gameState.fullness - 1, 0); updateUI();
+        if (!hasWorry && Math.random() < 0.35) triggerNewWorry();
+        saveActiveGame();
+    }, 15000);
+
+    // アプリ起動
+    initTitleScreen();
+</script>
+
+</body>
+</html>
